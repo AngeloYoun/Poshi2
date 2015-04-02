@@ -214,7 +214,7 @@ ul.collapsed, .header > .btn-container {
 	width: 32px;
 }
 
-.errorBtn, .screenShotBtn {
+.error-btn, .screen-shot-btn {
 	border-color: #FF5335;
 	bottom: 0;
 	top: 0;
@@ -224,21 +224,21 @@ ul.collapsed, .header > .btn-container {
 	margin-top: 1px;
 }
 
-.screenShotBtn:focus, .errorBtn:focus {
+.error-btn:focus, .screen-shot-btn:focus {
 	background: #FF5335;
 }
 
-.errorBtn svg, .screenShotBtn svg {
+.error-btn svg, .screen-shot-btn svg {
 	fill: #EBE7DC;
 	stroke: #FF5335;
 	stroke-width: 3;
 }
 
-.errorBtn:hover svg, .screenShotBtn:hover svg {
+.error-btn:hover svg, .screen-shot-btn:hover svg {
 	fill: #FF5335;
 }
 
-.errorBtn:focus svg, .screenShotBtn:focus svg {
+.error-btn:focus svg, .screen-shot-btn:focus svg {
 	fill: #EBE7DC;
 	stroke: #EBE7DC;
 }
@@ -437,7 +437,7 @@ li {
 	opacity: 1;
 }
 
-.errorBtn svg, .screenShotBtn svg {
+.error-btn svg, .screen-shot-btn svg {
 	transition: all 0.6s ease;
 }
 

@@ -13,15 +13,15 @@
                 var lastFail = A.one('.last-fail');
                 var sidebar = A.one('.sidebar');
                 var xmlLog = A.one('.xml-log');
-                
+
                 var collapseBtns = xmlLog.all('.pending > .btn-container .btn-collapse');
                 var failDivs = xmlLog.all('.fail-divider');
-                
+
                 var collapsePairIndex = 0;
                 var passFailHeight = 0;
 
                 var WIN = A.getWin();
-                
+
                 var treeToFail = lastFail.ancestors('ul');
 
                 formatPage();
@@ -36,12 +36,12 @@
                     //     function(node) {
                     //         var lineInnerNode = node.all('.status > div');
                     //         var lineContainer = lineInnerNode.item(1);
-                            
+
                     //         lineContainer.set('className', 'line-container');
                     //         var lineContent = new A.NodeList(lineContainer.getDOMNode().childNodes);
 
                     //         var nameContainerOg = lineContent.item(1);
-                            
+
                     //         var name = nameContainerOg.html();
 
                     //         var hashtagIndex = name.indexOf('#');
@@ -66,7 +66,7 @@
                     //             if(value) {
                     //                 runningText.placeAfter(A.Node.create('<span class="value">' + value + '</span>'));
                     //             }
-                                
+
                     //             lineContent.item(5).remove(true);
                     //         }
 
@@ -268,16 +268,16 @@
 
                             if (!paramContainer.hasClass('hidden')) {
                                 resetDividerHeight(newHeight, paramContainer);
-                                
+
                                 paramContainer.toggleClass('hidden');
                             }
                             else {
                                 paramContainer.toggleClass('hidden');
-                                
+
                                 newHeight = paramContainer.outerHeight();
-                                
+
                                 resetDividerHeight(newHeight, paramContainer);
-                                
+
                                 passFailHeight = newExpandHeight;
                             }
 
@@ -318,7 +318,7 @@
                             var commandLog = sidebar.one('.command-log');
 
                             currentTarget.toggleClass('toggle');
-                            
+
 
                             if (currentTarget.hasClass('toggle')) {
                                 sidebar.setStyle('width', '40%');
@@ -344,7 +344,7 @@
                                 xmlLog.setStyle('width', '80%');
 
                                 commandLog.setStyle('height', commandLog.innerHeight())
-                                
+
                                 commandLog.transition(
                                     {
                                         height: {
@@ -363,7 +363,7 @@
                             commandLog.toggleClass('toggle');
 
                             var body = A.one('body');
-                            
+
                             body.toggleClass('tree');
                         }
                     );
@@ -386,7 +386,7 @@
                         }
                     );
 
-                    var errorBtns = xmlLog.all('.errorBtn');
+                    var errorBtns = xmlLog.all('.error-btn');
 
                     errorBtns.on(
                         'click',
@@ -405,7 +405,7 @@
                         }
                     );
 
-                    var screenshotBtns = A.all('.screenShotBtn');
+                    var screenshotBtns = A.all('.screen-shot-btn');
 
                     screenshotBtns.on(
                         'click',
@@ -421,7 +421,7 @@
                                     screenshots.toggleClass('hidden');
                                 }
                             }
-                        }                    
+                        }
                     );
 
                     var scroll = scrollToNode(lastFail);
@@ -457,7 +457,7 @@
                             var lineContainer = node.next();
 
                             var newHeight = lineContainer.outerHeight();
-                            
+
                             node.setStyle('height', newHeight);
                         }
                     );
@@ -536,7 +536,7 @@
                                 var transDuration = (Math.pow(newHeight, 0.35) / 15);
 
                                 node.toggleClass('collapsed');
-                                
+
                                 node.html('+');
 
                                 targetNode.setStyle('height', newHeight);
@@ -578,7 +578,7 @@
                             var newHeight = (lastChildBottomY - targetNode.getY());
 
                             var transDuration = (Math.pow(newHeight, 0.35) / 15);
-                            
+
                             isRunning = targetNode;
 
                             targetNode.transition({
@@ -593,9 +593,9 @@
                                 },
                                 function() {
                                     this.setStyle('height', 'auto');
-                                    
+
                                     passFailHeight = newExpandHeight;
-                                    
+
                                     isRunning = null;
                                 }
                             );
@@ -653,7 +653,7 @@
 
                         var scopeNames = currentScope.all('> .line-container .name');
                         var scopeTypes = currentScope.all('> .line-container .tag-type');
-                        
+
                         var scopeName = scopeNames.item(0).html();
                         var scopeType = scopeTypes.item(0).html();
 
