@@ -50,7 +50,7 @@ ul {
 
 /* ---------- Main Content ---------- */
 
-ul.collapsed, .header > .btn-container {
+.collapsed, .header > .btn-container {
 	display: none;
 }
 
@@ -73,11 +73,6 @@ ul.collapsed, .header > .btn-container {
 	border-width: 0;
 	height: auto;
 	padding-left: 100px;
-}
-
-.xml-log > ul.collapsed {
-	display: block;
-	height: auto;
 }
 
 .global-btn-container {
@@ -162,7 +157,9 @@ ul.collapsed, .header > .btn-container {
 	border: 1px dashed #DDD;
 	border-top: 0;
 	color: #EEE;
+	height: 0;
 	margin-left: 35px;
+	overflow: hidden;
 	padding: 5px;
 }
 
@@ -469,5 +466,6 @@ li {
 }
 
 .line-container {
+	display: block;
 	transition: border, background 0.3s ease-out;
 }
