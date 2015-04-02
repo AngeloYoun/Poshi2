@@ -607,24 +607,20 @@ YUI().ready(
 		}
 
 		function scopeHover(event, enter) {
-			var scope = event.currentTarget;
+			var currentTarget = event.currentTarget;
 			var target = event.target;
 
 			if (testClickable(target)) {
+				currentTarget.toggleClass('scoped', enter);
+
+				var node = currentTarget.ancestor('.macro');
 
 				if (enter) {
-					scope.addClass('scoped');
-					var prevScope = scope.ancestors('.macro');
-					if (prevScope.size() > 0) {
-						prevScope.removeClass('scoped');
-					}
+					node = currentTarget.ancestors('.macro');
 				}
-				else {
-					scope.removeClass('scoped');
-					var nextScope = scope.ancestor('.macro');
-					if (nextScope) {
-						nextScope.addClass('scoped');
-					}
+
+				if (node) {
+					node.toggleClass('scoped', !enter);
 				}
 
 				event.stopPropagation();
@@ -710,9 +706,7 @@ YUI().ready(
 		}
 
 		function testClickable(testNode) {
-
-			var test = !testNode.test('.btn, .btn-container, polygon, svg');
-			return test;
+			return !testNode.test('.btn, .btn-container, polygon, svg');
 		}
 
 		function testScopeable(testNode) {
