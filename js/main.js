@@ -32,6 +32,7 @@
                     var commandLineArray = commandLine.get('id');
                     var passedLoops = new A.NodeList();
                     console.log(commandLineArray.length);
+
                     // commandLine.each(
                     //     function(node) {
                     //         var lineInnerNode = node.all('.status > div');
@@ -105,6 +106,7 @@
                     //     }
                     // )
                     var all = xmlLog.all('*');
+                    var collapseId = 0;
                     all.each(
                         function(node) {
                             if(node.html() === 'for') {
@@ -118,6 +120,19 @@
                             if(node.html() === 'echo') {
                                 var container = node.ancestor('li');
                                 container.addClass('echo');
+                            }
+                            if(node.hasClass('btn-collapse') || node.hasClass('btn-var')) {
+                                var attrId = 'collapseId-' + collapseId;
+                                collapseId++;
+                                node.attr('data-collapseId', attrId);
+                                var container = node.ancestor('li');
+                                if(node.hasClass('btn-collapse')) {
+                                    container = container.one('.child-container')
+                                }
+                                else {
+                                    container = container.one('.parameter-container');
+                                }
+                                container.attr('data-collapseId', attrId);
                             }
                         }
                     )
@@ -164,7 +179,7 @@
                                     var nodeName = node.one('.line-container > .name').html();
                                     var loopedFunctionClass = ('executedFunction-' + ii)
                                     loopPattern.push(nodeName);
-                                    node.attr('functionId', loopedFunctionClass)
+                                    node.attr('data-functionId', loopedFunctionClass)
                                     node.addClass(loopedFunctionClass);
                                     ii++;
                                 }
@@ -181,7 +196,7 @@
                                         console.log(checkLine.one('.command-name').html() + (k + j));
                                         checkLine.addClass(functionClass);
                                         checkLine.addClass('linkable');
-                                        checkLine.attr('functionId', functionClass);
+                                        checkLine.attr('data-functionId', functionClass);
 
                                     }
                                     else {
@@ -195,9 +210,9 @@
                             }
                         }
                         else {
-                            functionNode.attr('functionId', functionClass);
+                            functionNode.attr('data-functionId', functionClass);
                             functionNode.addClass(functionClass);
-                            line.attr('functionId', functionClass);
+                            line.attr('data-functionId', functionClass);
                             line.addClass(functionClass);
                             line.addClass('linkable');
                         }
@@ -208,11 +223,7 @@
 
                 function init() {
 
-                    collapseBtns.each(
-                        function(target) {
-                            collapseToggle(target);
-                        }
-                    );
+                    expandTree(lastFail);
 
                     sidebar.delegate(
                         'click',
@@ -223,18 +234,7 @@
                             var linkedFunction = xmlLog.one('.' + functionId);
                             linkedFunction.toggleClass('link');
 
-                            var tree = linkedFunction.ancestors('ul.child-container');
-                            console.log(tree)
-
-                            tree.each(
-                                function(target) {
-                                    if (target.hasClass('collapsed')) {
-                                        var targetContainer = target.ancestor('li');
-                                        console.log(targetContainer)
-                                        collapseToggle(targetContainer.one('.btn-collapse'));
-                                    }
-                                }
-                            );
+                            expandTree(linkedFunction);
 
                             var scroll = scrollToNode(linkedFunction);
 
@@ -245,44 +245,48 @@
 
                     xmlLog.delegate(
                         'click',
-                        function(event) {
-                            var currentTarget = event.currentTarget;
-
-                            collapseToggle(currentTarget);
-                        },
+                        collapseToggle,
                         '.btn-collapse'
                     );
 
+                    // xmlLog.delegate(
+                    //     'click',
+                    //     function(event) {
+                    //         var newHeight = 0;
+
+                    //         var currentTarget = event.currentTarget;
+
+                    //         console.log(currentTarget)
+
+                    //         var btnContainer = currentTarget.ancestor();
+
+                    //         var lineContainer = btnContainer.next();
+
+                    //         var paramContainer = lineContainer.one('.parameter-container');
+
+                    //         if (!paramContainer.hasClass('hidden')) {
+                    //             resetDividerHeight(newHeight, paramContainer);
+                                
+                    //             paramContainer.toggleClass('hidden');
+                    //         }
+                    //         else {
+                    //             paramContainer.toggleClass('hidden');
+                                
+                    //             newHeight = paramContainer.outerHeight();
+                                
+                    //             resetDividerHeight(newHeight, paramContainer);
+                                
+                    //             passFailHeight = newExpandHeight;
+                    //         }
+
+                    //         currentTarget.toggleClass('toggle');
+                    //     },
+                    //     '.btn-var'
+                    // );
+
                     xmlLog.delegate(
                         'click',
-                        function(event) {
-                            var newHeight = 0;
-
-                            var currentTarget = event.currentTarget;
-
-                            var btnContainer = currentTarget.ancestor();
-
-                            var lineContainer = btnContainer.next();
-
-                            var paramContainer = lineContainer.one('.parameter-container');
-
-                            if (!paramContainer.hasClass('hidden')) {
-                                resetDividerHeight(newHeight, paramContainer);
-                                
-                                paramContainer.toggleClass('hidden');
-                            }
-                            else {
-                                paramContainer.toggleClass('hidden');
-                                
-                                newHeight = paramContainer.outerHeight();
-                                
-                                resetDividerHeight(newHeight, paramContainer);
-                                
-                                passFailHeight = newExpandHeight;
-                            }
-
-                            currentTarget.toggleClass('toggle');
-                        },
+                        collapseToggle,
                         '.btn-var'
                     );
 
@@ -386,7 +390,7 @@
                         }
                     );
 
-                    var errorBtns = xmlLog.all('.errorBtn');
+                    var errorBtns = xmlLog.all('.error-btn');
 
                     errorBtns.on(
                         'click',
@@ -405,7 +409,7 @@
                         }
                     );
 
-                    var screenshotBtns = A.all('.screenShotBtn');
+                    var screenshotBtns = A.all('.screen-shot-btn');
 
                     screenshotBtns.on(
                         'click',
@@ -440,6 +444,18 @@
                     //     maxWidth: 250,
                     //     preserveRatio: false
                     // });
+                }
+
+                function expandTree(node) {
+                    var tree = node.ancestors('.child-container');
+
+                    tree.each(
+                        function(target) {
+                            if (target.hasClass('collapsed')) {
+                                collapseTransition(target);
+                            }
+                        }
+                    );
                 }
 
                 function stopPropagation(node) {
@@ -522,22 +538,29 @@
                     }
                 }
 
-                function collapseToggle(node) {
-                    var parent = node.ancestor('div');
+                function collapseToggle(event) {
+                    var currentTarget = event.currentTarget;
 
-                    var targetNode = parent.next('ul');
+                    var collapseId = currentTarget.attr('data-collapseId');
+
+                    var collapseContainer = xmlLog.one('.child-container[data-collapseId = ' + collapseId + ']');
+
+                    collapseTransition(collapseContainer);
+                }
+
+                function collapseTransition(targetNode) {
 
                     if (targetNode) {
 
-                        if (!node.hasClass('collapsed')) {
+                        if (!targetNode.hasClass('collapsed')) {
                             if(isRunning === targetNode || !isRunning) {
                                 var newHeight = targetNode.outerHeight();
 
                                 var transDuration = (Math.pow(newHeight, 0.35) / 15);
 
-                                node.toggleClass('collapsed');
+                                // node.toggleClass('collapsed');
                                 
-                                node.html('+');
+                                // node.html('+');
 
                                 targetNode.setStyle('height', newHeight);
 
@@ -564,9 +587,9 @@
 
                             lastChild = A.Node(lastChild);
 
-                            node.toggleClass('collapsed');
+                            // node.toggleClass('collapsed');
 
-                            node.html('-');
+                            // node.html('-');
 
                             targetNode.removeClass('collapsed');
 
