@@ -275,41 +275,6 @@ YUI().ready(
 				'.btn-collapse'
 			);
 
-			// xmlLog.delegate(
-			//     'click',
-			//     function(event) {
-			//         var newHeight = 0;
-
-			//         var currentTarget = event.currentTarget;
-
-			//         console.log(currentTarget)
-
-			//         var btnContainer = currentTarget.ancestor();
-
-			//         var lineContainer = btnContainer.next();
-
-			//         var paramContainer = lineContainer.one('.parameter-container');
-
-			//         if (!paramContainer.hasClass('hidden')) {
-			//             resetDividerHeight(newHeight, paramContainer);
-
-			//             paramContainer.toggleClass('hidden');
-			//         }
-			//         else {
-			//             paramContainer.toggleClass('hidden');
-
-			//             newHeight = paramContainer.outerHeight();
-
-			//             resetDividerHeight(newHeight, paramContainer);
-
-			//             passFailHeight = newExpandHeight;
-			//         }
-
-			//         currentTarget.toggleClass('toggle');
-			//     },
-			//     '.btn-var'
-			// );
-
 			xmlLog.delegate(
 				'click',
 				collapseToggle,
@@ -457,19 +422,6 @@ YUI().ready(
 			var scroll = scrollToNode(lastFail);
 
 			scroll.run();
-
-			// var resize = new A.Resize(
-			//     {
-			//         node: '.sidebar',
-			//         handles: 'l',
-			//         preserveRatio: false
-			//     }
-			// );
-			// resize.plug(A.Plugin.ResizeConstrained, {
-			//     minWidth: 250,
-			//     maxWidth: 250,
-			//     preserveRatio: false
-			// });
 		}
 
 		function expandTree(node) {
@@ -567,17 +519,11 @@ YUI().ready(
 		function collapseToggle(event) {
 			var currentTarget = event.currentTarget;
 
+			currentTarget.toggleClass('toggle');
+
 			var collapseId = currentTarget.attr('data-collapseId');
 
 			var collapseContainer = xmlLog.one('.child-container[data-collapseId = ' + collapseId + '], .parameter-container[data-collapseId = ' + collapseId + ']');
-
-			console.log(collapseContainer)
-
-			if(!collapseContainer) {
-				xmlLog.one('.parameter-border[data-collapseId = ' + collapseId + ']');
-			}
-
-			console.log(collapseContainer)
 
 			collapseTransition(collapseContainer);
 		}
