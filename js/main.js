@@ -23,228 +23,6 @@ YUI().ready(
 
 		var treeToFail = lastFail.ancestors('ul');
 
-		formatPage();
-
-		function formatPage() {
-			var commandLog = sidebar.one('.command-log');
-			var commandLine = commandLog.all('> .line');
-			var commandLineArray = commandLine.get('id');
-			var passedLoops = new A.NodeList();
-			console.log(commandLineArray.length);
-
-			// commandLine.each(
-			//     function(node) {
-			//         var lineInnerNode = node.all('.status > div');
-			//         var lineContainer = lineInnerNode.item(1);
-
-			//         lineContainer.set('className', 'line-container');
-			//         var lineContent = new A.NodeList(lineContainer.getDOMNode().childNodes);
-
-			//         var nameContainerOg = lineContent.item(1);
-
-			//         var name = nameContainerOg.html();
-
-			//         var hashtagIndex = name.indexOf('#');
-
-			//         var before = name.slice(hashtagIndex + 1);
-			//         var after = name.slice(0, hashtagIndex);
-
-			//         if (before.toLowerCase() === after.toLowerCase()) {
-			//             name = name.slice(0, hashtagIndex);
-			//         }
-
-			//         nameContainerOg.remove(true);
-
-			//         var paramDef = lineContent.item(2);
-
-			//         var paramDefString = paramDef._node.textContent.trim();
-
-			//         var runningText = lineContent.item(0);
-
-			//         if(lineContent.item(5)) {
-			//             var value = lineContent.item(5).html();
-			//             if(value) {
-			//                 runningText.placeAfter(A.Node.create('<span class="value">' + value + '</span>'));
-			//             }
-
-			//             lineContent.item(5).remove(true);
-			//         }
-
-			//         if(lineContent.item(4)) {
-			//             if(lineContent.item(4)._node.textContent.trim().length > 0) {
-			//                 runningText.placeAfter(A.Node.create('<span class="misc"> value </span>'));
-			//             }
-
-			//             lineContent.item(4).remove(true);
-			//         }
-
-			//         if(lineContent.item(3)) {
-			//             var locatorKeyOg = lineContent.item(3);
-
-			//             var locatorKey = locatorKeyOg.html();
-
-			//             locatorKeyOg.remove(true);
-
-			//             runningText.placeAfter(A.Node.create('<span class="locator-key">' + locatorKey + '</span>'))
-			//         }
-
-			//         if(paramDefString.length > 0) {
-			//             runningText.placeAfter(A.Node.create('<span class="misc"> ' + paramDefString + ' </span>'));
-			//         }
-
-			//         runningText.placeAfter(A.Node.create('<span class="command-name">' + name + '</span>'));
-			//         runningText.placeAfter(A.Node.create('<span class="misc">Running </span>'))
-
-			//         paramDef.remove(true);
-			//         runningText.remove(true);
-
-			//         node.append(lineInnerNode);
-
-			//         var toDie = node.one('li');
-			//         toDie.remove(true);
-			//     }
-			// )
-			var all = xmlLog.all('*');
-			var collapseId = 0;
-			all.each(
-				function(node) {
-					if(node.html() === 'for') {
-						var container = node.ancestor('li');
-						if(container.hasClass('pass') && !container.hasClass('for')) {
-							passedLoops.push(container);
-						}
-						container.addClass('for');
-
-					}
-					if(node.html() === 'echo') {
-						var container = node.ancestor('li');
-						container.addClass('echo');
-					}
-					if(node.hasClass('btn-collapse') || node.hasClass('btn-var')) {
-						var attrId = 'collapseId-' + collapseId;
-						collapseId++;
-						node.attr('data-collapseId', attrId);
-						var container = node.ancestor('li');
-						if(node.hasClass('btn-collapse')) {
-							container = container.one('.child-container')
-						}
-						else {
-							container = container.one('.parameter-container');
-						}
-						container.attr('data-collapseId', attrId);
-					}
-					if(node.hasClass('parameter-container')) {
-
-						var index = 0;
-						var childNodes = node.all('*');
-						var currentSize = childNodes.size();
-						console.log(currentSize % 10 > 1)
-						while (currentSize % 10 >= 1) {
-							console.log(currentSize % 10)
-							console.log('looping')
-							var slicedNodes = childNodes.slice(index, index + 10);
-							console.log(slicedNodes)
-							var lineContainer = A.Node.create('<span class="line-container"></span>')
-							node.append(lineContainer);
-							console.log(lineContainer)
-							if(slicedNodes) {
-								slicedNodes.each(
-									function(target) {
-										lineContainer.append(target);
-									}
-								)
-							}
-							index += 11
-							currentSize -= 11;
-						}
-						var toDie = node.all('br');
-						toDie.remove(true);
-					}
-				}
-			)
-			console.log(passedLoops);
-
-			var executedFunctions = xmlLog.all('.function.pass, .for.pass, .echo.pass, .last-fail');
-			console.log(executedFunctions)
-
-			console.log(commandLine)
-
-			var commandLength = commandLine.size();
-
-			for (i = 0, ii = 0; i < commandLength; i++, ii++) {
-				var line = commandLine.item(i);
-				var commandId = line.one('.command-name').html();
-				while (commandId === 'IsElementPresent') {
-					i++
-					line = commandLine.item(i);
-					commandId = line.one('.command-name').html();
-				}
-				var functionNode = executedFunctions.item(ii);
-
-				// if(functionNode.hasClass('echo')) {
-				//     commandId = commandId.slice(15);
-				//     commandId = commandId.slice(0, commandId.length - 1);
-				// }
-
-				// if(functionNode.hasClass('for')) {
-				//     ii++
-				//     functionNode = executedFunctions.item(ii);
-				// }
-				var functionClass = ('executedFunction-' + ii);
-
-				// console.log(commandId + ' / ' + functionNode.one('.line-container > .name').html())
-
-				if (functionNode.hasClass('for')) {
-					var loopPattern = [];
-					looping = true;
-					loopedFunctions = functionNode.all('.function.pass');
-					console.log('loop encountered @ ' + ii)
-					var k = ii;
-					loopedFunctions.each(
-						function (node) {
-							var nodeName = node.one('.line-container > .name').html();
-							var loopedFunctionClass = ('executedFunction-' + ii)
-							loopPattern.push(nodeName);
-							node.attr('data-functionId', loopedFunctionClass)
-							node.addClass(loopedFunctionClass);
-							ii++;
-						}
-					)
-					console.log(loopPattern)
-					var patternLength = loopPattern.length;
-					var looping = true;
-					while(looping) {
-						for (j = 0; j < patternLength; j++) {
-							var checkLine = commandLine.item(i + j);
-
-							if (loopPattern[j] == checkLine.one('.command-name').html()) {
-								functionClass = ('executedFunction-' + (k + j));
-								console.log(checkLine.one('.command-name').html() + (k + j));
-								checkLine.addClass(functionClass);
-								checkLine.addClass('linkable');
-								checkLine.attr('data-functionId', functionClass);
-
-							}
-							else {
-								looping = false;
-								break;
-							}
-						}
-						if(looping) {
-							i += patternLength;
-						}
-					}
-				}
-				else {
-					functionNode.attr('data-functionId', functionClass);
-					functionNode.addClass(functionClass);
-					line.attr('data-functionId', functionClass);
-					line.addClass(functionClass);
-					line.addClass('linkable');
-				}
-			}
-		}
-
 		init();
 
 		function init() {
@@ -253,19 +31,7 @@ YUI().ready(
 
 			sidebar.delegate(
 				'click',
-				function(event) {
-					var currentTarget = event.currentTarget;
-					var functionId = currentTarget.attr('functionid');
-					console.log(functionId);
-					var linkedFunction = xmlLog.one('.' + functionId);
-					linkedFunction.toggleClass('link');
-
-					expandTree(linkedFunction);
-
-					var scroll = scrollToNode(linkedFunction);
-
-					scroll.run();
-				},
+				linkFunction,
 				'.linkable'
 			)
 
@@ -430,19 +196,10 @@ YUI().ready(
 			tree.each(
 				function(target) {
 					if (target.hasClass('collapsed')) {
-						collapseTransition(target);
+						collapseToggle(null, target);
 					}
 				}
 			);
-		}
-
-		function stopPropagation(node) {
-			node.on(
-				['click', 'mouseenter', 'mouseleave'],
-				function(event) {
-					event.stopPropagation();
-				}
-			)
 		}
 
 		function recalculateHeights() {
@@ -516,31 +273,46 @@ YUI().ready(
 			}
 		}
 
-		function collapseToggle(event) {
+		function linkFunction(event) {
 			var currentTarget = event.currentTarget;
 
-			currentTarget.toggleClass('toggle');
+			var linkedFunction = getLink(currentTarget, 'li', 'data-functionLinkId', xmlLog);
 
-			var collapseId = currentTarget.attr('data-collapseId');
+			linkedFunction.toggleClass('linked');
 
-			var collapseContainer = xmlLog.one('.child-container[data-collapseId = ' + collapseId + '], .parameter-container[data-collapseId = ' + collapseId + ']');
+			expandTree(linkedFunction);
+
+			var scroll = scrollToNode(linkedFunction);
+
+			scroll.run();
+		}
+
+		function collapseToggle(event, collapseContainer) {
+			var collapseBtn
+
+			if (!collapseContainer) {
+				collapseBtn = event.currentTarget;
+				collapseContainer = getLink(collapseBtn, '.collapsible', 'data-btnLinkId', xmlLog);
+			}
+			else {
+				collapseBtn = getLink(collapseContainer, '.btn', 'data-btnLinkId', xmlLog);
+			}
 
 			collapseTransition(collapseContainer);
+			collapseBtn.toggleClass('toggle');
 		}
+
 
 		function collapseTransition(targetNode) {
 
 			if (targetNode) {
 
-				if (!targetNode.hasClass('collapsed')) {
+				if (targetNode.getStyle('height') != '0px') {
 					if(isRunning === targetNode || !isRunning) {
+						console.log('fired')
 						var newHeight = targetNode.outerHeight();
 
 						var transDuration = (Math.pow(newHeight, 0.35) / 15);
-
-						// node.toggleClass('collapsed');
-
-						// node.html('+');
 
 						targetNode.setStyle('height', newHeight);
 
@@ -566,10 +338,6 @@ YUI().ready(
 					var lastChild = targetNode.getDOMNode().lastElementChild;
 
 					lastChild = A.Node(lastChild);
-
-					// node.toggleClass('collapsed');
-
-					// node.html('-');
 
 					targetNode.removeClass('collapsed');
 
@@ -604,6 +372,14 @@ YUI().ready(
 					);
 				}
 			}
+		}
+
+		function getLink(node, selector, attrName, scope) {
+			linkId = node.attr(attrName);
+			if (!scope) {
+				scope = A;
+			}
+			return scope.one(selector + '[' + attrName + '=' + linkId + ']');
 		}
 
 		function scopeHover(event, enter) {
