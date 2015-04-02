@@ -1,0 +1,31 @@
+body.light {
+	background-color: #EBE7DC;
+}
+
+.light .pass-fail-divider {
+	background-color: #A0B58F;
+}
+
+.light ul {
+	color: #432712;
+}
+
+.light .btn-collapse, .light .btn-var {
+	border: 1px solid #432712;
+}
+
+.light .line-number {
+	color: #777;
+}
+
+.light .current-scope .line-number {
+	color: #494039;
+}
+
+.light .parameter-container {
+	color: #974C1E;
+}
+
+.light .fail-divider {
+	background-color: #D37878;
+}

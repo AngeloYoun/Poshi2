@@ -1,522 +1,453 @@
-<style>
-
-    /* ------- Theme ------- */
-    /*Light*/
-    body.light {
-        background-color: #EBE7DC;
-    }
-
-    .light .pass-fail-divider {
-        background-color: #A0B58F;
-    }
-
-    .light ul {
-        color: #432712;
-    }
-
-    .light .btn-collapse, .light .btn-var {
-        border: 1px solid #432712;
-    }
-
-    .light .line-number {
-        color: #777;
-    }
-
-    .light .current-scope .line-number {
-        color: #494039;
-    }
-
-    .light .parameter-container {
-        color: #974C1E;
-    }
-
-    .light .fail-divider {
-        background-color: #D37878;
-    }
-    /*gray*/
-    body.gray {
-        background-color: #B9B9B9;
-    }
-
-    .gray .pass-fail-divider {
-        background-color: #7C9FAA;
-    }
-
-    .gray ul {
-        color: #40444D;
-    }
-
-    .gray .scoped {
-        background-color: rgba(89, 61, 30, 0.12);
-    }
-
-    .gray .current-scope, .gray .scoped.current-scope {
-        background-color: rgba(134, 134, 134, 0.5);
-    }
-
-    .gray .parameter-container {
-        color: #615750;
-    }
-
-    .gray .tag-type {
-        color: #333;
-    }
-
-    .gray .name {
-        color: #111;
-    }
-
-    .gray .macro > div .name, .gray .function > div .name {
-        color: #663615;
-    }
-    /* ------- Main ------- */
-
-    body {
-        background-color: #937C6A;
-        font-family: menlo, Source Code Pro, Arial;
-        font-size: 11px;
-        line-height: 1.75em;
-        margin: 0;
-        overflow-x: hidden;
-        padding: 0;
-        word-wrap: break-word;
-    }
-
-    h3 {
-        font-size: 13px;
-        font-weight: normal;
-        margin: 0;
-        padding: 5px 0;
-    }
-
-    li {
-        display: block;
-    }
-
-    ul {
-        border-left: 1px solid #DDD;
-        color: #FFF;
-        height: 0;
-        list-style-type: none;
-        overflow: hidden;
-        padding: 1px 0 1px 20px;
-    }
-
-    .tree .function.pass.link .line-container {
-        background-color: #F1A46F;
-    }
-
-    .tree .pass > .line-container {
-        background-color: rgba(190, 205, 217, 0.32);
-        border-radius: 12px;
-        width: 102%;
-    }
-
-    .tree .function.pass > .line-container {
-        border: 1px solid #6DFF7A;
-        margin: -1px;
-    }
-
-    /* ======= Sidebar WIP ======== */
-
-    .sidebar {
-        background: #484B4D;
-        box-shadow: -5px 0 0 0 rgba(29, 60, 75, 0.3);
-        color: #FFF;
-        display: inline-block;
-        font-family: gotham;
-        height: 100%;
-        position: fixed;
-        right: 0;
-        transition: all 1s ease-out;
-        width: 20%;
-        z-index: 2;
-    }
-
-    .sidebar .command-log {
-        overflow-y: scroll;
-        height: 0;
-        transition: all 1s ease-in-out;
-    }
-
-    .sidebar .command-log.toggle {
-        height: 100%;
-    }
-
-    .sidebar .command-log ul {
-        height: auto;
-        border: none;
-        color: #FFF;
-    }
-
-    .sidebar .linkable {
-        cursor: pointer;
-    }
-
-    .sidebar .command-log .status div {
-        display: inline;
-    }
-
-    .sidebar .title {
-        display: block;
-        font-size: 32px;
-        font-weight: 500;
-        margin: 30px 0 5px 17px;
-        position: relative;
-    }
-
-    .sidebar .scope-type {
-        margin-bottom: 60px;
-    }
-
-    .sidebar .scope-name {
-        background-color: #484B4D;
-        font-size: 15px;
-        font-weight: 100;
-        max-width: 100%;
-        min-width: 100%;
-        overflow: hidden;
-        padding: 9px 0px 9px 20px;
-        position: absolute;
-        right: 0;
-        text-overflow: ellipsis;
-        transition: all 0.8s ease-in-out;
-        white-space: nowrap;
-        width: auto;
-    }
-
-    .sidebar .scope-name:hover {
-        box-shadow: -5px 7px 0 0 rgba(29, 60, 75, 0.3);
-        max-width: 300%;
-        padding-right: 20px;
-    }
-
-    .sidebar .parameter-name {
-        font-size: 12px;
-        font-weight: 500;
-        margin: 15px 20px 0;
-    }
-
-    .sidebar .parameter-value {
-        font-size: 11px;
-        margin: 10px 30px;
-    }
-
-    /* ------- Main content ------- */
-
-    .pass-fail-divider {
-        background-color: #00B8B9;
-        height: 0;
-        position: absolute;
-        top: 0;
-        width: 100%;
-        z-index: -2;
-    }
-
-    .xml-log {
-        display: block;
-        position: relative;
-        transition: width 1s ease-out;
-        width: 80%;
-    }
-
-    .global-btn-container {
-        left: -60px;
-        margin-top: 10px;
-        position: absolute;
-        width: 32px;
-    }
-
-    .btn.btn-tree, .btn.btn-sidebar {
-        font-family: fontAwesome;
-        font-size: 26px;
-        margin: 5px 15px;
-        opacity: 0.7;
-        color: #444;
-    }
-
-    .btn.btn-sidebar span {
-        transition: all 0.5s ease-in-out;
-        transform: rotate(180deg);
-        display: block;
-    }
-
-    .btn.btn-sidebar.toggle span {
-        transform: rotate(0);
-    }
-
-    .btn.toggle {
-        color: #DDD;
-        background-color: #444;
-        border-color: #444;
-
-    }
-
-    .btn.btn-tree:hover, .btn.btn-sidebar:hover {
-        opacity: 1;
-    }
-
-    .xml-log > ul {
-        border-width: 0;
-        height: auto;
-        padding-left: 100px;
-    }
-
-    .header > .btn-container {
-        display: none;
-    }
-
-    .root-container {
-        border-width: 0;
-        overflow: visible;
-    }
-
-    .attribute {
-        color: #FFDCC9;
-    }
-
-    ul.collapsed {
-        display: none;
-    }
-
-    .xml-log > ul.collapsed {
-        display: block;
-        height: auto;
-    }
-
-    .current-scope {
-        background-color: rgba(28, 117, 185, 0.5);
-        outline: 1px solid #DDD;
-    }
-
-    .last-fail:after, .current-scope:after {
-        content: ' ';
-        height: 7px;
-        margin-top: -30px;
-        overflow: hidden;
-        position: absolute;
-        width: 100%;
-    }
-
-    .current-scope .line-number {
-        color: #FFF;
-    }
-
-    .scoped.current-scope {
-        background-color: rgba(28, 117, 185, 0.5);
-    }
-
-    .line-container {
-        padding: 5px 3px;
-        transition: border, background 0.3s ease-out;
-    }
-
-    .scoped > .fail.line-container {
-        background-color: #EE6C39;
-    }
-
-    .current-scope > .fail.line-container {
-        background-color: #EE6C39;
-    }
-
-    .fail.line-container {
-        background-color: #E2604C;
-        border: 1px solid #FFA191;
-        position: relative;
-    }
-
-    .fail-divider {
-        background-color: #EBE7DC;
-        height: 32px;
-        position: absolute;
-        right: 0;
-        width: 100%;
-        z-index: -1;
-    }
-
-    .parameter-container {
-        border: 1px dashed #DDD;
-        border-top: 0;
-        color: #EEE;
-        margin-left: 35px;
-        padding: 5px;
-    }
-
-    .pending > .line-container {
-        background-color: rgba(254, 144, 60, 0.44);
-        border: 2px dotted #FF8E24;
-        margin: -2px;
-    }
-
-
-    .btn-container {
-        left: 0;
-        position: absolute;
-    }
-
-    .line-number {
-        border-width: 0;
-        color: #4F4F4F;
-        display: inline-block;
-        margin-left: 5px;
-        min-width: 26px;
-    }
-
-    .parameter-container .line-number {
-        left: 0;
-        position: absolute;
-    }
-
-    .fail .line-number {
-        color: #FF2600;
-        font-weight: bold;
-    }
-
-    .btn:focus, .btn:active:focus, .button.active:focus, .btn:hover {
-        outline: none;
-    }
-
-    .btn {
-        background: transparent;
-        border: 1px solid #FFF;
-        border-radius: 4px;
-        cursor: pointer;
-        font-size: 10px;
-        height: 32px;
-        left: 0;
-        line-height: 24px;
-        margin: auto;
-        outline: none;
-        padding: 2px;
-        text-align: center;
-        width: 32px;
-    }
-
-    .screenShotBtn, .errorBtn {
-        border-color: #FF5335;
-        bottom: 0;
-        top: 0;
-    }
-
-    .btn-collapse, .btn-var {
-        margin-top: 1px;
-    }
-
-    .screenShotBtn:focus, .errorBtn:focus {
-        background: #FF5335;
-    }
-
-    .errorBtn svg, .screenShotBtn svg {
-        fill: #EBE7DC;
-        stroke: #FF5335;
-        stroke-width: 3;
-    }
-
-    .errorBtn:hover svg, .screenShotBtn:hover svg {
-        fill: #FF5335;
-    }
-
-    .errorBtn:focus svg, .screenShotBtn:focus svg {
-        fill: #EBE7DC;
-        stroke: #EBE7DC;
-    }
-
-    .console, .screenshots {
-        border: 6px solid #E2E2D9;
-        border-radius: 13px;
-        color: #F4F5E8;
-        left: 50%;
-        opacity: 0.94;
-        position: absolute;
-        transform: translateX(-50%);
-        width: 94%;
-        z-index: 2;
-    }
-
-    .console {
-        background-color: #E24D2A;
-        font-size: 12px;
-        margin-top: 25px;
-        padding: 10px 10px 50px;
-        word-wrap: break-word;
-    }
-
-    .console:hover {
-        background-color: #EA461F;
-        color: #FFFBF0;
-        opacity: 0.98;
-    }
-
-    .screenshots {
-        background-color: #333;
-        margin-top: -25px;
-        padding: 30px 10px;
-        text-align: center;
-        transform: translate(-50%, -100%);
-    }
-
-    .screenshots div {
-        display: inline-block;
-        min-width: 600px;
-        width: 49%;
-    }
-
-    .screenshots img {
-        border: 3px solid #A19C8C;
-        border-radius: 13px;
-        height: auto;
-        max-width: 100%;
-    }
-
-    .screenshots span {
-        display: block;
-        padding: 5px 10px;
-        text-align: left;
-    }
-
-    .scoped {
-        background-color: rgba(0, 107, 255, 0.12);
-        outline: 2px dashed #FFF;
-    }
-
-    /* ------- Syntax Highlight ------- */
-
-    .name {
-        color: #FFE8C8;
-    }
-
-    .macro > div .name:hover, .function > div .name:hover {
-        cursor: pointer;
-        text-decoration: underline;
-    }
-
-    .tag-type {
-        color: #FFC1A9;
-    }
-
-    /* ------- Extras ------- */
-
-    li {
-        transition: background 0.2s ease-in-out, border 0.4s ease-in-out;
-    }
-
-    .pass-fail-divider {
-        transition: all 0.5s ease-in-out;
-    }
-
-    .console, .screenshots {
-        box-shadow: 17px 31px 0 0 rgba(29, 60, 75, 0.64);
-    }
-
-    .errorBtn svg, .screenShotBtn svg {
-        transition: all 0.6s ease;
-    }
-
-    .current-scope:after {
-        box-shadow: 5px 31px 0 0 rgba(29, 60, 75, 0.2);
-    }
-
-    .last-fail:after {
-        box-shadow: 5px 31px 0 0 rgba(29, 60, 75, 0.2);
-    }
-</style>
+@import url(color_schemes/dark.css);
+@import url(color_schemes/light.css);
+
+/* ------- Main ------- */
+
+body {
+	background-color: #937C6A;
+	font-family: menlo, Source Code Pro, Arial;
+	font-size: 11px;
+	line-height: 1.75em;
+	margin: 0;
+	overflow-x: hidden;
+	padding: 0;
+	word-wrap: break-word;
+}
+
+h3 {
+	font-size: 13px;
+	font-weight: normal;
+	margin: 0;
+	padding: 5px 0;
+}
+
+li {
+	display: block;
+}
+
+ul {
+	border-left: 1px solid #DDD;
+	color: #FFF;
+	height: 0;
+	list-style-type: none;
+	overflow: hidden;
+	padding: 1px 0 1px 20px;
+}
+
+.tree .function.pass.link .line-container {
+	background-color: #F1A46F;
+}
+
+.tree .pass > .line-container {
+	background-color: rgba(190, 205, 217, 0.32);
+	border-radius: 12px;
+	width: 102%;
+}
+
+.tree .function.pass > .line-container {
+	border: 1px solid #6DFF7A;
+	margin: -1px;
+}
+
+/* ======= Sidebar WIP ======== */
+
+.sidebar {
+	background: #484B4D;
+	box-shadow: -5px 0 0 0 rgba(29, 60, 75, 0.3);
+	color: #FFF;
+	display: inline-block;
+	font-family: gotham;
+	height: 100%;
+	position: fixed;
+	right: 0;
+	transition: all 1s ease-out;
+	width: 20%;
+	z-index: 2;
+}
+
+.sidebar .command-log {
+	overflow-y: scroll;
+	height: 0;
+	transition: all 1s ease-in-out;
+}
+
+.sidebar .command-log.toggle {
+	height: 100%;
+}
+
+.sidebar .command-log ul {
+	height: auto;
+	border: none;
+	color: #FFF;
+}
+
+.sidebar .linkable {
+	cursor: pointer;
+}
+
+.sidebar .command-log .status div {
+	display: inline;
+}
+
+.sidebar .title {
+	display: block;
+	font-size: 32px;
+	font-weight: 500;
+	margin: 30px 0 5px 17px;
+	position: relative;
+}
+
+.sidebar .scope-type {
+	margin-bottom: 60px;
+}
+
+.sidebar .scope-name {
+	background-color: #484B4D;
+	font-size: 15px;
+	font-weight: 100;
+	max-width: 100%;
+	min-width: 100%;
+	overflow: hidden;
+	padding: 9px 0px 9px 20px;
+	position: absolute;
+	right: 0;
+	text-overflow: ellipsis;
+	transition: all 0.8s ease-in-out;
+	white-space: nowrap;
+	width: auto;
+}
+
+.sidebar .scope-name:hover {
+	box-shadow: -5px 7px 0 0 rgba(29, 60, 75, 0.3);
+	max-width: 300%;
+	padding-right: 20px;
+}
+
+.sidebar .parameter-name {
+	font-size: 12px;
+	font-weight: 500;
+	margin: 15px 20px 0;
+}
+
+.sidebar .parameter-value {
+	font-size: 11px;
+	margin: 10px 30px;
+}
+
+/* ------- Main content ------- */
+
+.pass-fail-divider {
+	background-color: #00B8B9;
+	height: 0;
+	position: absolute;
+	top: 0;
+	width: 100%;
+	z-index: -2;
+}
+
+.xml-log {
+	display: block;
+	position: relative;
+	transition: width 1s ease-out;
+	width: 80%;
+}
+
+.global-btn-container {
+	left: -60px;
+	margin-top: 10px;
+	position: absolute;
+	width: 32px;
+}
+
+.btn.btn-tree, .btn.btn-sidebar {
+	font-family: fontAwesome;
+	font-size: 26px;
+	margin: 5px 15px;
+	opacity: 0.7;
+	color: #444;
+}
+
+.btn.btn-sidebar span {
+	transition: all 0.5s ease-in-out;
+	transform: rotate(180deg);
+	display: block;
+}
+
+.btn.btn-sidebar.toggle span {
+	transform: rotate(0);
+}
+
+.btn.toggle {
+	color: #DDD;
+	background-color: #444;
+	border-color: #444;
+
+}
+
+.btn.btn-tree:hover, .btn.btn-sidebar:hover {
+	opacity: 1;
+}
+
+.xml-log > ul {
+	border-width: 0;
+	height: auto;
+	padding-left: 100px;
+}
+
+.header > .btn-container {
+	display: none;
+}
+
+.root-container {
+	border-width: 0;
+	overflow: visible;
+}
+
+.attribute {
+	color: #FFDCC9;
+}
+
+ul.collapsed {
+	display: none;
+}
+
+.xml-log > ul.collapsed {
+	display: block;
+	height: auto;
+}
+
+.current-scope {
+	background-color: rgba(28, 117, 185, 0.5);
+	outline: 1px solid #DDD;
+}
+
+.last-fail:after, .current-scope:after {
+	content: ' ';
+	height: 7px;
+	margin-top: -30px;
+	overflow: hidden;
+	position: absolute;
+	width: 100%;
+}
+
+.current-scope .line-number {
+	color: #FFF;
+}
+
+.scoped.current-scope {
+	background-color: rgba(28, 117, 185, 0.5);
+}
+
+.line-container {
+	padding: 5px 3px;
+	transition: border, background 0.3s ease-out;
+}
+
+.scoped > .fail.line-container {
+	background-color: #EE6C39;
+}
+
+.current-scope > .fail.line-container {
+	background-color: #EE6C39;
+}
+
+.fail.line-container {
+	background-color: #E2604C;
+	border: 1px solid #FFA191;
+	position: relative;
+}
+
+.fail-divider {
+	background-color: #EBE7DC;
+	height: 32px;
+	position: absolute;
+	right: 0;
+	width: 100%;
+	z-index: -1;
+}
+
+.parameter-container {
+	border: 1px dashed #DDD;
+	border-top: 0;
+	color: #EEE;
+	margin-left: 35px;
+	padding: 5px;
+}
+
+.pending > .line-container {
+	background-color: rgba(254, 144, 60, 0.44);
+	border: 2px dotted #FF8E24;
+	margin: -2px;
+}
+
+
+.btn-container {
+	left: 0;
+	position: absolute;
+}
+
+.line-number {
+	border-width: 0;
+	color: #4F4F4F;
+	display: inline-block;
+	margin-left: 5px;
+	min-width: 26px;
+}
+
+.parameter-container .line-number {
+	left: 0;
+	position: absolute;
+}
+
+.fail .line-number {
+	color: #FF2600;
+	font-weight: bold;
+}
+
+.btn:focus, .btn:active:focus, .button.active:focus, .btn:hover {
+	outline: none;
+}
+
+.btn {
+	background: transparent;
+	border: 1px solid #FFF;
+	border-radius: 4px;
+	cursor: pointer;
+	font-size: 10px;
+	height: 32px;
+	left: 0;
+	line-height: 24px;
+	margin: auto;
+	outline: none;
+	padding: 2px;
+	text-align: center;
+	width: 32px;
+}
+
+.screenShotBtn, .errorBtn {
+	border-color: #FF5335;
+	bottom: 0;
+	top: 0;
+}
+
+.btn-collapse, .btn-var {
+	margin-top: 1px;
+}
+
+.screenShotBtn:focus, .errorBtn:focus {
+	background: #FF5335;
+}
+
+.errorBtn svg, .screenShotBtn svg {
+	fill: #EBE7DC;
+	stroke: #FF5335;
+	stroke-width: 3;
+}
+
+.errorBtn:hover svg, .screenShotBtn:hover svg {
+	fill: #FF5335;
+}
+
+.errorBtn:focus svg, .screenShotBtn:focus svg {
+	fill: #EBE7DC;
+	stroke: #EBE7DC;
+}
+
+.console, .screenshots {
+	border: 6px solid #E2E2D9;
+	border-radius: 13px;
+	color: #F4F5E8;
+	left: 50%;
+	opacity: 0.94;
+	position: absolute;
+	transform: translateX(-50%);
+	width: 94%;
+	z-index: 2;
+}
+
+.console {
+	background-color: #E24D2A;
+	font-size: 12px;
+	margin-top: 25px;
+	padding: 10px 10px 50px;
+	word-wrap: break-word;
+}
+
+.console:hover {
+	background-color: #EA461F;
+	color: #FFFBF0;
+	opacity: 0.98;
+}
+
+.screenshots {
+	background-color: #333;
+	margin-top: -25px;
+	padding: 30px 10px;
+	text-align: center;
+	transform: translate(-50%, -100%);
+}
+
+.screenshots div {
+	display: inline-block;
+	min-width: 600px;
+	width: 49%;
+}
+
+.screenshots img {
+	border: 3px solid #A19C8C;
+	border-radius: 13px;
+	height: auto;
+	max-width: 100%;
+}
+
+.screenshots span {
+	display: block;
+	padding: 5px 10px;
+	text-align: left;
+}
+
+.scoped {
+	background-color: rgba(0, 107, 255, 0.12);
+	outline: 2px dashed #FFF;
+}
+
+/* ------- Syntax Highlight ------- */
+
+.name {
+	color: #FFE8C8;
+}
+
+.macro > div .name:hover, .function > div .name:hover {
+	cursor: pointer;
+	text-decoration: underline;
+}
+
+.tag-type {
+	color: #FFC1A9;
+}
+
+/* ------- Extras ------- */
+
+li {
+	transition: background 0.2s ease-in-out, border 0.4s ease-in-out;
+}
+
+.pass-fail-divider {
+	transition: all 0.5s ease-in-out;
+}
+
+.console, .screenshots {
+	box-shadow: 17px 31px 0 0 rgba(29, 60, 75, 0.64);
+}
+
+.errorBtn svg, .screenShotBtn svg {
+	transition: all 0.6s ease;
+}
+
+.current-scope:after {
+	box-shadow: 5px 31px 0 0 rgba(29, 60, 75, 0.2);
+}
+
+.last-fail:after {
+	box-shadow: 5px 31px 0 0 rgba(29, 60, 75, 0.2);
+}
