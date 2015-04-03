@@ -35,6 +35,22 @@ YUI()
 
 				xmlLog.delegate(
 					'click',
+					function(event) {
+						var currentTarget = event.currentTarget;
+						var macroScope = currentTarget.all('[data-functionLinkId]');
+						console.log(macroScope)
+						macroScope.each(
+							function(node) {
+								var scoped = getLink(node, '.linkable', 'data-functionLinkId', sidebar);
+								scoped.toggleClass('yolo');
+							}
+						)
+					},
+					'.macro'
+				);
+
+				xmlLog.delegate(
+					'click',
 					collapseToggle,
 					'.btn-collapse'
 				);
