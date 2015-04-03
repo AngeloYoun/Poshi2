@@ -34,7 +34,7 @@ ul {
 	padding: 1px 0 1px 20px;
 }
 
-.tree .pass.link .line-container {
+.tree .pass.linked .line-container {
 	background-color: #F1A46F;
 }
 
@@ -83,10 +83,10 @@ ul {
 }
 
 .btn.btn-sidebar, .btn.btn-tree {
+	color: #444;
 	font-family: fontAwesome;
 	font-size: 26px;
 	margin: 5px 15px;
-	color: #444;
 }
 
 .btn.btn-sidebar span {
@@ -94,9 +94,9 @@ ul {
 }
 
 .btn.toggle {
-	color: #DDD;
 	background-color: #444;
 	border-color: #444;
+	color: #DDD;
 }
 
 .root-container {
@@ -155,6 +155,7 @@ ul {
 
 .parameter-container {
 	border: 1px dashed #DDD;
+	border-right: 0;
 	border-top: 0;
 	color: #EEE;
 	height: 0;
@@ -333,8 +334,8 @@ ul {
 }
 
 .sidebar .command-log {
-	overflow-y: scroll;
 	height: 0;
+	overflow-y: scroll;
 	transition: all 1s ease-in-out;
 }
 
@@ -343,9 +344,9 @@ ul {
 }
 
 .sidebar .command-log ul {
-	height: auto;
-	border: none;
+	border-width: 0;
 	color: #FFF;
+	height: auto;
 }
 
 .sidebar .linkable {
@@ -415,7 +416,6 @@ li {
 	transition: all 0.5s ease-in-out;
 }
 
-
 .xml-log {
 	transition: width 1s ease-out;
 }
@@ -429,8 +429,8 @@ li {
 }
 
 .btn.btn-sidebar span {
-	transition: all 0.5s ease-in-out;
 	transform: rotate(180deg);
+	transition: all 0.5s ease-in-out;
 }
 
 .btn.btn-sidebar.toggle span {
