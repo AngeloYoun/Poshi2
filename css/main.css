@@ -84,7 +84,6 @@ ul {
 
 .btn.btn-sidebar, .btn.btn-tree {
 	color: #444;
-	font-family: fontAwesome;
 	font-size: 26px;
 	margin: 5px 15px;
 }
@@ -155,8 +154,8 @@ ul {
 
 .parameter-container {
 	border: 1px dashed #DDD;
-	border-right: 0;
-	border-top: 0;
+	border-right-width: 0;
+	border-top-width: 0;
 	color: #EEE;
 	height: 0;
 	margin-left: 35px;
@@ -205,6 +204,7 @@ ul {
 	border: 1px solid #FFF;
 	cursor: pointer;
 	font-size: 10px;
+	font-family: fontAwesome;
 	height: 32px;
 	left: 0;
 	line-height: 24px;
@@ -218,7 +218,13 @@ ul {
 .error-btn, .screen-shot-btn {
 	border-color: #FF5335;
 	bottom: 0;
+	color: #FF5335;
+	font-size: 20px;
 	top: 0;
+}
+
+.error-btn:hover, .error-btn:focus, .screen-shot-btn:hover, .screen-shot-btn:focus {
+	color: #FF5335;
 }
 
 .btn-collapse:before {
@@ -229,23 +235,23 @@ ul {
 	content: "-";
 }
 
-.error-btn:focus, .screen-shot-btn:focus {
+.btn-var:before {
+	content: "var";
+	font-family: 'menlo';
+}
+
+.error-btn.toggle, .screen-shot-btn.toggle {
 	background: #FF5335;
+	border-color: #FF5335;
+	color: #EBE7DC;
 }
 
-.error-btn svg, .screen-shot-btn svg {
-	fill: #EBE7DC;
-	stroke: #FF5335;
-	stroke-width: 3;
+.error-btn:before {
+	content: "\f071";
 }
 
-.error-btn:hover svg, .screen-shot-btn:hover svg {
-	fill: #FF5335;
-}
-
-.error-btn:focus svg, .screen-shot-btn:focus svg {
-	fill: #EBE7DC;
-	stroke: #EBE7DC;
+.screen-shot-btn:before {
+	content: "\f108";
 }
 
 .console, .screenshots {
@@ -315,6 +321,19 @@ ul {
 	color: #FFC1A9;
 }
 
+.sidebar span.locator-key {
+	color: #CFCFCD;
+}
+
+.sidebar span.command-name {
+	color: #C1DBE4;
+}
+
+.sidebar ul b {
+	color: #C1DBE4;
+	font-weight: 300;
+}
+
 /* ---------- Sidebar ---------- */
 
 /* ---------- Work In Progress ---------- */
@@ -343,10 +362,41 @@ ul {
 	height: 100%;
 }
 
+.sidebar .title-line {
+	display: none;
+}
+
 .sidebar .command-log ul {
-	border-width: 0;
+	border: 1px dashed #EEE;
+	border-right-width: 0;
+	border-top-width: 0;
 	color: #FFF;
 	height: auto;
+	margin-left: 24px;
+	padding-bottom: 11px;
+}
+
+.sidebar .expand-toggle {
+	margin-left: 8px;
+	margin-top: 6px;
+	position: absolute;
+}
+
+.sidebar .line-container {
+	margin-left: 20px;
+}
+
+.sidebar .divider-line {
+	background: #979C9F;
+	color: #484B4D;
+	font-size: 12px;
+	font-weight: bold;
+	height: auto;
+	padding: 10px;
+}
+
+.sidebar .line {
+	position: relative;
 }
 
 .sidebar .linkable {
@@ -413,7 +463,7 @@ li {
 }
 
 .pass-fail-divider {
-	transition: all 0.5s ease-in-out;
+	transition: all 0.3s ease-in-out;
 }
 
 .xml-log {
@@ -441,8 +491,8 @@ li {
 	opacity: 1;
 }
 
-.error-btn svg, .screen-shot-btn svg {
-	transition: all 0.6s ease;
+.error-btn, .screen-shot-btn {
+	transition: all 0.2s ease;
 }
 
 .console, .screenshots {

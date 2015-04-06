@@ -21,6 +21,8 @@ YUI()
 
 			var WIN = A.getWin();
 
+			var treeToFail = lastFail.ancestors('ul');
+
 			function init() {
 
 				expandTree(lastFail);
@@ -36,12 +38,14 @@ YUI()
 					function(event) {
 						var currentTarget = event.currentTarget;
 						var macroScope = currentTarget.all('[data-functionLinkId]');
+
 						macroScope.each(
 							function(node) {
 								var scoped = getLink(node, '.linkable', 'data-functionLinkId', sidebar);
+
 								scoped.toggleClass('yolo');
 							}
-						)
+						);
 					},
 					'.macro'
 				);
@@ -91,7 +95,7 @@ YUI()
 
 				sidebarBtn.on(
 					'click',
-					animateSidebar
+					resizeXmlLog
 				);
 
 				var errorBtns = xmlLog.all('.error-btn');
@@ -134,7 +138,7 @@ YUI()
 
 				if (currentTarget.hasClass('toggle')) {
 					sidebar.setStyle('width', '40%');
-					xmlLog.setStyle('width', '60%');
+					resizeXmlLog();
 
 					commandLog.toggleClass('hidden');
 
@@ -148,12 +152,13 @@ YUI()
 						},
 						function() {
 							commandLog.setStyle('height', '100%');
+							setTimeout(resetDividerHeight, 400);
 						}
 					);
 				}
 				else {
 					sidebar.setStyle('width', '20%');
-					xmlLog.setStyle('width', '80%');
+					resizeXmlLog();
 
 					commandLog.setStyle('height', commandLog.innerHeight());
 
@@ -167,6 +172,7 @@ YUI()
 						},
 						function() {
 							commandLog.toggleClass('hidden');
+							setTimeout(resetDividerHeight, 400);
 						}
 					);
 				}
@@ -178,19 +184,37 @@ YUI()
 				body.toggleClass('tree');
 			}
 
-			function animateSidebar(event) {
-				var currentTarget = event.currentTarget;
-
-				if (currentTarget.hasClass('toggle')) {
-					sidebar.setStyle('transform', 'translateX(0%)');
-					xmlLog.setStyle('width', '80%');
-				}
-				else {
-					sidebar.setStyle('transform', 'translateX(100%)');
-					xmlLog.setStyle('width', '100%');
+			function resizeXmlLog(event) {
+				var defaultReset = true;
+				if (event) {
+					var currentTarget = event.currentTarget;
+					defaultReset = false;
 				}
 
-				currentTarget.toggleClass('toggle');
+				var xmlLogWidth = 100;
+				var translation = 100;
+
+				if (defaultReset || currentTarget.hasClass('toggle')) {
+					var sidebarWidth = sidebar.getStyle('width');
+
+					if (sidebarWidth.indexOf('%') === -1) {
+						sidebarWidth = 100 * (parseFloat(sidebarWidth) / WIN.width());
+					}
+					else {
+						sidebarWidth = parseFloat(sidebarWidth);
+					}
+					xmlLogWidth = (100 - sidebarWidth);
+
+					translation = 0;
+				}
+				sidebar.setStyle('transform', 'translateX(' + translation + '%)');
+				xmlLog.setStyle('width', xmlLogWidth + '%');
+
+				if (!defaultReset) {
+					currentTarget.toggleClass('toggle');
+				}
+
+				setTimeout(resetDividerHeight, 600);
 			}
 
 			function recalculateHeights() {
@@ -205,51 +229,66 @@ YUI()
 				);
 			}
 
-			function resetDividerHeight(collapsing, node) {
-				if (!node || (passFailHeight === 0) || (node.getY() <= passFailHeight)) {
+			function resetDividerHeight(collapsing, node, heightDiff) {
+				var defaultReset = !node;
 
+				if (defaultReset || (passFailHeight === 0) || (node.getY() <= passFailHeight)) {
 					var firstClosedPending;
-					if (node && collapsing && node.ancestor().hasClass('pending')) {
-						firstClosedPending = node.previous();
-					}
-					else {
-						firstClosedPending = xmlLog.one('.pending > .collapsed');
+					var pending;
 
-						if (!firstClosedPending) {
-							firstClosedPending = lastFail;
+					if (!defaultReset) {
+						pending = node.ancestor().hasClass('pending');
+					}
+					if (collapsing) {
+						if (pending) {
+							firstClosedPending = node.previous();
 						}
 						else {
+							heightDiff = node.attr('data-prevHeight');
+
+							passFailHeight -= heightDiff;
+
+							manageHeightDiff(-heightDiff, node);
+						}
+					}
+					else if (pending || defaultReset) {
+						firstClosedPending = xmlLog.one('.pending > .collapsed, .last-fail');
+
+						if (!firstClosedPending.hasClass('last-fail')) {
 							firstClosedPending = firstClosedPending.previous();
 						}
 					}
+					else {
+						passFailHeight += heightDiff;
 
-					var firstClosedLiHeight = firstClosedPending.outerHeight();
+						node.attr('data-prevHeight', heightDiff);
 
-					var firstClosedLiY = Math.round(firstClosedPending.getY());
+						manageHeightDiff(heightDiff, node);
+					}
+					if (firstClosedPending) {
+						var firstClosedLiHeight = firstClosedPending.outerHeight();
+						var firstClosedLiY = firstClosedPending.getY();
 
-					divider.setStyle('height', firstClosedLiY + 100);
-
-					matchHeight(firstClosedLiHeight, firstClosedPending);
+						passFailHeight = (firstClosedLiY + firstClosedLiHeight);
+					}
+					divider.setStyle('height', passFailHeight);
 
 					recalculateHeights();
 				}
 			}
 
-			function matchHeight(firstClosedLiHeight, firstClosedPending) {
-				var firstClosedLiY = Math.round(firstClosedPending.getY());
+			function manageHeightDiff(heightDiff, node) {
+				var nodeList = node.ancestors('[data-prevHeight]');
 
-				passFailHeight = (firstClosedLiY + firstClosedLiHeight);
+				if (nodeList.size() > 0) {
+					for (var i = 0; i < nodeList.size(); i++) {
+						var ancestorNode = nodeList.item(i);
 
-				setTimeout(function ()
-					{
-						if(firstClosedLiY != Math.round(firstClosedPending.getY())) {
-							matchHeight(firstClosedLiHeight, firstClosedPending);
-						}
-						else {
-							divider.setStyle('height', passFailHeight);
-						}
-					}, 80
-				);
+						var prevHeight = ancestorNode.attr('data-prevHeight');
+
+						ancestorNode.attr('data-prevHeight', (parseInt(prevHeight, 10) + heightDiff));
+					}
+				}
 			}
 
 			function linkFunction(event) {
@@ -275,21 +314,28 @@ YUI()
 					collapseBtn = getLink(collapseContainer, '.btn', 'data-btnLinkId', xmlLog);
 				}
 
-				collapseTransition(collapseContainer);
-				collapseBtn.toggleClass('toggle');
+				var collapsed = collapseTransition(collapseContainer);
+
+				if (collapsed) {
+					collapseBtn.toggleClass('toggle');
+				}
 			}
+
+			var running;
 
 			function collapseTransition(targetNode) {
 				var height;
 				var targetAncestor = targetNode.ancestor();
 
-				if (targetNode) {
+				if (targetNode && (!running || !running.contains(targetNode))) {
 					if (targetNode.getStyle('height') != '0px') {
 						height = targetNode.outerHeight();
 
 						targetNode.setStyle('height', height);
 
 						getTransition(targetNode, height, true);
+
+						running = targetNode;
 					}
 					else {
 						var lastChild = targetNode.getDOMNode().lastElementChild;
@@ -306,6 +352,7 @@ YUI()
 
 						getTransition(targetNode, height, false);
 					}
+					return true;
 				}
 			}
 
@@ -317,13 +364,14 @@ YUI()
 				var transDuration = (Math.pow(height, 0.35) / 15);
 
 				var ease = 'ease-in';
+				var newHeight = height;
 
 				if (collapsing) {
 					callback = function(node) {
 						node.addClass('collapsed');
 					};
 
-					height = 0;
+					newHeight = 0;
 
 					ease = 'ease-out';
 				}
@@ -333,14 +381,13 @@ YUI()
 						height: {
 							duration: transDuration,
 							easing: ease,
-							value: height
+							value: newHeight
 						},
-						on: {
-							start: resetDividerHeight(collapsing, targetNode)
-						}
+						on: resetDividerHeight(collapsing, targetNode, height)
 					},
 					function() {
 						callback(this);
+						running = null;
 					}
 				);
 			}
@@ -459,6 +506,8 @@ YUI()
 
 			function showError(event) {
 				var currentTarget = event.currentTarget;
+
+				currentTarget.toggleClass('toggle');
 
 				var errorPanel = getLink(currentTarget, '.errorPanel', 'data-errorLinkId', xmlLog);
 
