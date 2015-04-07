@@ -34,23 +34,38 @@ ul {
 	padding: 1px 0 1px 20px;
 }
 
+/* ---------- Run Log ---------- */
+
+.tree .pass.conditional-failed > .line-container {
+	background: transparent;
+	border: 1px solid #E2604C;
+}
+
+.tree .pass.conditional-elsed > .line-container {
+	border: 2px dotted #FF5335;
+}
+
+.tree .pass.conditional-passed > .line-container {
+	border: 2px solid #23FFAF;
+}
+
 .tree .pass.linked .line-container {
 	background-color: #F1A46F;
 }
 
 .tree .pass > .line-container {
 	background-color: rgba(190, 205, 217, 0.32);
+	margin-top: 1px;
 	width: 102%;
 }
 
 .tree .function.pass > .line-container {
-	border: 1px solid #6DFF7A;
-	margin: -1px;
+	border: 2px solid #23FFAF;
 }
 
 /* ---------- Main Content ---------- */
 
-.collapsed, .header > .btn-container {
+.collapse, .header > .btn-container {
 	display: none;
 }
 
@@ -82,13 +97,18 @@ ul {
 	width: 32px;
 }
 
-.btn.btn-sidebar, .btn.btn-tree {
+.btn.btn-sidebar, .btn.btn-command-log {
 	color: #444;
 	font-size: 26px;
 	margin: 5px 15px;
 }
 
-.btn.btn-sidebar span {
+.btn.btn-command-log:before {
+	content: "\f126";
+}
+
+.btn.btn-sidebar:before {
+	content: "\f104";
 	display: block;
 }
 
@@ -371,15 +391,41 @@ ul {
 	border-right-width: 0;
 	border-top-width: 0;
 	color: #FFF;
-	height: auto;
 	margin-left: 24px;
+}
+
+.sidebar .command-log ul div:last-child {
 	padding-bottom: 11px;
 }
 
 .sidebar .expand-toggle {
-	margin-left: 8px;
+	color: #AAA;
+	cursor: pointer;
+	height: 20px;
 	margin-top: 6px;
 	position: absolute;
+	text-align: center;
+	width: 20px;
+}
+
+.sidebar .expand-toggle:hover {
+	color: #FFF;
+}
+
+.expand-toggle {
+	transition: all 0.2s ease;
+}
+
+.expand-toggle:before {
+	content: "\f105";
+	font-family: fontAwesome;
+	font-size: 14px;
+	height: 10px;
+	width: 10px;
+}
+
+.expand-toggle.toggle {
+	transform: rotate(90deg);
 }
 
 .sidebar .line-container {
@@ -474,20 +520,20 @@ li {
 	border-radius: 4px;
 }
 
-.btn.btn-sidebar, .btn.btn-tree {
+.btn.btn-sidebar, .btn.btn-command-log {
 	opacity: 0.7;
 }
 
-.btn.btn-sidebar span {
+.btn.btn-sidebar:before {
 	transform: rotate(180deg);
 	transition: all 0.5s ease-in-out;
 }
 
-.btn.btn-sidebar.toggle span {
+.btn.btn-sidebar.toggle:before {
 	transform: rotate(0);
 }
 
-.btn.btn-tree:hover, .btn.btn-sidebar:hover {
+.btn.btn-command-log:hover, .btn.btn-sidebar:hover {
 	opacity: 1;
 }
 
