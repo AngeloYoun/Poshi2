@@ -36,31 +36,49 @@ ul {
 
 /* ---------- Run Log ---------- */
 
-.tree .pass.conditional-failed > .line-container {
+.tree .xml-log .pass.conditional-failed > .line-container {
 	background: transparent;
 	border: 1px solid #E2604C;
 }
 
-.tree .pass.conditional-elsed > .line-container {
+.tree .xml-log .pass.conditional-elsed > .line-container {
 	border: 2px dotted #FF5335;
 }
 
-.tree .pass.conditional-passed > .line-container {
-	border: 2px solid #23FFAF;
+.tree .xml-log .pass.conditional-passed > .line-container {
+	border: 2px solid #41DB7F;
 }
 
-.tree .pass.linked .line-container {
-	background-color: #F1A46F;
-}
+// .tree .xml-log .pass.linked .line-container {
+// 	background-color: #F1A46F;
+// }
 
-.tree .pass > .line-container {
-	background-color: rgba(190, 205, 217, 0.32);
+.tree .xml-log .pass > .line-container {
+	background-color: rgba(245, 245, 245, 0.34);
 	margin-top: 1px;
 	width: 102%;
+	padding-right: 2%;
 }
 
-.tree .function.pass > .line-container {
-	border: 2px solid #23FFAF;
+.tree .xml-log .function.pass > .line-container, .tree .xml-log .macro.pass > .line-container {
+	background-color: rgba(245, 245, 245, 0.54);
+}
+
+.tree .xml-log .function.pass > .line-container {
+	border: 3px solid #25B2D8
+}
+
+.tree .xml-log .scoped.pass.function, .tree .current-scope.pass.function {
+	background: transparent;
+	outline-width: 0px;
+}
+
+.tree .xml-log .scoped.pass > .line-container {
+	background: #FFFBF1;
+}
+
+.tree .xml-log .current-scope.pass > .line-container {
+	background: #EEE;
 }
 
 /* ---------- Main Content ---------- */
@@ -103,6 +121,12 @@ ul {
 	margin: 5px 15px;
 }
 
+.btn.btn-command-log.toggle {
+	background-color: #444;
+	border-color: #444;
+	color: #CCC;
+}
+
 .btn.btn-command-log:before {
 	content: "\f126";
 }
@@ -113,9 +137,19 @@ ul {
 }
 
 .btn.toggle {
-	background-color: #444;
-	border-color: #444;
-	color: #DDD;
+	background-color: rgba(220, 220, 220, 0.60);
+}
+
+.btn:hover {
+	background-color: rgba(220, 220, 220, 0.7);
+}
+
+.fail .btn:hover {
+	background-color: transparent;
+}
+
+.fail .btn.toggle:hover {
+	background-color: #FF5335;
 }
 
 .root-container {
@@ -125,6 +159,10 @@ ul {
 
 .attribute {
 	color: #FFDCC9;
+}
+
+.function > .line-container, .macro > .line-container{
+	cursor: pointer;
 }
 
 .current-scope {
@@ -142,7 +180,11 @@ ul {
 }
 
 .current-scope .line-number {
-	color: #FFF;
+	opacity: 0.8;
+}
+
+.macro.current-scope > .btn-container .line-number {
+	opacity: 0.4;
 }
 
 .scoped.current-scope {
@@ -150,7 +192,7 @@ ul {
 }
 
 .line-container {
-	padding: 6px 3px;
+	padding: 7px 3px;
 }
 
 .current-scope > .fail.line-container, .scoped > .fail.line-container {
@@ -173,7 +215,7 @@ ul {
 }
 
 .parameter-container {
-	border: 1px dashed #DDD;
+	border: 1px dashed #777;
 	border-right-width: 0;
 	border-top-width: 0;
 	color: #EEE;
@@ -199,10 +241,20 @@ ul {
 
 .line-number {
 	border-width: 0;
-	color: #4F4F4F;
+	color: #222;
 	display: inline-block;
 	margin-left: 5px;
 	min-width: 26px;
+	opacity: 0.4;
+	cursor: pointer;
+}
+
+.line-number:hover {
+	opacity: 1;
+}
+
+.scoped .line-number {
+	opacity: 1;
 }
 
 .parameter-container .line-number {
@@ -217,6 +269,7 @@ ul {
 
 .btn:active:focus, .btn:focus, .btn:hover, .button.active:focus {
 	outline: none;
+	box-shadow: none;
 }
 
 .btn {
@@ -232,7 +285,16 @@ ul {
 	outline: none;
 	padding: 2px;
 	text-align: center;
+	transition: all 0.2s ease;
 	width: 32px;
+}
+
+.btn .btn-content {
+	transition: all 0.2s ease;
+}
+
+.btn:hover .btn-content {
+	transform: scale(1.3, 1.3);
 }
 
 .error-btn, .screen-shot-btn {
@@ -240,7 +302,7 @@ ul {
 	bottom: 0;
 	color: #FF5335;
 	font-size: 20px;
-	top: 0;
+	margin-top: 1px;
 }
 
 .error-btn:hover, .error-btn:focus, .screen-shot-btn:hover, .screen-shot-btn:focus {
@@ -262,15 +324,14 @@ ul {
 
 .error-btn.toggle, .screen-shot-btn.toggle {
 	background: #FF5335;
-	border-color: #FF5335;
 	color: #EBE7DC;
 }
 
-.error-btn:before {
+.error-btn .btn-content:before {
 	content: "\f071";
 }
 
-.screen-shot-btn:before {
+.screen-shot-btn .btn-content:before {
 	content: "\f108";
 }
 
@@ -332,11 +393,6 @@ ul {
 	color: #FFE8C8;
 }
 
-.macro > div .name:hover, .function > div .name:hover {
-	cursor: pointer;
-	text-decoration: underline;
-}
-
 .tag-type {
 	color: #FFC1A9;
 }
@@ -363,19 +419,25 @@ ul {
 	box-shadow: -5px 0 0 0 rgba(29, 60, 75, 0.3);
 	color: #FFF;
 	display: inline-block;
-	font-family: gotham;
+	font-family: Futura, Verdana, menlo;
 	height: 100%;
 	position: fixed;
 	right: 0;
-	transition: all 1s ease-out;
+	transition: all 0.6s ease-out;
 	width: 20%;
 	z-index: 2;
 }
 
 .sidebar .command-log {
-	height: 0;
+	height: 100%;
+	font-family: Verdana, menlo;
 	overflow-y: scroll;
-	transition: all 1s ease-in-out;
+	transition: all 0.4s ease-in-out;
+}
+
+.sidebar .command-log.collapse {
+	display: block;
+	height: 0;
 }
 
 .sidebar .command-log.toggle {
@@ -399,10 +461,14 @@ ul {
 }
 
 .sidebar .expand-toggle {
+	background: transparent;
+	border-width: 0;
 	color: #AAA;
 	cursor: pointer;
 	height: 20px;
-	margin-top: 6px;
+	line-height: inherit;
+	margin: 6px 0 0 0;
+	padding: 0;
 	position: absolute;
 	text-align: center;
 	width: 20px;
@@ -432,6 +498,15 @@ ul {
 	margin-left: 20px;
 }
 
+.sidebar .linkable {
+	transition: all 0.3s ease;
+}
+
+.sidebar .linkable:hover {
+	outline: 1px solid #DDD;
+	background: #555;
+}
+
 .sidebar .divider-line {
 	background: #979C9F;
 	color: #484B4D;
@@ -451,6 +526,11 @@ ul {
 
 .sidebar .command-log .status div {
 	display: inline;
+}
+
+.sidebar .command-log .current-scope {
+	border: 2px solid #DDD;
+	outline-width: 0;
 }
 
 .sidebar .title {
@@ -508,20 +588,29 @@ li {
 	border-radius: 12px;
 }
 
+.tree .pass.macro > .line-container {
+	border-radius: 5px;
+}
+
 .pass-fail-divider {
 	transition: all 0.3s ease-in-out;
 }
 
 .xml-log {
-	transition: width 1s ease-out;
+	transition: width 0.6s ease-out;
 }
 
 .btn {
 	border-radius: 4px;
+	opacity: 0.7;
 }
 
-.btn.btn-sidebar, .btn.btn-command-log {
-	opacity: 0.7;
+.btn:hover {
+	opacity: 1;
+}
+
+.fail .btn {
+	opacity: 1;
 }
 
 .btn.btn-sidebar:before {
@@ -535,10 +624,6 @@ li {
 
 .btn.btn-command-log:hover, .btn.btn-sidebar:hover {
 	opacity: 1;
-}
-
-.error-btn, .screen-shot-btn {
-	transition: all 0.2s ease;
 }
 
 .console, .screenshots {
@@ -561,7 +646,7 @@ li {
 }
 
 .current-scope:after {
-	box-shadow: 5px 31px 0 0 rgba(29, 60, 75, 0.2);
+	box-shadow: 5px 30px 0 0 rgba(29, 60, 75, 0.3);
 }
 
 .last-fail:after {

@@ -7,52 +7,8 @@ YUI()
 		'resize',
 		'transition',
 		function(A) {
-			// generation();
-			function generation() {
-				var allNodes = A.all('*');
-				// console.log(allNodes)
-				var btnLinkId = 1095;
-				allNodes.each(
-					function(node) {
-						if (node.hasClass('action-type') && node.html() == 'if') {
-							var ifContainer = node.ancestor('li');
-							if (ifContainer.hasClass('pass')) {
-								var containedPass = ifContainer.one('.pass')
-								if (!containedPass) {
-									ifContainer.addClass('conditional-failed')
-								}
-								else {
-									var containedPassType = containedPass.one('.action-type');
-									var containedPassHtml = containedPass.one('.action-type').html();
-									if (containedPassHtml == 'else' || containedPassHtml == 'elseif') {
-										ifContainer.addClass('conditional-elsed');
-									}
-									else {
-										console.log(containedPassType.html())
-										ifContainer.addClass('conditional-passed');
-									}
-								}
-							}
-						}
-						if (node.hasClass('action-type') && node.html() == 'while') {
-							var whileContainer = node.ancestor('li');
-							if (whileContainer.hasClass('pass')) {
-								var containedPass = whileContainer.one('.pass')
-								if (!containedPass) {
-									whileContainer.addClass('conditional-failed')
-								}
-							}
-						}
-						if (node.hasClass('expand-toggle')) {
-							node.attr('data-btnLinkId', 'btnLinkId-' + btnLinkId);
-							node.ancestor().next().attr('data-btnLinkId', 'btnLinkId-' + btnLinkId);
-							btnLinkId++;
-						}
-					}
-				);
-			}
-
 			var currentScope;
+			var commandLogScope;
 
 			var divider = A.one('.pass-fail-divider');
 			var lastFail = A.one('.last-fail');
@@ -178,31 +134,44 @@ YUI()
 				var collapsing = !currentTarget.hasClass('toggle');
 
 				if (!collapsing) {
-					newHeight = WIN.height();
+				// 	newHeight = WIN.height();
 					newWidth = '40%';
-					commandLog.toggleClass('collapse');
+				// 	commandLog.toggleClass('collapse');
 				}
 
-				else {
-					commandLog.setStyle('height', commandLog.innerHeight());
-				}
+				// else {
+				// 	commandLog.setStyle('height', commandLog.innerHeight());
+				// }
 
 				sidebar.setStyle('width', newWidth);
 				resizeXmlLog();
+				resetDividerHeight;
 
-				commandLog.transition(
-					{
-						height: {
-							duration: 0.5,
-							easing: 'ease-out',
-							value: newHeight
-						}
-					},
-					function() {
-						callback(commandLog, collapsing, true)
-						setTimeout(resetDividerHeight, 400);
-					}
-				);
+				// commandLog.transition(
+				// 	{
+				// 		height: {
+				// 			duration: 0.5,
+				// 			easing: 'ease-out',
+				// 			value: newHeight
+				// 		}
+				// 	},
+				// 	function() {
+				// 		callback(commandLog, collapsing, true)
+				// 		setTimeout(resetDividerHeight, 400);
+				// 	}
+				// );
+				commandLog.toggleClass('collapse');
+
+				var lastLog = commandLog.one('ul:last-child');
+				console.log(lastLog);
+				if (lastLog.hasClass('collapse')) {
+					collapseToggle(null, lastLog, true);
+				}
+
+				if (commandLogScope) {
+					scrollToNode(commandLogScope.item(0), true)
+				}
+
 				var body = A.one('body');
 
 				body.toggleClass('tree');
@@ -238,7 +207,7 @@ YUI()
 					currentTarget.toggleClass('toggle');
 				}
 
-				setTimeout(resetDividerHeight, 600);
+				setTimeout(resetDividerHeight, 400);
 			}
 
 			function recalculateHeights() {
@@ -323,7 +292,15 @@ YUI()
 
 				var linkedFunction = getLink(currentTarget, 'li', 'data-functionLinkId', xmlLog);
 
-				linkedFunction.toggleClass('linked');
+				if (currentScope) {
+					currentScope.removeClass('current-scope');
+				}
+
+				parseCommandLog(currentTarget, true)
+
+				linkedFunction.addClass('current-scope');
+
+				currentScope = linkedFunction;
 
 				expandTree(linkedFunction);
 
@@ -384,9 +361,6 @@ YUI()
 
 						height = (lastChildBottomY - targetNode.getY());
 
-						console.log(height)
-						console.log(targetNode)
-
 						getTransition(targetNode, height, false, resetHeights);
 					}
 					return true;
@@ -410,6 +384,8 @@ YUI()
 					reset = resetDividerHeight(collapsing, targetNode, height);
 				}
 
+				targetNode.setStyle('overflow', 'hidden');
+
 				targetNode.transition(
 					{
 						height: {
@@ -422,6 +398,7 @@ YUI()
 					function() {
 						callback(this, collapsing);
 						running = null;
+						targetNode.setStyle('overflow', 'visible');
 					}
 				);
 			}
@@ -439,13 +416,22 @@ YUI()
 				}
 			}
 
-			function getLink(node, selector, attrName, scope) {
+			function getLink(node, selector, attrName, scope, returnAll) {
 				var linkId = node.attr(attrName);
 
 				if (!scope) {
 					scope = A;
 				}
-				return scope.one(selector + '[' + attrName + '=' + linkId + ']');
+				var attrSelector = (selector + '[' + attrName + '=' + linkId + ']');
+				var links;
+				if (!returnAll) {
+					links = scope.one(attrSelector);
+				}
+				else {
+					links = scope.all(attrSelector);
+					console.log(links)
+				}
+				return links;
 			}
 
 			function scopeHover(event, enter) {
@@ -482,32 +468,51 @@ YUI()
 					currentScope = scope;
 					scopeSidebar();
 					scope.addClass('current-scope');
-					scopeCommandLog(scope);
+					parseCommandLog(scope);
 					event.stopPropagation();
 				}
 			}
 
-			function scopeCommandLog(scope) {
+			function parseCommandLog(scope, noLookUp) {
+				if (commandLogScope) {
+					commandLogScope.removeClass('current-scope');
+				}
+				commandLogScope = new A.NodeList();
+
 				if (scope.hasClass('macro')) {
 					var macroScope = scope.all('[data-functionLinkId]');
-					if (macroScope.item(0)) {
-						scrollToNode(macroScope.item(0), true);
-					}
+					console.log(macroScope)
 
 					macroScope.each(
-						function(node) {
-							var scoped = getLink(node, '.linkable', 'data-functionLinkId', sidebar);
-
-							scoped.toggleClass('yolo');
-						}
+						scopeCommandLog
 					);
 				}
-				else if (scope.hasClass('function')) {
-					var scoped = getLink(scope, '.linkable', 'data-functionLinkId', sidebar);
-					scrollToNode(scoped, true);
-
-					scoped.toggleClass('yolo');
+				else {
+					scopeCommandLog(scope, null, null, noLookUp);
 				}
+			}
+
+			function scopeCommandLog(scope, index, nodeList, noLookUp) {
+				var scrollTo = scope;
+				console.log(noLookUp)
+				if (!noLookUp) {
+					scope = getLink(scope, '.linkable', 'data-functionLinkId', sidebar, true);
+
+					scrollTo = scope.item(0);
+
+					console.log(scope)
+
+					while(scope.size() > 0) {
+						var node = scope.pop()
+						commandLogScope.push(node);
+					}
+				}
+				else {
+					commandLogScope.push(scope);
+				}
+				scrollToNode(scrollTo, true);
+
+				commandLogScope.addClass('current-scope');
 			}
 
 			function scopeSidebar() {
@@ -562,9 +567,13 @@ YUI()
 
 				var offset = (winHalf - halfNodeHeight);
 
-				var yDistance = (node.getY() - offset);
+				var nodeY = node.getY();
+				if (inSidebar) {
+					nodeY = (nodeY - sidebar.one('.divider-line').getY());
+				}
 
-				console.log(node.getY());
+				var yDistance = (nodeY - offset);
+
 				var scroll = new A.Anim(
 					{
 						duration: 2,
@@ -575,7 +584,6 @@ YUI()
 						}
 					}
 				);
-				console.log('scroll')
 
 				scroll.run();
 			}
