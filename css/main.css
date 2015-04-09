@@ -30,7 +30,7 @@ ul {
 	color: #FFF;
 	height: 0;
 	list-style-type: none;
-	overflow: hidden;
+	overflow: visible;
 	padding: 1px 0 1px 20px;
 }
 
@@ -38,20 +38,11 @@ ul {
 
 .tree .xml-log .pass.conditional-failed > .line-container {
 	background: transparent;
-	border: 1px solid #E2604C;
 }
 
 .tree .xml-log .pass.conditional-elsed > .line-container {
 	border: 2px dotted #FF5335;
 }
-
-.tree .xml-log .pass.conditional-passed > .line-container {
-	border: 2px solid #41DB7F;
-}
-
-// .tree .xml-log .pass.linked .line-container {
-// 	background-color: #F1A46F;
-// }
 
 .tree .xml-log .pass > .line-container {
 	background-color: rgba(245, 245, 245, 0.34);
@@ -65,7 +56,8 @@ ul {
 }
 
 .tree .xml-log .function.pass > .line-container {
-	border: 3px solid #25B2D8
+	background: #72C3EA;
+	border: 1px solid #4293B0;
 }
 
 .tree .xml-log .scoped.pass.function, .tree .current-scope.pass.function {
@@ -115,7 +107,7 @@ ul {
 	width: 32px;
 }
 
-.btn.btn-sidebar, .btn.btn-command-log {
+.btn.btn-sidebar, .btn.btn-command-log, .btn.btn-jump-to-error {
 	color: #444;
 	font-size: 26px;
 	margin: 5px 15px;
@@ -134,6 +126,10 @@ ul {
 .btn.btn-sidebar:before {
 	content: "\f104";
 	display: block;
+}
+
+.btn.btn-jump-to-error:before {
+	content: "\f071";
 }
 
 .btn.toggle {
@@ -174,8 +170,8 @@ ul {
 	content: ' ';
 	height: 7px;
 	margin-top: -30px;
-	overflow: hidden;
 	position: absolute;
+	transition: all 0.2s ease;
 	width: 100%;
 }
 
@@ -205,13 +201,28 @@ ul {
 	position: relative;
 }
 
-.fail-divider {
+.fail.line-container:before {
 	background-color: #EBE7DC;
-	height: 32px;
+	content: "";
+	height: 100%;
 	position: absolute;
 	right: 0;
-	width: 100%;
+	top: 0;
+	width: 100vw;
 	z-index: -1;
+	transition: all 0.2s ease;
+}
+
+.transitioning .last-fail:after, .collapse .last-fail:after {
+	opacity: 0;
+}
+
+.transitioning .fail.line-container:before {
+	opacity: 0;
+}
+
+.child-container.transitioning {
+	overflow: hidden;
 }
 
 .parameter-container {
@@ -274,7 +285,7 @@ ul {
 
 .btn {
 	background: transparent;
-	border: 1px solid #FFF;
+	border-width: 0;
 	cursor: pointer;
 	font-size: 10px;
 	font-family: fontAwesome;
@@ -297,7 +308,7 @@ ul {
 	transform: scale(1.3, 1.3);
 }
 
-.error-btn, .screen-shot-btn {
+.error-btn, .screenshot-btn {
 	border-color: #FF5335;
 	bottom: 0;
 	color: #FF5335;
@@ -305,7 +316,7 @@ ul {
 	margin-top: 1px;
 }
 
-.error-btn:hover, .error-btn:focus, .screen-shot-btn:hover, .screen-shot-btn:focus {
+.error-btn:hover, .error-btn:focus, .screenshot-btn:hover, .screenshot-btn:focus {
 	color: #FF5335;
 }
 
@@ -322,7 +333,7 @@ ul {
 	font-family: 'menlo';
 }
 
-.error-btn.toggle, .screen-shot-btn.toggle {
+.error-btn.toggle, .screenshot-btn.toggle {
 	background: #FF5335;
 	color: #EBE7DC;
 }
@@ -331,7 +342,7 @@ ul {
 	content: "\f071";
 }
 
-.screen-shot-btn .btn-content:before {
+.screenshot-btn .btn-content:before {
 	content: "\f108";
 }
 
@@ -339,9 +350,21 @@ ul {
 	border: 6px solid #E2E2D9;
 	color: #F4F5E8;
 	left: 50%;
+	max-height: 1000px;
+	overflow-Y: auto;
 	position: absolute;
+	transition: max-height 0.3s ease 0.2s, padding 0.1s ease 0.2s, width 0.2s ease;
 	width: 94%;
 	z-index: 2;
+}
+
+.console.toggle, .screenshots.toggle {
+	border-width: 0;
+	max-height: 0;
+	padding: 0;
+	width: 0;
+	overflow: hidden;
+	transition: max-height 0.3s ease, padding 0.1s ease 0.2s, width 0.2s ease 0.3s, border-width 0.1s 0.7s;
 }
 
 .console {
@@ -380,6 +403,45 @@ ul {
 	display: block;
 	padding: 5px 10px;
 	text-align: left;
+}
+
+.fullscreen-image {
+	height: 100%;
+	position: fixed;
+	top: 0;
+	z-index: 9999;
+	width: 100%;
+}
+
+.fullscreen-image:before {
+	background: #111;
+	content: "";
+	height: 100%;
+	opacity: 0.7;
+	position: absolute;
+	transition: opacity 0.5s ease;
+	width: 100%;
+}
+
+.fullscreen-image.toggle:before {
+	opacity: 0;
+}
+
+.fullscreen-image img {
+  left: 0;
+  right: 0;
+  position: absolute;
+  height: 95%;
+  transform: translate(-50%, -50%);
+  transition: height 0.5s ease;
+  left: 50%;
+  top: 50%;
+  cursor: zoom-out;
+}
+
+.fullscreen-image.toggle, .fullscreen-image.toggle img {
+	height: 0;
+	transition: all 0s ease 0.5s;
 }
 
 .scoped {
@@ -628,7 +690,7 @@ li {
 
 .console, .screenshots {
 	border-radius: 13px;
-	box-shadow: 17px 31px 0 0 rgba(29, 60, 75, 0.64);
+	box-shadow: 14px 22px 0 0 rgba(27, 60, 75, 0.4);
 	opacity: 0.94;
 	transform: translateX(-50%);
 }
@@ -643,6 +705,7 @@ li {
 
 .screenshots img {
 	border-radius: 13px;
+	cursor: pointer;
 }
 
 .current-scope:after {

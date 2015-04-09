@@ -13,6 +13,7 @@
 		<div class="global-btn-container">
 			<button class="btn btn-command-log"></button>
 			<button class="btn btn-sidebar"></button>
+			<button class="btn btn-jump-to-error"></button>
 		</div>
 		<!-- COMMAND LOG BEGIN -->
 		<div class="command-log collapse">
@@ -4429,8 +4430,9 @@
 			</div>
 		</div>
 	</div>
-	<div class="pass-fail-divider"></div>
+<!-- 	<div class="pass-fail-divider"></div> -->
 	<div class="xml-log">
+		<div class="fullscreen-image toggle"></div>
 		<ul class="xml-log-container">
 			<li class="header pending pass">
 				<div class="btn-container">
@@ -27284,7 +27286,7 @@
 													</li>
 													<li class="last-fail function" data-functionlinkid="functionLinkId-76">
 														<!-- put class="fail-# function" with # starting as 0 ~ last fail -->
-														<div class="screenshots errorPanel hidden" data-errorlinkid="errorLinkId-0">
+														<div class="screenshots errorPanel toggle" data-errorlinkid="errorLinkId-0">
 															<div class="screenshot-container">
 																<img alt="1" src="../screenshots/ScreenshotBeforeAction1.jpg">
 																<span>Before</span>
@@ -27296,14 +27298,13 @@
 														</div>
 														<div class="btn-container fail">
 															<div class="line-number">206</div>
-															<button type="button" class="btn screen-shot-btn" data-errorlinkid="errorLinkId-0">
+															<button type="button" class="btn screenshot-btn" data-errorlinkid="errorLinkId-0">
 																<div class="btn-content"></div>
 															</button>
 															<button class="btn error-btn" data-errorlinkid="errorLinkId-1">
 																<div class="btn-content"></div>
 															</button>
 														</div>
-														<div class="fail-divider"></div>
 														<div class="fail line-container">
 															<span class="misc">&lt;</span>
 															<span class="action-type">execute</span>
@@ -27324,7 +27325,7 @@
 															<span class="misc quote">"</span>
 															<span class="misc">/&gt;</span>
 														</div>
-														<div class="console errorPanel hidden" data-errorlinkid="errorLinkId-1">
+														<div class="console errorPanel toggle" data-errorlinkid="errorLinkId-1">
 															<div class="consoleLog">TypeError: str is undefined [http://localhost:8080/html/js/everything.jsp?browserId=firefox&amp;themeId=classic&amp;colorSchemeId=01&amp;minifierType=js&amp;minifierBundleId=javascript.everything.files&amp;languageId=en_US&amp;b=6210&amp;t=1426598661000:3] com.liferay.portalweb.portal.util.liferayselenium.WebDriverHelper.assertJavaScriptErrors(WebDriverHelper.java:123) com.liferay.portalweb.portal.util.liferayselenium.BaseWebDriverImpl.assertJavaScriptErrors(BaseWebDriverImpl.java:149) com.liferay.portalweb.util.logger.LoggerHandler.invoke(LoggerHandler.java:78) com.liferay.portalweb.functions.AssertClickFunction.assertTextClickAt(AssertClickFunction.java:134) com.liferay.portalweb.functions.AssertClickFunction.assertClick(AssertClickFunction.java:38) com.liferay.portalweb.macros.DMDocumentMacro.addPGViaFlashUploader(DMDocumentMacro.java:2437) com.liferay.portalweb.tests.enduser.documentmanagement.documentsadministration.usecase.DocumentsadministrationUsecaseTestCase.methodViewPaginationCategoriesAndTags(DocumentsadministrationUsecaseTestCase.java:3144) com.liferay.portalweb.tests.enduser.documentmanagement.documentsadministration.usecase.DocumentsadministrationUsecaseTestCase.testViewPaginationCategoriesAndTags(DocumentsadministrationUsecaseTestCase.java:3801)
 															</div>
 														</div>

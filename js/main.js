@@ -10,12 +10,12 @@ YUI()
 			var currentScope;
 			var commandLogScope;
 
-			var divider = A.one('.pass-fail-divider');
+			// var divider = A.one('.pass-fail-divider');
 			var lastFail = A.one('.last-fail');
 			var sidebar = A.one('.sidebar');
 			var xmlLog = A.one('.xml-log');
 
-			var failDivs = xmlLog.all('.fail-divider');
+			// var failDivs = xmlLog.all('.fail-divider');
 
 			var collapsePairIndex = 0;
 			var passFailHeight = 0;
@@ -82,8 +82,14 @@ YUI()
 				xmlLog.delegate(
 					'click',
 					showError,
-					'.screen-shot-btn'
+					'.screenshot-btn'
 				);
+
+				xmlLog.delegate(
+					'click',
+					fullScreen,
+					'.screenshot-container img, .fullscreen-image'
+				)
 
 				var logBtn = sidebar.one('.btn-command-log');
 
@@ -99,24 +105,47 @@ YUI()
 					resizeXmlLog
 				);
 
+				var jumpToBtn = sidebar.one('.btn-jump-to-error');
+
+				jumpToBtn.on(
+					'click',
+					expandTree
+				);
+
 				if (lastFail) {
-					expandTree(lastFail);
-					scrollToNode(lastFail);
+					expandTree(null, lastFail);
+					scopeSelect(null, lastFail);
 				}
 			}
 
 			init();
 
-			function expandTree(node) {
+			function expandTree(event, node, noScroll) {
+				if (!node) {
+					node = lastFail;
+				}
 				var tree = node.ancestors('.child-container');
 
-				tree.each(
-					function(target) {
-						if (target.hasClass('collapse')) {
-							collapseToggle(null, target);
-						}
-					}
-				);
+				var temp = expandLoop(tree, node, noScroll);
+			}
+
+			function expandLoop(tree, target, noScroll) {
+				var timing = 0;
+
+				var node = tree.splice(0, 1);
+
+				node = node.item(0);
+
+				if (node.hasClass('collapse')) {
+					collapseToggle(null, node);
+					timing = 100;
+				}
+				if(tree.size() > 0) {
+					setTimeout(expandLoop, timing, tree, target, noScroll);
+				}
+				else if(!noScroll) {
+					scrollToNode(target);
+				}
 			}
 
 			function commandLog(event) {
@@ -145,7 +174,7 @@ YUI()
 
 				sidebar.setStyle('width', newWidth);
 				resizeXmlLog();
-				resetDividerHeight;
+				// resetDividerHeight;
 
 				// commandLog.transition(
 				// 	{
@@ -163,7 +192,7 @@ YUI()
 				commandLog.toggleClass('collapse');
 
 				var lastLog = commandLog.one('ul:last-child');
-				console.log(lastLog);
+
 				if (lastLog.hasClass('collapse')) {
 					collapseToggle(null, lastLog, true);
 				}
@@ -207,71 +236,69 @@ YUI()
 					currentTarget.toggleClass('toggle');
 				}
 
-				setTimeout(resetDividerHeight, 400);
+				// setTimeout(resetDividerHeight, 400);
 			}
 
-			function recalculateHeights() {
-				failDivs.each(
-					function(node) {
-						var lineContainer = node.next();
+			// function recalculateHeights() {
+			// 	failDivs.each(
+			// 		function(node) {
+			// 			var lineContainer = node.next();
 
-						var newHeight = lineContainer.outerHeight();
+			// 			var newHeight = lineContainer.outerHeight();
 
-						node.setStyle('height', newHeight);
-					}
-				);
-			}
+			// 			node.setStyle('height', newHeight);
+			// 		}
+			// 	);
+			// }
 
-			function resetDividerHeight(collapsing, node, heightDiff) {
-				var defaultReset = !node;
-				if (!lastFail) {
-					divider.setStyle('height', '100%');
-				}
+			// function resetDividerHeight(collapsing, node, heightDiff) {
+			// 	var defaultReset = !node;
+			// 	if (!lastFail) {
+			// 		divider.setStyle('height', '100%');
+			// 	}
 
-				else if (defaultReset || (passFailHeight === 0) || (node.getY() <= passFailHeight)) {
-					var firstClosedPending;
-					var pending;
+			// 	else if (defaultReset || (passFailHeight === 0) || (node.getY() <= passFailHeight)) {
+			// 		var firstClosedPending;
+			// 		var pending;
 
-					if (!defaultReset) {
-						pending = node.ancestor().hasClass('pending');
-					}
-					if (collapsing) {
-						if (pending) {
-							firstClosedPending = node.previous();
-						}
-						else {
-							heightDiff = node.attr('data-prevHeight');
+			// 		if (!defaultReset) {
+			// 			pending = node.ancestor().hasClass('pending');
+			// 		}
+			// 		if (collapsing) {
+			// 			if (pending) {
+			// 				firstClosedPending = node.previous();
+			// 			}
+			// 			else {
+			// 				heightDiff = node.attr('data-prevHeight');
 
-							passFailHeight -= heightDiff;
+			// 				passFailHeight -= heightDiff;
 
-							manageHeightDiff(-heightDiff, node);
-						}
-					}
-					else if (pending || defaultReset) {
-						firstClosedPending = xmlLog.one('.pending > .collapse, .last-fail');
+			// 				manageHeightDiff(-heightDiff, node);
+			// 			}
+			// 		}
+			// 		else if (pending || defaultReset) {
+			// 			firstClosedPending = xmlLog.one('.pending > .collapse, .last-fail');
 
-						if (!firstClosedPending.hasClass('last-fail')) {
-							firstClosedPending = firstClosedPending.previous();
-						}
-					}
-					else {
-						passFailHeight += heightDiff;
+			// 			if (!firstClosedPending.hasClass('last-fail')) {
+			// 				firstClosedPending = firstClosedPending.previous();
+			// 			}
+			// 		}
+			// 		else {
+			// 			passFailHeight += heightDiff;
 
-						node.attr('data-prevHeight', heightDiff);
+			// 			node.attr('data-prevHeight', heightDiff);
 
-						manageHeightDiff(heightDiff, node);
-					}
-					if (firstClosedPending) {
-						var firstClosedLiHeight = firstClosedPending.outerHeight();
-						var firstClosedLiY = firstClosedPending.getY();
+			// 			manageHeightDiff(heightDiff, node);
+			// 		}
+			// 		if (firstClosedPending) {
+			// 			var firstClosedLiHeight = firstClosedPending.outerHeight();
+			// 			var firstClosedLiY = firstClosedPending.getY();
 
-						passFailHeight = (firstClosedLiY + firstClosedLiHeight);
-					}
-					divider.setStyle('height', passFailHeight);
-
-					recalculateHeights();
-				}
-			}
+			// 			passFailHeight = (firstClosedLiY + firstClosedLiHeight);
+			// 		}
+			// 		divider.setStyle('height', passFailHeight);
+			// 	}
+			// }
 
 			function manageHeightDiff(heightDiff, node) {
 				var nodeList = node.ancestors('[data-prevHeight]');
@@ -302,9 +329,7 @@ YUI()
 
 				currentScope = linkedFunction;
 
-				expandTree(linkedFunction);
-
-				scrollToNode(linkedFunction);
+				expandTree(null, linkedFunction);
 			}
 
 			function collapseToggle(event, collapseContainer, inSidebar) {
@@ -354,6 +379,7 @@ YUI()
 						lastChild = A.Node(lastChild);
 
 						targetNode.removeClass('collapse');
+						targetNode.addClass('transitioning');
 
 						var lastChildY = lastChild.getY();
 						var lastChildHeight = lastChild.innerHeight();
@@ -365,6 +391,20 @@ YUI()
 					}
 					return true;
 				}
+			}
+
+			function fullScreen(event) {
+				var node = event.currentTarget;
+
+				var src = node.attr('src');
+				var fullscreenDiv = A.one('.fullscreen-image');
+				if (fullscreenDiv.hasClass('toggle')) {
+					fullscreenDiv.append(A.Node.create('<img alt="fullscreen screenshot" src="' + src + '">'));
+				}
+				else {
+					fullscreenDiv.one('*').remove(true);
+				}
+				fullscreenDiv.toggleClass('toggle');
 			}
 
 			function getTransition(targetNode, height, collapsing, resetHeights) {
@@ -380,11 +420,11 @@ YUI()
 				}
 
 				var reset;
-				if(resetHeights) {
-					reset = resetDividerHeight(collapsing, targetNode, height);
-				}
+				// if(resetHeights) {
+				// 	reset = resetDividerHeight(collapsing, targetNode, height);
+				// }
 
-				targetNode.setStyle('overflow', 'hidden');
+				targetNode.addClass('transitioning');
 
 				targetNode.transition(
 					{
@@ -398,7 +438,7 @@ YUI()
 					function() {
 						callback(this, collapsing);
 						running = null;
-						targetNode.setStyle('overflow', 'visible');
+						targetNode.removeClass('transitioning');
 					}
 				);
 			}
@@ -429,7 +469,6 @@ YUI()
 				}
 				else {
 					links = scope.all(attrSelector);
-					console.log(links)
 				}
 				return links;
 			}
@@ -455,11 +494,20 @@ YUI()
 				}
 			}
 
-			function scopeSelect(event) {
-				var scope = event.currentTarget;
-				var target = event.target;
+			function scopeSelect(event, node) {
+				var scope
+				var clickable = true;
 
-				if (testClickable(target)) {
+				if (!event) {
+					scope = node;
+				}
+				else {
+					var scope = event.currentTarget;
+					clickable = testClickable(event.target);
+					event.stopPropagation();
+				}
+
+				if (clickable) {
 
 					if (currentScope) {
 						currentScope.removeClass('current-scope');
@@ -469,7 +517,6 @@ YUI()
 					scopeSidebar();
 					scope.addClass('current-scope');
 					parseCommandLog(scope);
-					event.stopPropagation();
 				}
 			}
 
@@ -481,7 +528,6 @@ YUI()
 
 				if (scope.hasClass('macro')) {
 					var macroScope = scope.all('[data-functionLinkId]');
-					console.log(macroScope)
 
 					macroScope.each(
 						scopeCommandLog
@@ -494,13 +540,11 @@ YUI()
 
 			function scopeCommandLog(scope, index, nodeList, noLookUp) {
 				var scrollTo = scope;
-				console.log(noLookUp)
+
 				if (!noLookUp) {
 					scope = getLink(scope, '.linkable', 'data-functionLinkId', sidebar, true);
 
 					scrollTo = scope.item(0);
-
-					console.log(scope)
 
 					while(scope.size() > 0) {
 						var node = scope.pop()
@@ -530,7 +574,7 @@ YUI()
 					sidebarScopeName.html(scopeName);
 					sidebarScopeTitle.html(scopeType);
 
-					sidebarParameterList.all('> *').remove();
+					sidebarParameterList.all('> *').remove(true);
 
 					var parameterCount;
 
@@ -561,31 +605,33 @@ YUI()
 					scrollNode = sidebar.one('.command-log');
 				}
 
-				var winHalf = (WIN.height() / 2);
+				if (node) {
+					var winHalf = (WIN.height() / 2);
 
-				var halfNodeHeight = (node.innerHeight() / 2);
+					var halfNodeHeight = (node.innerHeight() / 2);
 
-				var offset = (winHalf - halfNodeHeight);
+					var offset = (winHalf - halfNodeHeight);
 
-				var nodeY = node.getY();
-				if (inSidebar) {
-					nodeY = (nodeY - sidebar.one('.divider-line').getY());
-				}
-
-				var yDistance = (nodeY - offset);
-
-				var scroll = new A.Anim(
-					{
-						duration: 2,
-						easing: 'easeOutStrong',
-						node: scrollNode,
-						to: {
-							scroll: [0, yDistance]
-						}
+					var nodeY = node.getY();
+					if (inSidebar) {
+						nodeY = (nodeY - sidebar.one('.divider-line').getY());
 					}
-				);
 
-				scroll.run();
+					var yDistance = (nodeY - offset);
+
+					var scroll = new A.Anim(
+						{
+							duration: 2,
+							easing: 'easeOutStrong',
+							node: scrollNode,
+							to: {
+								scroll: [0, yDistance]
+							}
+						}
+					);
+
+					scroll.run();
+				}
 			}
 
 			function showError(event) {
@@ -596,7 +642,7 @@ YUI()
 				var errorPanel = getLink(currentTarget, '.errorPanel', 'data-errorLinkId', xmlLog);
 
 				if (errorPanel) {
-					errorPanel.toggleClass('hidden');
+					errorPanel.toggleClass('toggle');
 				}
 			}
 
