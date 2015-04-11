@@ -9,13 +9,10 @@ YUI()
 		function(A) {
 			var currentScope;
 			var commandLogScope;
+			var fails;
 
-			// var divider = A.one('.pass-fail-divider');
-			var lastFail = A.one('.last-fail');
 			var sidebar = A.one('.sidebar');
 			var xmlLog = A.one('.xml-log');
-
-			// var failDivs = xmlLog.all('.fail-divider');
 
 			var collapsePairIndex = 0;
 			var passFailHeight = 0;
@@ -27,7 +24,7 @@ YUI()
 				sidebar.delegate(
 					'click',
 					linkFunction,
-					'.linkable'
+					'.linkable .line-container'
 				);
 
 				sidebar.delegate(
@@ -95,7 +92,7 @@ YUI()
 
 				logBtn.on(
 					'click',
-					commandLog
+					commandLogToggle
 				);
 
 				var sidebarBtn = sidebar.one('.btn-sidebar');
@@ -112,17 +109,18 @@ YUI()
 					expandTree
 				);
 
-				if (lastFail) {
-					expandTree(null, lastFail);
-					scopeSelect(null, lastFail);
-				}
+				commandLogToggle();
 			}
 
 			init();
+			function xmlLogRefresh(node) {
+				expandTree(null, node);
+				scopeSelect(null, node);
+			}
 
 			function expandTree(event, node, noScroll) {
 				if (!node) {
-					node = lastFail;
+					node = fails.last();
 				}
 				var tree = node.ancestors('.child-container');
 
@@ -138,7 +136,7 @@ YUI()
 
 				if (node.hasClass('collapse')) {
 					collapseToggle(null, node);
-					timing = 100;
+					timing = 200;
 				}
 				if(tree.size() > 0) {
 					setTimeout(expandLoop, timing, tree, target, noScroll);
@@ -148,50 +146,23 @@ YUI()
 				}
 			}
 
-			function commandLog(event) {
-				var currentTarget = event.currentTarget;
-
-				inCommandLogMode = !inCommandLogMode;
-
-				var commandLog = sidebar.one('.command-log');
-
-				currentTarget.toggleClass('toggle');
-
+			function transitionCommandLog(commandLog) {
 				var newHeight = 0;
 				var newWidth = '20%';
 
-				var collapsing = !currentTarget.hasClass('toggle');
-
-				if (!collapsing) {
-				// 	newHeight = WIN.height();
+				if (inCommandLogMode) {
 					newWidth = '40%';
-				// 	commandLog.toggleClass('collapse');
 				}
-
-				// else {
-				// 	commandLog.setStyle('height', commandLog.innerHeight());
-				// }
 
 				sidebar.setStyle('width', newWidth);
 				resizeXmlLog();
-				// resetDividerHeight;
-
-				// commandLog.transition(
-				// 	{
-				// 		height: {
-				// 			duration: 0.5,
-				// 			easing: 'ease-out',
-				// 			value: newHeight
-				// 		}
-				// 	},
-				// 	function() {
-				// 		callback(commandLog, collapsing, true)
-				// 		setTimeout(resetDividerHeight, 400);
-				// 	}
-				// );
 				commandLog.toggleClass('collapse');
 
 				var lastLog = commandLog.one('ul:last-child');
+
+				var lastLine = lastLog.previous();
+
+				var functionId = lastLine.attr('data-functionLinkId');
 
 				if (lastLog.hasClass('collapse')) {
 					collapseToggle(null, lastLog, true);
@@ -199,6 +170,39 @@ YUI()
 
 				if (commandLogScope) {
 					scrollToNode(commandLogScope.item(0), true)
+				}
+			}
+
+			function commandLogToggle(event) {
+				var commandLog;
+
+				if (event) {
+					var currentTarget = event.currentTarget;
+					currentTarget.toggleClass('toggle');
+					commandLog = getLink(currentTarget, '.command-log', 'data-logId', sidebar);
+				}
+				else {
+					commandLog = A.one('.command-log');
+				}
+
+				inCommandLogMode = !inCommandLogMode;
+
+				var logId = commandLog.attr('data-logId');
+
+				var status = ['pass', 'pending', 'fail']
+				var selector = 'data-status' + logId;
+
+				for (var i = 0; i < status.length; i++) {
+					var nodes = A.all('[' + selector + '="' + status[i] + '"]')
+					nodes.toggleClass(status[i]);
+				}
+
+				transitionCommandLog(commandLog);
+
+				fails = xmlLog.all('.fail');
+
+				if (fails) {
+					fails.each(xmlLogRefresh);
 				}
 
 				var body = A.one('body');
@@ -235,70 +239,7 @@ YUI()
 				if (!defaultReset) {
 					currentTarget.toggleClass('toggle');
 				}
-
-				// setTimeout(resetDividerHeight, 400);
 			}
-
-			// function recalculateHeights() {
-			// 	failDivs.each(
-			// 		function(node) {
-			// 			var lineContainer = node.next();
-
-			// 			var newHeight = lineContainer.outerHeight();
-
-			// 			node.setStyle('height', newHeight);
-			// 		}
-			// 	);
-			// }
-
-			// function resetDividerHeight(collapsing, node, heightDiff) {
-			// 	var defaultReset = !node;
-			// 	if (!lastFail) {
-			// 		divider.setStyle('height', '100%');
-			// 	}
-
-			// 	else if (defaultReset || (passFailHeight === 0) || (node.getY() <= passFailHeight)) {
-			// 		var firstClosedPending;
-			// 		var pending;
-
-			// 		if (!defaultReset) {
-			// 			pending = node.ancestor().hasClass('pending');
-			// 		}
-			// 		if (collapsing) {
-			// 			if (pending) {
-			// 				firstClosedPending = node.previous();
-			// 			}
-			// 			else {
-			// 				heightDiff = node.attr('data-prevHeight');
-
-			// 				passFailHeight -= heightDiff;
-
-			// 				manageHeightDiff(-heightDiff, node);
-			// 			}
-			// 		}
-			// 		else if (pending || defaultReset) {
-			// 			firstClosedPending = xmlLog.one('.pending > .collapse, .last-fail');
-
-			// 			if (!firstClosedPending.hasClass('last-fail')) {
-			// 				firstClosedPending = firstClosedPending.previous();
-			// 			}
-			// 		}
-			// 		else {
-			// 			passFailHeight += heightDiff;
-
-			// 			node.attr('data-prevHeight', heightDiff);
-
-			// 			manageHeightDiff(heightDiff, node);
-			// 		}
-			// 		if (firstClosedPending) {
-			// 			var firstClosedLiHeight = firstClosedPending.outerHeight();
-			// 			var firstClosedLiY = firstClosedPending.getY();
-
-			// 			passFailHeight = (firstClosedLiY + firstClosedLiHeight);
-			// 		}
-			// 		divider.setStyle('height', passFailHeight);
-			// 	}
-			// }
 
 			function manageHeightDiff(heightDiff, node) {
 				var nodeList = node.ancestors('[data-prevHeight]');
@@ -315,7 +256,7 @@ YUI()
 			}
 
 			function linkFunction(event) {
-				var currentTarget = event.currentTarget;
+				var currentTarget = event.currentTarget.ancestor();
 
 				var linkedFunction = getLink(currentTarget, 'li', 'data-functionLinkId', xmlLog);
 
@@ -364,12 +305,11 @@ YUI()
 				var height;
 
 				if (targetNode && (!running || !running.contains(targetNode))) {
-					if (targetNode.getStyle('height') != '0px') {
+					var collapsing = targetNode.getStyle('height') != '0px';
+					if (collapsing) {
 						height = targetNode.outerHeight();
 
 						targetNode.setStyle('height', height);
-
-						getTransition(targetNode, height, true, resetHeights);
 
 						running = targetNode;
 					}
@@ -386,9 +326,9 @@ YUI()
 						var lastChildBottomY = lastChildY + lastChildHeight + 1;
 
 						height = (lastChildBottomY - targetNode.getY());
-
-						getTransition(targetNode, height, false, resetHeights);
 					}
+					getTransition(targetNode, height, collapsing, resetHeights);
+
 					return true;
 				}
 			}
@@ -420,9 +360,6 @@ YUI()
 				}
 
 				var reset;
-				// if(resetHeights) {
-				// 	reset = resetDividerHeight(collapsing, targetNode, height);
-				// }
 
 				targetNode.addClass('transitioning');
 
@@ -480,10 +417,10 @@ YUI()
 				if (testClickable(target)) {
 					currentTarget.toggleClass('scoped', enter);
 
-					var node = currentTarget.ancestor('.macro');
+					var node = currentTarget.ancestor('.macro, .test-group');
 
 					if (enter) {
-						node = currentTarget.ancestors('.macro');
+						node = currentTarget.ancestors('.macro, .test-group');
 					}
 
 					if (node) {
@@ -536,6 +473,8 @@ YUI()
 				else {
 					scopeCommandLog(scope, null, null, noLookUp);
 				}
+
+				scrollToNode(commandLogScope.item(0), true);
 			}
 
 			function scopeCommandLog(scope, index, nodeList, noLookUp) {
@@ -554,7 +493,6 @@ YUI()
 				else {
 					commandLogScope.push(scope);
 				}
-				scrollToNode(scrollTo, true);
 
 				commandLogScope.addClass('current-scope');
 			}
@@ -563,13 +501,38 @@ YUI()
 				if (currentScope) {
 					var sidebarScopeName = sidebar.one('.scope-type .scope-name');
 					var sidebarScopeTitle = sidebar.one('.scope-type .title');
+					var sidebarParameterTitle = sidebar.one('.parameter .title');
 					var sidebarParameterList = sidebar.one('.parameter .parameter-list');
 
 					var scopeNames = currentScope.all('> .line-container .name');
 					var scopeTypes = currentScope.all('> .line-container .tag-type');
 
-					var scopeName = scopeNames.item(0).html();
-					var scopeType = scopeTypes.item(0).html();
+					var scopeType = scopeTypes.item(0);
+					var scopeName = scopeNames.item(0);
+					if (scopeName) {
+						scopeName = scopeName.html();
+					}
+					else {
+						var scopeName = currentScope.one('.testCaseCommand');
+
+						if (scopeName) {
+							scopeName = scopeName.html();
+						}
+					}
+					if (scopeType && scopeType.html() != 'name') {
+						scopeType = scopeType.html();
+					}
+					else {
+						scopeType = currentScope.one('> .line-container .action-type');
+
+						if (scopeType) {
+							scopeType = scopeType.html();
+						}
+						else {
+							scopeType = 'test-case'
+						}
+
+					}
 
 					sidebarScopeName.html(scopeName);
 					sidebarScopeTitle.html(scopeType);
@@ -577,6 +540,8 @@ YUI()
 					sidebarParameterList.all('> *').remove(true);
 
 					var parameterCount;
+
+					sidebarParameterTitle.removeClass('hidden');
 
 					if (scopeType === 'macro') {
 						var parameters = currentScope.all('> .line-container .parameter-container .parameter-value');
@@ -595,6 +560,9 @@ YUI()
 							sidebarParameterList.append(A.Node.create('<li class="parameter-name">' + scopeTypes.item(i).html() + '</div>'));
 							sidebarParameterList.append(A.Node.create('<li class="parameter-value">' + scopeNames.item(i).html() + '</div>'));
 						}
+					}
+					else {
+						sidebarParameterTitle.addClass('hidden');
 					}
 				}
 			}
@@ -651,7 +619,7 @@ YUI()
 			}
 
 			function testScopeable(testNode) {
-				return testNode.hasClass('macro') || testNode.hasClass('function');
+				return testNode.hasClass('macro') || testNode.hasClass('function') || testNode.hasClass('test-group');
 			}
 		}
 	);

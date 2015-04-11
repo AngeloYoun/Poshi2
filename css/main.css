@@ -5,7 +5,7 @@
 
 body {
 	background-color: #937C6A;
-	font-family: menlo, Source Code Pro, Arial;
+	font-family: menlo, source code pro, lucia console, monospace;
 	font-size: 11px;
 	line-height: 1.75em;
 	margin: 0;
@@ -40,10 +40,6 @@ ul {
 	background: transparent;
 }
 
-.tree .xml-log .pass.conditional-elsed > .line-container {
-	border: 2px dotted #FF5335;
-}
-
 .tree .xml-log .pass > .line-container {
 	background-color: rgba(245, 245, 245, 0.34);
 	margin-top: 1px;
@@ -51,13 +47,14 @@ ul {
 	padding-right: 2%;
 }
 
-.tree .xml-log .function.pass > .line-container, .tree .xml-log .macro.pass > .line-container {
-	background-color: rgba(245, 245, 245, 0.54);
-}
+// .tree .xml-log .macro.pass > .line-container {
+// 	background: #81CFD2;
+// }
 
 .tree .xml-log .function.pass > .line-container {
 	background: #72C3EA;
 	border: 1px solid #4293B0;
+	border-radius: 6px;
 }
 
 .tree .xml-log .scoped.pass.function, .tree .current-scope.pass.function {
@@ -78,20 +75,10 @@ ul {
 .collapse, .header > .btn-container {
 	display: none;
 }
-
-.pass-fail-divider {
-	background-color: #00B8B9;
-	height: 0;
-	position: absolute;
-	top: 0;
-	width: 100%;
-	z-index: -2;
-}
-
 .xml-log {
 	display: block;
 	position: relative;
-	width: 80%;
+	width: 100%;
 }
 
 .xml-log > ul {
@@ -144,6 +131,14 @@ ul {
 	background-color: transparent;
 }
 
+.screenshot-btn, .error-btn {
+	display: none;
+}
+
+.fail .screenshot-btn, .fail .error-btn {
+	display: inline-block;
+}
+
 .fail .btn.toggle:hover {
 	background-color: #FF5335;
 }
@@ -166,7 +161,11 @@ ul {
 	outline: 1px solid #DDD;
 }
 
-.last-fail:after, .current-scope:after {
+.xml-log .current-scope:after {
+	box-shadow: 4px 31px 0 0 rgba(29, 60, 75, 0.3);
+}
+
+.fail:after, .current-scope:after {
 	content: ' ';
 	height: 7px;
 	margin-top: -30px;
@@ -175,12 +174,41 @@ ul {
 	width: 100%;
 }
 
-.current-scope .line-number {
+.transitioning .current-scope:after {
+	opacity: 0;
+}
+
+.current-scope .line-number,
+.current-scope.scoped .line-number,
+.current-scope.scoped .macro > .btn-container .line-number,
+.current-scope.scoped .macro > .line-container .line-number
+.current-scope .macro > .line-container .line-number,
+.current-scope .macro > .btn-container .line-number {
 	opacity: 0.8;
 }
 
-.macro.current-scope > .btn-container .line-number {
-	opacity: 0.4;
+.scoped > .line-container .line-number,
+.scoped > .btn-container .line-number,
+.scoped .line-number {
+	opacity: 1;
+}
+
+.marco.current-scope > .btn-container .line-number,
+.marco.current-scope > .line-container .line-number,
+.current-scope.scoped .macro .line-number,
+.current-scope .macro .line-number,
+.current-scope .macro .child-container .macro .btn-container .line-number,
+.current-scope .macro .child-container .macro .line-container .line-number {
+	opacity: 0.2;
+}
+
+.macro > .child-container {
+	box-shadow: inset -1px 0px 0px 2px rgba(157, 157, 157, 0.69);
+	background-color: rgba(159, 155, 155, 0.2);
+}
+
+.scoped.macro > .child-container, .current-scope.macro > .child-container {
+	background: rgba(185, 185, 185, 0.3);
 }
 
 .scoped.current-scope {
@@ -191,17 +219,17 @@ ul {
 	padding: 7px 3px;
 }
 
-.current-scope > .fail.line-container, .scoped > .fail.line-container {
+.current-scope.fail .line-container, .scoped.fail .line-container {
 	background-color: #EE6C39;
 }
 
-.fail.line-container {
+.fail .line-container {
 	background-color: #E2604C;
 	border: 1px solid #FFA191;
 	position: relative;
 }
 
-.fail.line-container:before {
+.fail .line-container:before {
 	background-color: #EBE7DC;
 	content: "";
 	height: 100%;
@@ -213,11 +241,11 @@ ul {
 	transition: all 0.2s ease;
 }
 
-.transitioning .last-fail:after, .collapse .last-fail:after {
+.transitioning .fail:after, .collapse .fail:after {
 	opacity: 0;
 }
 
-.transitioning .fail.line-container:before {
+.transitioning .fail .line-container:before {
 	opacity: 0;
 }
 
@@ -242,7 +270,6 @@ ul {
 .pending > .line-container {
 	background-color: rgba(254, 144, 60, 0.44);
 	border: 2px dotted #FF8E24;
-	margin: -2px;
 }
 
 .btn-container {
@@ -256,15 +283,11 @@ ul {
 	display: inline-block;
 	margin-left: 5px;
 	min-width: 26px;
-	opacity: 0.4;
+	opacity: 0.2;
 	cursor: pointer;
 }
 
 .line-number:hover {
-	opacity: 1;
-}
-
-.scoped .line-number {
 	opacity: 1;
 }
 
@@ -330,7 +353,7 @@ ul {
 
 .btn-var:before {
 	content: "var";
-	font-family: 'menlo';
+	font-family: menlo, source code pro, lucia console, monospace;
 }
 
 .error-btn.toggle, .screenshot-btn.toggle {
@@ -459,17 +482,33 @@ ul {
 	color: #FFC1A9;
 }
 
-.sidebar span.locator-key {
-	color: #CFCFCD;
-}
-
 .sidebar span.command-name {
 	color: #C1DBE4;
 }
 
+.sidebar span.locator-key {
+	color: #CFCFCD;
+}
+
+.sidebar .failed span.command-name {
+	color: #FBF4D7;
+}
+
+.sidebar .failed span.locator-key, .sidebar .failed span.value {
+	color: #FFE4C7;
+}
+
+.sidebar ul b:first-child {
+	color: #E9C993;
+}
+
 .sidebar ul b {
-	color: #C1DBE4;
+	color: #FDBA93;
 	font-weight: 300;
+}
+
+.sidebar ul .command-failure {
+	color: #FC8686;
 }
 
 /* ---------- Sidebar ---------- */
@@ -481,10 +520,11 @@ ul {
 	box-shadow: -5px 0 0 0 rgba(29, 60, 75, 0.3);
 	color: #FFF;
 	display: inline-block;
-	font-family: Futura, Verdana, menlo;
+	font-family: Futura, Trebuchet MS, Arial, sans-serif;
 	height: 100%;
 	position: fixed;
 	right: 0;
+	transform: translateX(100%);
 	transition: all 0.6s ease-out;
 	width: 20%;
 	z-index: 2;
@@ -492,7 +532,7 @@ ul {
 
 .sidebar .command-log {
 	height: 100%;
-	font-family: Verdana, menlo;
+	font-family: Verdana, Geneva, sans-serif;
 	overflow-y: scroll;
 	transition: all 0.4s ease-in-out;
 }
@@ -516,6 +556,7 @@ ul {
 	border-top-width: 0;
 	color: #FFF;
 	margin-left: 24px;
+	overflow: hidden;
 }
 
 .sidebar .command-log ul div:last-child {
@@ -534,6 +575,10 @@ ul {
 	position: absolute;
 	text-align: center;
 	width: 20px;
+}
+
+.sidebar .failed .expand-toggle {
+	color: #FBEFB4;
 }
 
 .sidebar .expand-toggle:hover {
@@ -595,11 +640,23 @@ ul {
 	outline-width: 0;
 }
 
+.sidebar .command-log .failed.current-scope {
+	background-color: #EE6C39;
+}
+
+.sidebar .command-log .failed {
+	background-color: #E2604C;
+}
+
+.sidebar .command-log .failed:hover {
+	background-color: #F0652B;
+}
+
 .sidebar .title {
 	display: block;
 	font-size: 32px;
 	font-weight: 500;
-	margin: 30px 0 5px 17px;
+	margin: 30px 0 10px 17px;
 	position: relative;
 }
 
@@ -646,16 +703,8 @@ li {
 	transition: background 0.2s ease-in-out, border 0.4s ease-in-out;
 }
 
-.tree .pass > .line-container {
-	border-radius: 12px;
-}
-
 .tree .pass.macro > .line-container {
 	border-radius: 5px;
-}
-
-.pass-fail-divider {
-	transition: all 0.3s ease-in-out;
 }
 
 .xml-log {
@@ -708,11 +757,11 @@ li {
 	cursor: pointer;
 }
 
-.current-scope:after {
-	box-shadow: 5px 30px 0 0 rgba(29, 60, 75, 0.3);
+.sidebar .current-scope:after {
+	box-shadow: 3px 30px 0 0 rgba(29, 60, 75, 0.3)
 }
 
-.last-fail:after {
+.fail:after {
 	box-shadow: 5px 31px 0 0 rgba(29, 60, 75, 0.2);
 }
 
