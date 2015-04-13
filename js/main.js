@@ -49,20 +49,20 @@ YUI()
 				);
 
 				xmlLog.delegate(
-					'mouseenter',
+					'mouseover',
 					scopeHover,
 					testScopeable,
 					null,
 					true
 				);
 
-				xmlLog.delegate(
-					'mouseleave',
-					scopeHover,
-					testScopeable,
-					null,
-					false
-				);
+				// xmlLog.delegate(
+				// 	'mouseleave',
+				// 	scopeHover,
+				// 	testScopeable,
+				// 	null,
+				// 	false
+				// );
 
 				xmlLog.delegate(
 					'click',
@@ -136,6 +136,7 @@ YUI()
 
 				if (node.hasClass('collapse')) {
 					collapseToggle(null, node);
+
 					timing = 200;
 				}
 				if(tree.size() > 0) {
@@ -382,6 +383,7 @@ YUI()
 
 			function callback(node, collapsing, inSidebar) {
 				var height = 'auto';
+
 				if (inSidebar) {
 					height = '100%';
 				}
@@ -399,8 +401,10 @@ YUI()
 				if (!scope) {
 					scope = A;
 				}
-				var attrSelector = (selector + '[' + attrName + '=' + linkId + ']');
+
 				var links;
+				var attrSelector = (selector + '[' + attrName + '=' + linkId + ']');
+
 				if (!returnAll) {
 					links = scope.one(attrSelector);
 				}
@@ -410,25 +414,30 @@ YUI()
 				return links;
 			}
 
+			var prevHover;
+
 			function scopeHover(event, enter) {
 				var currentTarget = event.currentTarget;
-				var target = event.target;
 
-				if (testClickable(target)) {
-					currentTarget.toggleClass('scoped', enter);
+				console.log('this is currentTarget = ' + currentTarget);
 
-					var node = currentTarget.ancestor('.macro, .test-group');
+				if (prevHover) {
+					prevHover.removeClass('scoped');
+				}
+				currentTarget.addClass('scoped');
+				prevHover = currentTarget;
 
-					if (enter) {
-						node = currentTarget.ancestors('.macro, .test-group');
-					}
+					// if (enter) {
 
-					if (node) {
-						node.toggleClass('scoped', !enter);
-					}
+					// 	node = currentTarget.ancestors('.macro, .test-group');
+					// }
+
+					// if (node) {
+					// 	prevHover.toggleClass('scoped', !enter);
+					// 	prevHover = currentTarget;
+					// }
 
 					event.stopPropagation();
-				}
 			}
 
 			function scopeSelect(event, node) {
@@ -451,9 +460,12 @@ YUI()
 					}
 
 					currentScope = scope;
-					scopeSidebar();
+
 					scope.addClass('current-scope');
+
 					parseCommandLog(scope);
+
+					scopeSidebar();
 				}
 			}
 
@@ -487,6 +499,7 @@ YUI()
 
 					while(scope.size() > 0) {
 						var node = scope.pop()
+
 						commandLogScope.push(node);
 					}
 				}
@@ -509,6 +522,7 @@ YUI()
 
 					var scopeType = scopeTypes.item(0);
 					var scopeName = scopeNames.item(0);
+
 					if (scopeName) {
 						scopeName = scopeName.html();
 					}
@@ -615,7 +629,7 @@ YUI()
 			}
 
 			function testClickable(testNode) {
-				return !testNode.test('.btn, .btn-container, polygon, svg');
+				return !testNode.test('.btn, .btn-container');
 			}
 
 			function testScopeable(testNode) {

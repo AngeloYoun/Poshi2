@@ -1,5 +1,4 @@
 @import url(color_schemes/dark.css);
-@import url(color_schemes/light.css);
 
 /* ---------- Main ---------- */
 
@@ -469,7 +468,8 @@ ul {
 
 .scoped {
 	background-color: rgba(0, 107, 255, 0.12);
-	outline: 2px dashed #FFF;
+	border: 2px dashed #FFF;
+	margin: -2px;
 }
 
 /* ---------- Syntax Highlight ---------- */
@@ -534,7 +534,7 @@ ul {
 	height: 100%;
 	font-family: Verdana, Geneva, sans-serif;
 	overflow-y: scroll;
-	transition: all 0.4s ease-in-out;
+	transition: all 0.5s ease-in-out;
 }
 
 .sidebar .command-log.collapse {
@@ -559,8 +559,12 @@ ul {
 	overflow: hidden;
 }
 
-.sidebar .command-log ul div:last-child {
+.sidebar .command-log ul > div:last-child {
 	padding-bottom: 11px;
+}
+
+.sidebar .command-log ul:last-child {
+	margin-bottom: 50vh;
 }
 
 .sidebar .expand-toggle {
@@ -700,7 +704,7 @@ ul {
 /* ---------- Extras ---------- */
 
 li {
-	transition: background 0.2s ease-in-out, border 0.4s ease-in-out;
+	transition: background 0.2s ease-in-out;
 }
 
 .tree .pass.macro > .line-container {
