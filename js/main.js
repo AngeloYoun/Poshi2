@@ -7,18 +7,22 @@ YUI()
 		'resize',
 		'transition',
 		function(A) {
-			var allNodes = A.all('*');
+			var allNodes = A.all('[data-status01]');
+			console.log(allNodes)
 			allNodes.each(
 				function(node) {
-					if (node.attr('data-functionlinkid')) {
-						node.attr('data-status02', 'pass')
-						node.attr('data-status03', 'pending')
+					node.attr('data-status02', 'pass')
+					node.attr('data-status03', 'pending')
+					if (node.hasClass('function')) {
 						if (Math.random() > 0.5) {
 							node.attr('data-status04', 'pass');
 						}
 						else {
-							node.attr('data-status04', 'pending');
+							node.attr('data-status04', 'fail');
 						}
+					}
+					else {
+						node.attr('data-status04', 'pass');
 					}
 				}
 			);
