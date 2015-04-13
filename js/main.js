@@ -16,7 +16,7 @@ YUI()
 
 			var collapsePairIndex = 0;
 			var passFailHeight = 0;
-			var inCommandLogMode = false;
+			var commandLogId = null;
 
 			var WIN = A.getWin();
 
@@ -88,7 +88,7 @@ YUI()
 					'.screenshot-container img, .fullscreen-image'
 				)
 
-				var logBtn = sidebar.one('.btn-command-log');
+				var logBtn = sidebar.all('.btn-command-log');
 
 				logBtn.on(
 					'click',
@@ -113,10 +113,6 @@ YUI()
 			}
 
 			init();
-			function xmlLogRefresh(node) {
-				expandTree(null, node);
-				scopeSelect(null, node);
-			}
 
 			function expandTree(event, node, noScroll) {
 				if (!node) {
@@ -151,7 +147,7 @@ YUI()
 				var newHeight = 0;
 				var newWidth = '20%';
 
-				if (inCommandLogMode) {
+				if (commandLogId) {
 					newWidth = '40%';
 				}
 
@@ -174,21 +170,38 @@ YUI()
 				}
 			}
 
-			function commandLogToggle(event) {
-				var commandLog;
+			function commandLogToggle(event, commandLog) {
+				var logId;
 
 				if (event) {
-					var currentTarget = event.currentTarget;
-					currentTarget.toggleClass('toggle');
-					commandLog = getLink(currentTarget, '.command-log', 'data-logId', sidebar);
+					var btn = event.currentTarget;
+
+					commandLog = getLink(btn, '.command-log', 'data-logId', sidebar);
 				}
 				else {
-					commandLog = A.one('.command-log');
-				}
+					if (!commandLog) {
+						commandLog = A.one('.command-log');
+					}
 
-				inCommandLogMode = !inCommandLogMode;
+					var btn = getLink(commandLog, '.btn-command-log', 'data-logId', sidebar);
+				}
+				btn.toggleClass('toggle');
 
 				var logId = commandLog.attr('data-logId');
+
+				if (!commandLogId) {
+					commandLogId = logId;
+				}
+				else {
+					if (commandLogId === logId) {
+						commandLogId = null;
+					}
+					else {
+						var currentActiveLog = sidebar.one('.command-log[data-logId=' + commandLogId + ']')
+						commandLogToggle(null, currentActiveLog);
+						commandLogId = logId;
+					}
+				}
 
 				var status = ['pass', 'pending', 'fail']
 				var selector = 'data-status' + logId;
@@ -208,7 +221,12 @@ YUI()
 
 				var body = A.one('body');
 
-				body.toggleClass('tree');
+				body.toggleClass('link-run-log');
+			}
+
+			function xmlLogRefresh(node) {
+				expandTree(null, node);
+				scopeSelect(null, node);
 			}
 
 			function resizeXmlLog(event) {
@@ -419,8 +437,6 @@ YUI()
 			function scopeHover(event, enter) {
 				var currentTarget = event.currentTarget;
 
-				console.log('this is currentTarget = ' + currentTarget);
-
 				if (prevHover) {
 					prevHover.removeClass('scoped');
 				}
@@ -584,10 +600,10 @@ YUI()
 			function scrollToNode(node, inSidebar) {
 				var scrollNode = WIN;
 				if (inSidebar) {
-					scrollNode = sidebar.one('.command-log');
+					scrollNode = sidebar.one('.command-log[data-logId=' + commandLogId + ']');
 				}
 
-				if (node) {
+				if (node && scrollNode) {
 					var winHalf = (WIN.height() / 2);
 
 					var halfNodeHeight = (node.innerHeight() / 2);
@@ -596,7 +612,7 @@ YUI()
 
 					var nodeY = node.getY();
 					if (inSidebar) {
-						nodeY = (nodeY - sidebar.one('.divider-line').getY());
+						nodeY = (nodeY - scrollNode.one('.divider-line').getY());
 					}
 
 					var yDistance = (nodeY - offset);

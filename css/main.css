@@ -35,37 +35,37 @@ ul {
 
 /* ---------- Run Log ---------- */
 
-.tree .xml-log .pass.conditional-failed > .line-container {
+.link-run-log .xml-log .pass.conditional-failed > .line-container {
 	background: transparent;
 }
 
-.tree .xml-log .pass > .line-container {
+.link-run-log .xml-log .pass > .line-container {
 	background-color: rgba(245, 245, 245, 0.34);
 	margin-top: 1px;
 	width: 102%;
 	padding-right: 2%;
 }
 
-// .tree .xml-log .macro.pass > .line-container {
+// .link-run-log .xml-log .macro.pass > .line-container {
 // 	background: #81CFD2;
 // }
 
-.tree .xml-log .function.pass > .line-container {
+.link-run-log .xml-log .function.pass > .line-container {
 	background: #72C3EA;
 	border: 1px solid #4293B0;
 	border-radius: 6px;
 }
 
-.tree .xml-log .scoped.pass.function, .tree .current-scope.pass.function {
+.link-run-log .xml-log .scoped.pass.function, .link-run-log .current-scope.pass.function {
 	background: transparent;
 	outline-width: 0px;
 }
 
-.tree .xml-log .scoped.pass > .line-container {
+.link-run-log .xml-log .scoped.pass > .line-container {
 	background: #FFFBF1;
 }
 
-.tree .xml-log .current-scope.pass > .line-container {
+.link-run-log .xml-log .current-scope.pass > .line-container {
 	background: #EEE;
 }
 
@@ -90,13 +90,22 @@ ul {
 	left: -60px;
 	margin-top: 10px;
 	position: absolute;
-	width: 32px;
+	width: 28px;
 }
 
 .btn.btn-sidebar, .btn.btn-command-log, .btn.btn-jump-to-error {
 	color: #444;
-	font-size: 26px;
+	font-size: 20px;
+	line-height: 25px;
 	margin: 5px 15px;
+}
+
+.btn.btn-jump-to-error {
+	display: none;
+}
+
+.link-run-log .btn.btn-jump-to-error {
+	display: block;
 }
 
 .btn.btn-command-log.toggle {
@@ -215,7 +224,7 @@ ul {
 }
 
 .line-container {
-	padding: 7px 3px;
+	padding: 5px 3px;
 }
 
 .current-scope.fail .line-container, .scoped.fail .line-container {
@@ -226,6 +235,7 @@ ul {
 	background-color: #E2604C;
 	border: 1px solid #FFA191;
 	position: relative;
+	margin: 1px;
 }
 
 .fail .line-container:before {
@@ -311,15 +321,14 @@ ul {
 	cursor: pointer;
 	font-size: 10px;
 	font-family: fontAwesome;
-	height: 32px;
+	height: 28px;
 	left: 0;
-	line-height: 24px;
 	margin: auto;
 	outline: none;
 	padding: 2px;
 	text-align: center;
 	transition: all 0.2s ease;
-	width: 32px;
+	width: 28px;
 }
 
 .btn .btn-content {
@@ -334,7 +343,7 @@ ul {
 	border-color: #FF5335;
 	bottom: 0;
 	color: #FF5335;
-	font-size: 20px;
+	font-size: 17px;
 	margin-top: 1px;
 }
 
@@ -472,6 +481,10 @@ ul {
 	margin: -2px;
 }
 
+.scoped > .btn-container {
+	margin: 1px 0;
+}
+
 /* ---------- Syntax Highlight ---------- */
 
 .name {
@@ -563,9 +576,9 @@ ul {
 	padding-bottom: 11px;
 }
 
-.sidebar .command-log ul:last-child {
-	margin-bottom: 50vh;
-}
+// .sidebar .command-log ul:last-child {
+// 	margin-bottom: 50vh;
+// }
 
 .sidebar .expand-toggle {
 	background: transparent;
@@ -707,7 +720,7 @@ li {
 	transition: background 0.2s ease-in-out;
 }
 
-.tree .pass.macro > .line-container {
+.link-run-log .pass.macro > .line-container {
 	border-radius: 5px;
 }
 
