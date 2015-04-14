@@ -689,7 +689,7 @@ ul {
 	min-width: 100%;
 	overflow: hidden;
 	padding: 9px 0 9px 20px;
-	position: absolute;
+	position: relative;
 	right: 0;
 	text-overflow: ellipsis;
 	transition: all 0.8s ease-in-out;

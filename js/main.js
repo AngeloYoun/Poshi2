@@ -56,14 +56,6 @@ YUI()
 					true
 				);
 
-				// xmlLog.delegate(
-				// 	'mouseleave',
-				// 	scopeHover,
-				// 	testScopeable,
-				// 	null,
-				// 	false
-				// );
-
 				xmlLog.delegate(
 					'click',
 					scopeSelect,
@@ -442,16 +434,6 @@ YUI()
 				}
 				currentTarget.addClass('scoped');
 				prevHover = currentTarget;
-
-					// if (enter) {
-
-					// 	node = currentTarget.ancestors('.macro, .test-group');
-					// }
-
-					// if (node) {
-					// 	prevHover.toggleClass('scoped', !enter);
-					// 	prevHover = currentTarget;
-					// }
 
 					event.stopPropagation();
 			}
