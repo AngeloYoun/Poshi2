@@ -10,13 +10,10 @@ YUI()
 			var currentScope;
 			var commandLogScope;
 			var fails;
+			var commandLogId;
 
 			var sidebar = A.one('.sidebar');
 			var xmlLog = A.one('.xml-log');
-
-			var collapsePairIndex = 0;
-			var passFailHeight = 0;
-			var commandLogId = null;
 
 			var WIN = A.getWin();
 
@@ -102,6 +99,7 @@ YUI()
 				);
 
 				commandLogToggle();
+				resizeXmlLog();
 			}
 
 			init();
@@ -144,7 +142,7 @@ YUI()
 				}
 
 				sidebar.setStyle('width', newWidth);
-				resizeXmlLog();
+				resizeXmlLog(null, open);
 				commandLog.toggleClass('collapse');
 
 				var lastLog = commandLog.one('ul:last-child');
@@ -221,17 +219,15 @@ YUI()
 				scopeSelect(null, node);
 			}
 
-			function resizeXmlLog(event) {
-				var defaultReset = true;
+			function resizeXmlLog(event, open) {
 				if (event) {
 					var currentTarget = event.currentTarget;
-					defaultReset = false;
 				}
 
 				var xmlLogWidth = 100;
 				var translation = 100;
 
-				if (defaultReset || currentTarget.hasClass('toggle')) {
+				if (open || (currentTarget && currentTarget.hasClass('toggle'))) {
 					var sidebarWidth = sidebar.getStyle('width');
 
 					if (sidebarWidth.indexOf('%') === -1) {
@@ -247,7 +243,7 @@ YUI()
 				sidebar.setStyle('transform', 'translateX(' + translation + '%)');
 				xmlLog.setStyle('width', xmlLogWidth + '%');
 
-				if (!defaultReset) {
+				if (currentTarget) {
 					currentTarget.toggleClass('toggle');
 				}
 			}
@@ -370,8 +366,6 @@ YUI()
 					ease = 'ease-out';
 				}
 
-				var reset;
-
 				targetNode.addClass('transitioning');
 
 				targetNode.transition(
@@ -380,8 +374,7 @@ YUI()
 							duration: transDuration,
 							easing: ease,
 							value: newHeight
-						},
-						on: reset
+						}
 					},
 					function() {
 						callback(this, collapsing);
@@ -483,17 +476,17 @@ YUI()
 				else {
 					scopeCommandLog(scope, null, null, noLookUp);
 				}
+				var position = null;
+				if (!noLookUp) {
+					position = scope;
+				}
 
-				scrollToNode(commandLogScope.item(0), true);
+				scrollToNode(commandLogScope.item(0), true, position);
 			}
 
 			function scopeCommandLog(scope, index, nodeList, noLookUp) {
-				var scrollTo = scope;
-
 				if (!noLookUp) {
 					scope = getLink(scope, '.linkable', 'data-functionLinkId', sidebar, true);
-
-					scrollTo = scope.item(0);
 
 					while(scope.size() > 0) {
 						var node = scope.pop()
@@ -579,24 +572,29 @@ YUI()
 				}
 			}
 
-			function scrollToNode(node, inSidebar) {
+			function scrollToNode(node, inSidebar, matchNode) {
 				var scrollNode = WIN;
 				if (inSidebar) {
 					scrollNode = sidebar.one('.command-log[data-logId=' + commandLogId + ']');
 				}
 
 				if (node && scrollNode) {
-					var winHalf = (WIN.height() / 2);
-
-					var halfNodeHeight = (node.innerHeight() / 2);
-
-					var offset = (winHalf - halfNodeHeight);
-
 					var nodeY = node.getY();
+
 					if (inSidebar) {
 						nodeY = (nodeY - scrollNode.one('.divider-line').getY());
 					}
+					var offset;
+					var halfNodeHeight = (node.innerHeight() / 2);
 
+					if (!matchNode) {
+						var winHalf = (WIN.height() / 2);
+						offset = (winHalf - halfNodeHeight);
+					}
+					else {
+						var position = matchNode.getY();
+						offset = (position - window.scrollY);
+					}
 					var yDistance = (nodeY - offset);
 
 					var scroll = new A.Anim(

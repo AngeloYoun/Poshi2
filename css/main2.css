@@ -1,0 +1,725 @@
+/* ---------- Main ---------- */
+body {
+  background-color: #B9B9B9;
+  font-family: menlo, source code pro, lucia console, monospace;
+  font-size: 11px;
+  line-height: 1.75em;
+  margin: 0;
+  overflow-x: hidden;
+  padding: 0;
+  word-wrap: break-word;
+}
+
+h3 {
+  font-size: 13px;
+  font-weight: normal;
+  margin: 0;
+  padding: 5px 0;
+}
+
+li {
+  display: block;
+}
+
+/* ---------- XML-Log ---------- */
+.collapse, .header > .btn-container {
+  display: none;
+}
+
+.xml-log {
+  display: block;
+  position: relative;
+  width: 100%;
+}
+
+.xml-log-container {
+  border-width: 0;
+  height: auto;
+  padding-left: 100px;
+}
+
+.child-container.root-container {
+  border-width: 0;
+  overflow: visible;
+}
+
+.line-container {
+  padding: 5px 3px;
+}
+
+.function > .line-container, .macro > .line-container {
+  cursor: pointer;
+}
+
+.macro > .child-container {
+  background-color: rgba(159, 155, 155, 0.2);
+  box-shadow: inset -1px 0 0 2px rgba(157, 157, 157, 0.69);
+}
+
+.child-container, .sidebar .collapsible {
+  border-left: 1px solid #DDD;
+  color: #40444D;
+  height: 0;
+  list-style-type: none;
+  overflow: visible;
+  padding: 1px 0 1px 20px;
+}
+
+.child-container.transitioning, .sidebar .collapsible.transitioning {
+  overflow: hidden;
+}
+
+.btn-container {
+  left: 0;
+  position: absolute;
+}
+
+.parameter-container {
+  border: 1px dashed #777;
+  border-right-width: 0;
+  border-top-width: 0;
+  color: #615750;
+  height: 0;
+  margin-left: 35px;
+  overflow: hidden;
+}
+.parameter-container .line-container {
+  padding: 5px 10px;
+}
+.parameter-container .line-number {
+  left: 0;
+  position: absolute;
+}
+
+.line-number {
+  border-width: 0;
+  color: #222;
+  cursor: pointer;
+  display: inline-block;
+  margin-left: 5px;
+  min-width: 26px;
+  opacity: 0.2;
+}
+.line-number:hover {
+  opacity: 1;
+}
+
+/* ---------- Buttons ---------- */
+.btn {
+  background: transparent;
+  border-width: 0;
+  cursor: pointer;
+  font-family: fontAwesome;
+  font-size: 10px;
+  height: 28px;
+  left: 0;
+  margin: auto;
+  outline: none;
+  padding: 2px;
+  text-align: center;
+  transition: all 0.2s ease;
+  width: 28px;
+}
+.btn:active:focus, .btn:focus, .btn:hover {
+  box-shadow: none;
+  outline: 0;
+}
+.btn .btn-content {
+  transition: all 0.2s ease;
+}
+.btn:hover .btn-content {
+  transform: scale(1.3, 1.3);
+}
+.btn.toggle {
+  background-color: rgba(220, 220, 220, 0.6);
+}
+
+.error-btn, .screenshot-btn {
+  border-color: #FF5335;
+  bottom: 0;
+  color: #FF5335;
+  font-size: 17px;
+  margin-top: 1px;
+}
+.error-btn:hover, .error-btn:focus, .screenshot-btn:hover, .screenshot-btn:focus {
+  color: #FF5335;
+}
+
+.screenshot-btn, .error-btn {
+  display: none;
+}
+
+.fail .screenshot-btn, .fail .error-btn {
+  display: inline-block;
+}
+.fail .btn:hover {
+  background-color: transparent;
+}
+.fail .btn.toggle:hover {
+  background-color: #FF5335;
+}
+
+.error-btn.toggle, .screenshot-btn.toggle {
+  background: #FF5335;
+  color: #EBE7DC;
+}
+
+/* ---------- Button Icons ---------- */
+.btn-collapse:before {
+  content: '+';
+}
+.btn-collapse.toggle:before {
+  content: '-';
+}
+
+.btn-var:before {
+  content: 'var';
+  font-family: menlo, source code pro, lucia console, monospace;
+}
+
+.error-btn .btn-content:before {
+  content: '\f071';
+}
+
+.screenshot-btn .btn-content:before {
+  content: '\f108';
+}
+
+/* ---------- Link Run Log ---------- */
+.link-run-log .pass.conditional-failed > .line-container {
+  background: transparent;
+}
+.link-run-log .pass > .line-container {
+  background-color: rgba(245, 245, 245, 0.34);
+  margin-top: 1px;
+  padding-right: 2%;
+  width: 102%;
+}
+.link-run-log .function.pass > .line-container {
+  background: #D8D8D8;
+  border: 1px solid #DE8968;
+}
+.link-run-log .pending > .line-container {
+  background-color: rgba(254, 144, 60, 0.07);
+  border: 2px dotted #FF8E24;
+}
+.link-run-log .scoped.pass.function {
+  background: transparent;
+  outline-width: 0;
+}
+.link-run-log .current-scope.pass.function {
+  background: transparent;
+  outline-width: 0;
+}
+.link-run-log .scoped.pass > .line-container, .link-run-log .scoped.pending > .line-container {
+  background-color: #FFFBF1;
+}
+.link-run-log .current-scope.pass > .line-container, .link-run-log .current-scope.pending > .line-container {
+  background-color: #FFDBA2;
+}
+
+/* ---------- Scope Selection ---------- */
+.current-scope {
+  background-color: rgba(28, 117, 185, 0.5);
+  outline: 1px solid #DDD;
+}
+
+.xml-log .current-scope:after {
+  box-shadow: 4px 31px 0 0 rgba(29, 60, 75, 0.3);
+}
+
+.fail:after, .current-scope:after {
+  content: ' ';
+  height: 7px;
+  margin-top: -30px;
+  position: absolute;
+  transition: all 0.2s ease;
+  width: 100%;
+}
+
+.transitioning .current-scope:after {
+  opacity: 0;
+}
+
+.scoped {
+  background-color: rgba(89, 61, 30, 0.12);
+  border: 2px dashed #FFF;
+  margin: -2px;
+}
+
+.pass.scoped > .btn-container, .fail.scoped > .btn-container {
+  margin: 1px 0;
+}
+
+.pending.scoped > .btn-container {
+  margin: 0;
+}
+
+.current-scope .line-number {
+  opacity: 0.8;
+}
+.current-scope.scoped .line-number {
+  opacity: 0.8;
+}
+.current-scope.scoped .macro > .btn-container .line-number, .current-scope.scoped .macro > .line-container .line-number .current-scope .macro > .line-container .line-number {
+  opacity: 0.8;
+}
+.current-scope .macro > .btn-container .line-number {
+  opacity: 0.8;
+}
+
+.scoped > .line-container .line-number, .scoped > .btn-container .line-number {
+  opacity: 1;
+}
+.scoped .line-number {
+  opacity: 1;
+}
+
+.marco.current-scope > .btn-container .line-number, .marco.current-scope > .line-container .line-number {
+  opacity: 0.2;
+}
+
+.current-scope.scoped .macro .line-number {
+  opacity: 0.2;
+}
+.current-scope .macro .line-number {
+  opacity: 0.2;
+}
+.current-scope .macro .child-container .macro .btn-container .line-number, .current-scope .macro .child-container .macro .line-container .line-number {
+  opacity: 0.2;
+}
+
+.scoped.macro > .child-container, .current-scope.macro > .child-container {
+  background: rgba(185, 185, 185, 0.3);
+}
+
+.current-scope, .scoped.current-scope {
+  background-color: rgba(134, 134, 134, 0.5);
+}
+
+.current-scope.fail .line-container, .scoped.fail .line-container {
+  background-color: #EE6C39;
+}
+
+.fail .btn-container {
+  margin-top: 1px;
+}
+.fail .line-number {
+  color: #FF2600;
+  font-weight: bold;
+}
+.fail .line-container {
+  background-color: #E2604C;
+  border: 1px solid #FFA191;
+  position: relative;
+}
+.fail .line-container:before {
+  background-color: #EBE7DC;
+  content: '';
+  height: 100%;
+  position: absolute;
+  right: 0;
+  top: 0;
+  transition: all 0.2s ease;
+  width: 100vw;
+  z-index: -1;
+}
+
+.transitioning .fail:after, .collapse .fail:after, .transitioning .fail .line-container:before {
+  opacity: 0;
+}
+
+.console, .screenshots {
+  border: 6px solid #E2E2D9;
+  color: #FFFBF0;
+  left: 50%;
+  max-height: 1000px;
+  overflow-Y: auto;
+  position: absolute;
+  transition: max-height 0.3s ease 0.2s, padding 0.1s ease 0.2s, width 0.2s ease;
+  width: 94%;
+  z-index: 2;
+}
+.console.toggle, .screenshots.toggle {
+  border-width: 0;
+  max-height: 0;
+  overflow: hidden;
+  padding: 0;
+  transition: max-height 0.3s ease, padding 0.1s ease 0.2s, width 0.2s ease 0.3s, border-width 0.1s 0.7s;
+  width: 0;
+}
+
+.console {
+  background-color: #EA461F;
+  font-size: 12px;
+  margin-top: 25px;
+  padding: 10px 10px 50px;
+  word-wrap: break-word;
+}
+
+.screenshots {
+  background-color: #333;
+  margin-top: -25px;
+  padding: 30px 10px;
+  text-align: center;
+}
+.screenshots div {
+  display: inline-block;
+  min-width: 600px;
+  width: 49%;
+}
+.screenshots img {
+  border: 3px solid #A19C8C;
+  height: auto;
+  max-width: 100%;
+}
+.screenshots span {
+  display: block;
+  padding: 5px 10px;
+  text-align: left;
+}
+
+.fullscreen-image {
+  height: 100%;
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: 9999;
+}
+.fullscreen-image:before {
+  background: #111;
+  content: '';
+  height: 100%;
+  opacity: 0.7;
+  position: absolute;
+  transition: opacity 0.5s ease;
+  width: 100%;
+}
+.fullscreen-image.toggle:before {
+  opacity: 0;
+}
+.fullscreen-image img {
+  cursor: zoom-out;
+  height: 95%;
+  left: 0;
+  left: 50%;
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  transition: height 0.5s ease;
+}
+.fullscreen-image.toggle {
+  height: 0;
+  transition: all 0s ease 0.5s;
+}
+.fullscreen-image.toggle img {
+  height: 0;
+  transition: all 0s ease 0.5s;
+}
+
+/* ---------- Syntax Highlight ---------- */
+.name {
+  color: #111;
+}
+
+.tag-type {
+  color: #333;
+}
+
+.gray .function > div .name, .gray .macro > div .name {
+  color: #663615;
+}
+
+/* ---------- Sidebar ---------- */
+.sidebar {
+  background: #565C61;
+  box-shadow: -5px 0 0 0 rgba(29, 60, 75, 0.3);
+  color: #FFF;
+  display: inline-block;
+  font-family: Futura, Trebuchet MS, Arial, sans-serif;
+  height: 100%;
+  position: fixed;
+  right: 0;
+  transform: translateX(100%);
+  transition: all 0.6s ease-out;
+  width: 20%;
+  z-index: 2;
+}
+.sidebar .title {
+  display: block;
+  font-size: 32px;
+  font-weight: 500;
+  margin: 30px 0 10px 17px;
+  position: relative;
+}
+.sidebar .scope-type {
+  margin-bottom: 60px;
+}
+.sidebar .scope-name {
+  background-color: #565C61;
+  display: block;
+  float: right;
+  font-size: 15px;
+  font-weight: 100;
+  max-width: 100%;
+  min-width: 100%;
+  overflow: hidden;
+  padding: 9px 0 9px 20px;
+  position: relative;
+  text-overflow: ellipsis;
+  transition: all 0.8s ease-in-out;
+  white-space: nowrap;
+  width: auto;
+}
+.sidebar .scope-name:hover {
+  box-shadow: -5px 7px 0 0 rgba(29, 60, 75, 0.3);
+  max-width: 300%;
+  padding-right: 20px;
+}
+.sidebar .parameter-name {
+  font-size: 12px;
+  font-weight: 500;
+  margin: 15px 20px 0;
+}
+.sidebar .parameter-value {
+  font-size: 11px;
+  margin: 10px 30px;
+}
+
+.global-btn-container {
+  left: -60px;
+  margin-top: 10px;
+  position: absolute;
+  width: 28px;
+}
+.global-btn-container .btn {
+  color: #444;
+  font-size: 20px;
+  line-height: 25px;
+  margin: 5px 15px;
+}
+.global-btn-container .btn.toggle {
+  background-color: rgba(220, 220, 220, 0.6);
+}
+.global-btn-container .btn:hover {
+  background-color: rgba(220, 220, 220, 0.7);
+}
+.global-btn-container .btn-command-log.toggle {
+  background-color: #444;
+  border-color: #444;
+  color: #CCC;
+}
+.global-btn-container .btn-command-log:before {
+  content: '\f126';
+}
+.global-btn-container .btn-sidebar:before {
+  content: '\f104';
+  display: block;
+}
+.global-btn-container .btn-jump-to-error {
+  display: none;
+}
+.global-btn-container .btn-jump-to-error:before {
+  content: '\f071';
+}
+
+.link-run-log .btn.btn-jump-to-error {
+  display: block;
+}
+
+/* ---------- Command-Log ---------- */
+.command-log {
+  font-family: Verdana, Geneva, sans-serif;
+  height: 100%;
+  overflow-y: scroll;
+  transition: all 0.5s ease-in-out;
+}
+.command-log .status div {
+  display: inline;
+}
+.command-log .current-scope {
+  border: 2px solid #AAA;
+  outline-width: 0;
+}
+.command-log.collapse {
+  display: block;
+  height: 0;
+}
+.command-log.toggle {
+  height: 100%;
+}
+.command-log .line-container {
+  margin-left: 20px;
+}
+.command-log .linkable {
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+.command-log .linkable:hover {
+  background: #555;
+  outline: 1px solid #777;
+}
+.command-log .divider-line {
+  background: #979C9F;
+  color: #484B4D;
+  font-size: 12px;
+  font-weight: bold;
+  height: auto;
+  padding: 10px;
+}
+.command-log .line {
+  position: relative;
+}
+.command-log .collapsible {
+  border: 1px dashed #EEE;
+  border-right-width: 0;
+  border-top-width: 0;
+  color: #FFF;
+  margin-left: 24px;
+  overflow: hidden;
+  padding-bottom: 11px;
+}
+.command-log .expand-toggle {
+  background: transparent;
+  border-width: 0;
+  color: #AAA;
+  cursor: pointer;
+  height: 20px;
+  line-height: inherit;
+  margin: 6px 0 0 0;
+  padding: 0;
+  position: absolute;
+  text-align: center;
+  width: 20px;
+}
+.command-log .expand-toggle:hover {
+  color: #FFF;
+}
+.command-log .expand-toggle:before {
+  content: '\f105';
+  font-family: fontAwesome;
+  font-size: 14px;
+  height: 10px;
+  width: 10px;
+}
+.command-log .failed {
+  background-color: #E2604C;
+}
+.command-log .failed.current-scope {
+  background-color: #EE6C39;
+}
+.command-log .failed:hover {
+  background-color: #F0652B;
+}
+.command-log .failed .expand-toggle {
+  color: #FBEFB4;
+}
+.command-log .title-line {
+  display: none;
+}
+
+/* ---------- Syntax Highlight ---------- */
+.command-name {
+  color: #FFBA6C;
+}
+
+.locator-key {
+  color: #CFCFCD;
+}
+
+.failed .command-name {
+  color: #FBF4D7;
+}
+.failed .locator-key, .failed .value {
+  color: #FFE4C7;
+}
+
+.collapsible b {
+  color: #FDBA93;
+  font-weight: 300;
+}
+.collapsible b:first-child {
+  color: #E9C993;
+}
+.collapsible .command-failure {
+  color: #FC8686;
+}
+
+/* ---------- Extras ---------- */
+li {
+  transition: background 0.2s ease-in-out;
+}
+
+.link-run-log .pass.macro > .line-container {
+  border-radius: 5px;
+}
+
+.xml-log {
+  transition: width 0.6s ease-out;
+}
+
+.btn {
+  border-radius: 4px;
+  opacity: 0.7;
+}
+.btn:hover {
+  opacity: 1;
+}
+
+.fail .btn {
+  opacity: 1;
+}
+
+.function.pass > .line-container {
+  border-radius: 6px;
+}
+
+.btn.btn-sidebar:before {
+  transform: rotate(180deg);
+  transition: all 0.5s ease-in-out;
+}
+.btn.btn-sidebar.toggle:before {
+  transform: rotate(0);
+}
+.btn.btn-command-log:hover, .btn.btn-sidebar:hover {
+  opacity: 1;
+}
+
+.console, .screenshots {
+  border-radius: 13px;
+  box-shadow: 14px 22px 0 0 rgba(27, 60, 75, 0.4);
+  opacity: 0.9;
+  transform: translateX(-50%);
+}
+.console:hover, .screenshots:hover {
+  opacity: 1;
+}
+
+.screenshots {
+  transform: translate(-50%, -100%);
+}
+.screenshots img {
+  border-radius: 13px;
+  cursor: pointer;
+}
+
+.sidebar .current-scope:after {
+  box-shadow: 3px 30px 0 0 rgba(29, 60, 75, 0.3);
+}
+
+.fail:after {
+  box-shadow: 5px 31px 0 0 rgba(29, 60, 75, 0.2);
+}
+
+.line-container {
+  display: block;
+  transition: border, background 0.3s ease-out;
+}
+
+.expand-toggle {
+  transition: all 0.2s ease;
+}
+.expand-toggle.toggle {
+  transform: rotate(90deg);
+}

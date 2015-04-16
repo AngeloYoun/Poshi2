@@ -51,9 +51,9 @@ ul {
 // }
 
 .link-run-log .xml-log .function.pass > .line-container {
-	background: #72C3EA;
-	border: 1px solid #4293B0;
+	border: 1px solid #DE8968;
 	border-radius: 6px;
+	background: #D8D8D8;
 }
 
 .link-run-log .xml-log .scoped.pass.function, .link-run-log .current-scope.pass.function {
@@ -66,7 +66,7 @@ ul {
 }
 
 .link-run-log .xml-log .current-scope.pass > .line-container {
-	background: #EEE;
+	background-color: #FFDBA2;
 }
 
 /* ---------- Main Content ---------- */
@@ -235,7 +235,7 @@ ul {
 	background-color: #E2604C;
 	border: 1px solid #FFA191;
 	position: relative;
-	margin: 1px;
+	margin-top: 1px;
 }
 
 .fail .line-container:before {
@@ -277,7 +277,7 @@ ul {
 }
 
 .pending > .line-container {
-	background-color: rgba(254, 144, 60, 0.44);
+	background-color: rgba(254, 144, 60, 0.07);
 	border: 2px dotted #FF8E24;
 }
 
@@ -481,9 +481,14 @@ ul {
 	margin: -2px;
 }
 
-.scoped > .btn-container {
+.pass.scoped > .btn-container, .fail.scoped > .btn-container {
 	margin: 1px 0;
 }
+
+.pending.scoped > .btn-container {
+	margin: 0;
+}
+
 
 /* ---------- Syntax Highlight ---------- */
 
@@ -496,7 +501,7 @@ ul {
 }
 
 .sidebar span.command-name {
-	color: #C1DBE4;
+	color: #FFBA6C;
 }
 
 .sidebar span.locator-key {
@@ -529,7 +534,7 @@ ul {
 /* ---------- Work In Progress ---------- */
 
 .sidebar {
-	background: #484B4D;
+	background: #565C61;
 	box-shadow: -5px 0 0 0 rgba(29, 60, 75, 0.3);
 	color: #FFF;
 	display: inline-block;
@@ -627,7 +632,7 @@ ul {
 }
 
 .sidebar .linkable:hover {
-	outline: 1px solid #DDD;
+	outline: 1px solid #777;
 	background: #555;
 }
 
@@ -653,7 +658,7 @@ ul {
 }
 
 .sidebar .command-log .current-scope {
-	border: 2px solid #DDD;
+	border: 2px solid #AAA;
 	outline-width: 0;
 }
 
@@ -682,7 +687,9 @@ ul {
 }
 
 .sidebar .scope-name {
-	background-color: #484B4D;
+	background-color: #565C61;
+	display: block;
+	float: right;
 	font-size: 15px;
 	font-weight: 100;
 	max-width: 100%;
@@ -690,7 +697,6 @@ ul {
 	overflow: hidden;
 	padding: 9px 0 9px 20px;
 	position: relative;
-	right: 0;
 	text-overflow: ellipsis;
 	transition: all 0.8s ease-in-out;
 	white-space: nowrap;
