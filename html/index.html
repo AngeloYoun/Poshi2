@@ -4413,23 +4413,29 @@
 			</ul>
 		</div>
 		<!-- COMMAND LOG END -->
-		<div class="scope-type">
-			<span class="title">macro</span>
-			<span class="scope-name">current-scope</span>
-		</div>
-		<div class="parameter">
-			<span class="title">parameter</span>
-			<div class="parameter-list">
-				<li class="parameter-name">categoryName</li>
-				<li class="parameter-value">Category Name</li>
-				<li class="parameter-name">categoryName</li>
-				<li class="parameter-value">Category Name</li>
-				<li class="parameter-name">categoryName</li>
-				<li class="parameter-value">Category Name</li>
-				<li class="parameter-name">categoryName</li>
-				<li class="parameter-value">Category Name</li>
+
+		<!-- EDIT MENU BEGIN -->
+		<div id="editMenu">
+			<div class="scope-type">
+				<span class="title">macro</span>
+				<span class="scope-name">current-scope</span>
+			</div>
+
+			<div class="parameter">
+				<span class="title">parameter</span>
+				<div class="parameter-list">
+					<li class="parameter-name">categoryName</li>
+					<li class="parameter-value">Category Name</li>
+					<li class="parameter-name">categoryName</li>
+					<li class="parameter-value">Category Name</li>
+					<li class="parameter-name">categoryName</li>
+					<li class="parameter-value">Category Name</li>
+					<li class="parameter-name">categoryName</li>
+					<li class="parameter-value">Category Name</li>
+				</div>
 			</div>
 		</div>
+		<!-- EDIT MENU END -->
 	</div>
 	<div class="xml-log">
 		<div class="fullscreen-image toggle"></div>
@@ -53449,5 +53455,23 @@
 			</li>
 		</ul>
 	</div>
+
+	<script>
+		var tetmp = YUI().use(
+			'liferay-qa-poshi-logger',
+			function(Y) {
+				var logger = new Y.PoshiLogger(
+					{
+						contentBox: '.xml-log',
+						sidebar: '.sidebar'
+					}
+				).render();
+			}
+		);
+
+		temptmfire(functuon
+			tempfire .test 1
+			)
+	</script>
 </body>
 </html>
