@@ -233,6 +233,35 @@ YUI.add(
 					}
 				},
 
+				expandParentContainers: function(childContainers, node) {
+					var instance = this;
+
+					var timeout = 0;
+
+					var childNode = childContainers.shift();
+
+					if (childNode.hasClass('collapse')) {
+						instance.toggleNode(childNode);
+
+						timeout = 200;
+					}
+
+					if (childContainers.size()) {
+						setTimeout(
+							A.bind(
+								'expandParentContainers',
+								instance,
+								childContainers,
+								node
+							),
+							timeout
+						);
+					}
+					else {
+						instance.scrollToNode(node);
+					}
+				},
+
 				getSidebarLogNode: function(logId) {
 					var instance = this;
 
@@ -580,35 +609,6 @@ YUI.add(
 					instance.resizeXmlLog(xmlLogWidth);
 				},
 
-				expandParentContainers: function(childContainers, node) {
-					var instance = this;
-
-					var timeout = 0;
-
-					var childNode = childContainers.shift();
-
-					if (childNode.hasClass('collapse')) {
-						instance.toggleNode(childNode);
-
-						timeout = 200;
-					}
-
-					if (childContainers.size()) {
-						setTimeout(
-							A.bind(
-								'expandParentContainers',
-								instance,
-								childContainers,
-								node
-							),
-							timeout
-						);
-					}
-					else {
-						instance.scrollToNode(node);
-					}
-				},
-
 				toggleCommandLog: function(commandLog, button) {
 					var instance = this;
 
@@ -621,20 +621,18 @@ YUI.add(
 
 					button.toggleClass('toggle');
 
-					if (!commandLogId) {
-						instance.set('commandLogId', logId);
-					}
-					else {
-						if (commandLogId === logId) {
-							instance.set('commandLogId', null);
-						}
-						else {
+					if (commandLogId !== logId) {
+						if (commandLogId) {
 							var currentActiveLog = instance.getSidebarLogNode();
 
 							instance.toggleCommandLog(currentActiveLog);
-
-							instance.set('commandLogId', logId);
 						}
+						instance.set('commandLogId', logId);
+
+						commandLog.all('.failed').each(refreshXmlError);
+					}
+					else {
+						instance.set('commandLogId', null);
 					}
 
 					var selector = 'data-status' + logId;
