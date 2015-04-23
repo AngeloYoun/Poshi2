@@ -31,6 +31,14 @@ li {
 .xml-log {
 	display: block;
 	position: relative;
+	width: 80%;
+}
+
+.command-logger .xml-log {
+	width: 60%;
+}
+
+.minimized-sidebar .xml-log {
 	width: 100%;
 }
 
@@ -210,7 +218,7 @@ li {
 
 /* ---------- Link run log ---------- */
 
-.link-run-log {
+.command-logger {
 	.pass {
 		&.conditional-failed > .line-container {
 			background: transparent;
@@ -497,6 +505,14 @@ li {
 
 /* ---------- Sidebar ---------- */
 
+.command-logger .sidebar {
+	width: 40%;
+}
+
+.minimized-sidebar .sidebar {
+	transform: translateX(100%);
+}
+
 .sidebar {
 	background: #565C61;
 	box-shadow: -5px 0 0 0 rgba(29, 60, 75, 0.3);
@@ -510,14 +526,6 @@ li {
 	transition: all 0.6s ease-out;
 	width: 20%;
 	z-index: 2;
-
-	&.commandLog {
-		width: 40%;
-	}
-
-	&.minimized {
-		transform: translateX(100%);
-	}
 
 	.title {
 		display: block;
@@ -616,7 +624,7 @@ li {
 	display: none;
 }
 
-.link-run-log .btn.btn-jump-to-error {
+.command-logger .btn.btn-jump-to-error {
 	display: block;
 }
 
@@ -639,6 +647,7 @@ li {
 	}
 
 	&.collapse {
+		display: block;
 		height: 0;
 	}
 
@@ -775,7 +784,7 @@ li {
 	transition: background 0.2s ease-in-out;
 }
 
-.link-run-log .pass.macro > .line-container {
+.command-logger .pass.macro > .line-container {
 	border-radius: 5px;
 }
 
