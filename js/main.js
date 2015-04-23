@@ -86,21 +86,21 @@ YUI.add(
 
 					sidebar.delegate(
 						'click',
-						A.rbind('handleToggleCollapseClick', instance, true),
+						A.rbind('handleToggleCollapseBtn', instance, true),
 						'.expand-toggle'
 					);
 
 					var logBtn = sidebar.all('.btn-command-log');
 
-					logBtn.on('click', A.bind('handleToggleCommandLogClick', instance));
+					logBtn.on('click', A.bind('handleToggleCommandLogBtn', instance));
 
 					var sidebarBtn = sidebar.one('.btn-sidebar');
 
-					sidebarBtn.on('click', A.bind('handleResizeXmlLogClick', instance));
+					sidebarBtn.on('click', A.bind('handleMinimizeSidebarBtn', instance));
 
 					var jumpToError = sidebar.one('.btn-jump-to-error');
 
-					jumpToError.on('click', A.bind('handleGoToErrorClick', instance));
+					jumpToError.on('click', A.bind('handleGoToErrorBtn', instance));
 
 				},
 
@@ -129,13 +129,13 @@ YUI.add(
 
 					contentBox.delegate(
 						'click',
-						A.rbind('handleToggleCollapseClick', instance, false),
+						A.rbind('handleToggleCollapseBtn', instance, false),
 						'.btn-collapse, .btn-var'
 					);
 
 					contentBox.delegate(
 						'click',
-						A.bind('handleErrorButtonsClick', instance),
+						A.bind('handleErrorBtns', instance),
 						'.error-btn, .screenshot-btn'
 					);
 				},
@@ -226,10 +226,10 @@ YUI.add(
 
 					node = node || instance.get('fails').last();
 
-					var childContainer = node.ancestors('.child-container');
+					var childContainers = node.ancestors('.child-container');
 
-					if (childContainer) {
-						instance.expandParentContainers(childContainer, node);
+					if (childContainers) {
+						instance.expandParentContainers(childContainers, node);
 					}
 				},
 
@@ -258,13 +258,14 @@ YUI.add(
 						}
 
 						currentTarget.addClass('current-scope');
+
 						instance.set('currentScope', currentTarget);
 						instance.displayNode(currentTarget);
-						instance.parseCommandLog(currentTarget);
+						instance.selectCurrentNode(currentTarget);
 					}
 				},
 
-				handleErrorButtonsClick: function(event) {
+				handleErrorBtns: function(event) {
 					var instance = this;
 
 					var currentTarget = event.currentTarget;
@@ -307,6 +308,8 @@ YUI.add(
 						instance.set('currentScope', linkedFunction);
 
 						instance.displayNode(linkedFunction);
+
+						instance.selectCurrentNode(linkedFunction);
 					}
 				},
 
@@ -329,7 +332,7 @@ YUI.add(
 					fullScreenImage.toggleClass('toggle');
 				},
 
-				handleGoToErrorClick: function(event) {
+				handleGoToErrorBtn: function(event) {
 					var instance = this;
 
 					instance.displayNode();
@@ -353,7 +356,7 @@ YUI.add(
 					instance.set('prevNode', currentTarget);
 				},
 
-				handleToggleCommandLogClick: function(event) {
+				handleToggleCommandLogBtn: function(event) {
 					var instance = this;
 
 					var sidebar = instance.get('sidebar');
@@ -367,7 +370,7 @@ YUI.add(
 					instance.toggleCommandLog(commandLog, currentTarget);
 				},
 
-				handleToggleCollapseClick: function(event, inSidebar) {
+				handleToggleCollapseBtn: function(event, inSidebar) {
 					var instance = this;
 
 					var currentTarget = event.currentTarget;
@@ -380,12 +383,12 @@ YUI.add(
 						contentBox = instance.get('sidebar');
 					}
 
-					var collapsibleNode = contentBox.one('.collapsible[data-btnLinkId="' + linkId + '"]');
+					var collapsibleNode = contentBox.one('.child-container[data-btnLinkId="' + linkId + '"]');
 
 					instance.toggleNode(collapsibleNode, currentTarget, inSidebar);
 				},
 
-				handleResizeXmlLogClick:function(event) {
+				handleMinimizeSidebarBtn:function(event) {
 					var instance = this;
 
 					var currentTarget = event.currentTarget;
@@ -394,7 +397,7 @@ YUI.add(
 						instance.setXmlLogDimensions();
 					}
 					else {
-						instance.resizeXmlLog(100, 100);
+						instance.resizeXmlLog(100);
 					}
 
 					currentTarget.toggleClass('toggle');
@@ -411,7 +414,9 @@ YUI.add(
 
 					node.addClass('current-scope');
 
-					instance.parseCommandLog(node);
+					if (instance.get('commandLogId')) {
+						instance.parseCommandLog(node);
+					}
 
 					instance.scopeSidebar();
 				},
@@ -450,7 +455,7 @@ YUI.add(
 					instance.selectCurrentNode(node);
 				},
 
-				refreshXmlError: function(command) {
+				injectXmlError: function(command) {
 					var instance = this;
 
 					var consoleLog = command.one('.console');
@@ -477,10 +482,16 @@ YUI.add(
 					}
 				},
 
-				resizeXmlLog: function(xmlLogWidth, translation) {
+				resizeXmlLog: function(xmlLogWidth) {
 					var instance = this;
+					var sidebar = instance.get('sidebar');
 
-					instance.get('sidebar').setStyle('transform', 'translateX(' + translation + '%)');
+					if (xmlLogWidth === 100) {
+						sidebar.addClass('minimized');
+					}
+					else {
+						sidebar.removeClass('minimized');
+					}
 
 					instance.get('contentBox').setStyle('width', xmlLogWidth + '%');
 				},
@@ -566,15 +577,15 @@ YUI.add(
 
 					var xmlLogWidth = (100 - sidebarWidth);
 
-					instance.resizeXmlLog(xmlLogWidth, 0);
+					instance.resizeXmlLog(xmlLogWidth);
 				},
 
-				expandParentContainers: function(childContainer, node) {
+				expandParentContainers: function(childContainers, node) {
 					var instance = this;
 
 					var timeout = 0;
 
-					var childNode = childContainer.shift();
+					var childNode = childContainers.shift();
 
 					if (childNode.hasClass('collapse')) {
 						instance.toggleNode(childNode);
@@ -582,12 +593,12 @@ YUI.add(
 						timeout = 200;
 					}
 
-					if (childContainer.size()) {
+					if (childContainers.size()) {
 						setTimeout(
 							A.bind(
 								'expandParentContainers',
 								instance,
-								childContainer,
+								childContainers,
 								node
 							),
 							timeout
