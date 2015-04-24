@@ -777,7 +777,7 @@ YUI.add(
 					}
 				},
 
-				updateLog: function(id) {
+				handleCommandCompleted: function(id) {
 					console.log('test' + id);
 					var instance = this;
 
@@ -802,7 +802,22 @@ YUI.add(
 					}
 				},
 
-				updateXml: function(id) {
+				handleLineCompleted: function(id) {
+					console.log('test' + id);
+					var instance = this;
+
+					var linkedLine = instance.get('xmlLog').one('#' + id);
+
+					instance._setXmlNodeClass(linkedLine);
+
+					var container = linkedLine.one('> .child-container');
+
+					if (container && !container.hasClass('collapse')) {
+						instance._toggleContainer(container, false);
+					}
+				}
+
+				handleLineStarted: function(id) {
 					console.log('test' + id);
 					var instance = this;
 
@@ -817,21 +832,6 @@ YUI.add(
 					}
 					instance._scrollToNode(linkedLine);
 				},
-
-				updateXmlClosing: function(id) {
-					console.log('test' + id);
-					var instance = this;
-
-					var linkedLine = instance.get('xmlLog').one('#' + id);
-
-					instance._setXmlNodeClass(linkedLine);
-
-					var container = linkedLine.one('> .child-container');
-
-					if (container && !container.hasClass('collapse')) {
-						instance._toggleContainer(container, false);
-					}
-				}
 			}
 		});
 

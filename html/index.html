@@ -58,20 +58,20 @@
 				).render();
 
 				Y.on(
-					'line-started',
-					logger.updateXml,
+					'command-complete',
+					logger.handleCommandCompleted,
 					logger
 				);
 
 				Y.on(
 					'line-complete',
-					logger.updateXmlClosing,
+					logger.handleLineCompleted,
 					logger
 				);
 
 				Y.on(
-					'command-complete',
-					logger.updateLog,
+					'line-started',
+					logger.handleLineStarted,
 					logger
 				);
 			}
