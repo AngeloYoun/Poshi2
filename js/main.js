@@ -26,7 +26,6 @@ YUI.add(
 				fails: {
 					setter: function() {
 						var instance = this;
-						console.log('test')
 
 						var xmlLog = instance.get('xmlLog');
 
@@ -155,7 +154,7 @@ YUI.add(
 					btnContainer.one('.error-btn').remove(true);
 				},
 
-				collapseTransition: function(targetNode, resetHeights) {
+				collapseTransition: function(targetNode) {
 					var instance = this;
 
 					var returnVal = false;
@@ -173,6 +172,7 @@ YUI.add(
 							targetNode.setStyle('height', height);
 
 							instance.set('running', targetNode);
+
 							targetNode.addClass('transitioning');
 						}
 						else {
@@ -191,7 +191,7 @@ YUI.add(
 							height = (lastChildBottomY - targetNode.getY());
 						}
 
-						instance.getTransition(targetNode, height, collapsing, resetHeights);
+						instance._getTransition(targetNode, height, collapsing);
 
 						returnVal = true;
 					}
@@ -200,7 +200,7 @@ YUI.add(
 				},
 
 
-				getTransition: function(targetNode, height, collapsing, resetHeights) {
+				_getTransition: function(targetNode, height, collapsing) {
 					var instance = this;
 
 					var duration = (Math.pow(height, 0.35) / 15);
@@ -244,11 +244,11 @@ YUI.add(
 					var parentContainers = node.ancestors('.child-container');
 
 					if (parentContainers) {
-						instance.expandParentContainers(parentContainers, node);
+						instance._expandParentContainers(parentContainers, node);
 					}
 				},
 
-				expandParentContainers: function(parentContainers, node) {
+				_expandParentContainers: function(parentContainers, node) {
 					var instance = this;
 
 					var timeout = 0;
@@ -256,14 +256,14 @@ YUI.add(
 					var container = parentContainers.shift();
 
 					if (container.hasClass('collapse')) {
-						instance.toggleNode(container);
+						instance._toggleContainer(container, false);
 						instance.scrollToNode(container.one('.line-group'));
 						timeout = 200;
 					}
 
 					if (parentContainers.size()) {
 						setTimeout(
-							A.bind('expandParentContainers', instance, parentContainers, node),
+							A.bind('_expandParentContainers', instance, parentContainers, node),
 							timeout
 						);
 					}
@@ -338,7 +338,7 @@ YUI.add(
 							currentScope.removeClass('current-scope');
 						}
 
-						instance.parseCommandLog(currentTargetAncestor, true);
+						instance._parseCommandLog(currentTargetAncestor, true);
 
 						var functionLinkId = currentTargetAncestor.attr('data-functionLinkId');
 
@@ -416,17 +416,17 @@ YUI.add(
 
 					var currentTarget = event.currentTarget;
 
-					var xmlLog = instance.get('xmlLog');
+					var lookUpScope = instance.get('xmlLog');
 
 					var linkId = currentTarget.attr('data-btnLinkId');
 
 					if (inSidebar) {
-						xmlLog = instance.get('sidebar');
+						lookUpScope = instance.get('sidebar');
 					}
 
-					var collapsibleNode = xmlLog.one('.child-container[data-btnLinkId="' + linkId + '"]');
+					var collapsibleNode = lookUpScope.one('.child-container[data-btnLinkId="' + linkId + '"]');
 
-					instance.toggleNode(collapsibleNode, currentTarget, inSidebar);
+					instance._toggleContainer(collapsibleNode, inSidebar);
 				},
 
 				handleMinimizeSidebarBtn:function(event) {
@@ -437,7 +437,7 @@ YUI.add(
 					instance.minimizeSidebar(currentTarget);
 				},
 
-				injectXmlError: function(command) {
+				_injectXmlError: function(command) {
 					var instance = this;
 
 					var consoleLog = command.one('.console');
@@ -464,15 +464,7 @@ YUI.add(
 					}
 				},
 
-				refreshXmlLog: function(node) {
-					var instance = this;
-
-					instance.displayNode(node);
-
-					instance.selectCurrentScope(node);
-				},
-
-				refreshXmlClasses: function(logId) {
+				_refreshXmlClasses: function(logId) {
 					var instance = this;
 
 					var selector = 'data-status' + logId;
@@ -500,10 +492,10 @@ YUI.add(
 					node.addClass('current-scope');
 
 					if (instance.get('commandLogId')) {
-						instance.parseCommandLog(node);
+						instance._parseCommandLog(node);
 					}
 
-					instance.scopeSidebar();
+					instance._refreshEditMenu();
 				},
 
 				minimizeSidebar: function(button) {
@@ -518,7 +510,7 @@ YUI.add(
 					button.toggleClass('toggle');
 				},
 
-				parseCommandLog: function(node) {
+				_parseCommandLog: function(node) {
 					var instance = this;
 
 					var commandLogScope = instance.get('commandLogScope');
@@ -576,8 +568,6 @@ YUI.add(
 					var scrollNode = WIN;
 
 					if (node) {
-						console.log(node);
-
 						node = node.one('> .line-container');
 
 						var halfNodeHeight = (node.innerHeight() / 2);
@@ -638,7 +628,7 @@ YUI.add(
 
 						var commandFailures = commandLog.all('.failed');
 
-						commandFailures.each(instance.injectXmlError, instance)
+						commandFailures.each(instance._injectXmlError, instance)
 					}
 					else {
 						instance.set('commandLogId', null);
@@ -648,40 +638,41 @@ YUI.add(
 						fails.each(instance.clearXmlErrors)
 					}
 
-					instance.refreshXmlClasses(logId);
+					instance._refreshXmlClasses(logId);
 
 					instance.set('fails');
 
-					instance.transitionCommandLog(commandLog);
+					instance._transitionCommandLog(commandLog);
 
 					var fails = instance.get('fails');
 
 					if (fails) {
-						fails.each(instance.refreshXmlLog, instance);
+						fails.each(instance.displayNode, instance);
+						instance.selectCurrentScope(fails.first());
 					}
 				},
 
-				toggleNode: function(collapsibleContainer, collapsibleBtn, inSidebar) {
+				_toggleContainer: function(collapsibleContainer, inSidebar) {
 					var instance = this;
 
-					var resetHeights = false;
+					var lookUpScope = instance.get('xmlLog');
 
-					if (!inSidebar) {
-						resetHeights = true;
-
-						var linkId = collapsibleContainer.attr('data-btnLinkId');
-
-						collapsibleBtn = instance.get('xmlLog').one('.btn[data-btnLinkId="' + linkId + '"]');
+					if (inSidebar) {
+						lookUpScope = instance.get('sidebar');
 					}
 
-					var collapsed = instance.collapseTransition(collapsibleContainer, resetHeights);
+					var linkId = collapsibleContainer.attr('data-btnLinkId');
+
+					collapsibleBtn = lookUpScope.one('.btn[data-btnLinkId="' + linkId + '"]');
+
+					var collapsed = instance.collapseTransition(collapsibleContainer);
 
 					if (collapsed) {
 						collapsibleBtn.toggleClass('toggle');
 					}
 				},
 
-				transitionCommandLog: function(commandLog) {
+				_transitionCommandLog: function(commandLog) {
 					var instance = this;
 
 					var newHeight = 0;
@@ -693,14 +684,10 @@ YUI.add(
 
 					instance.get('contentBox').toggleClass('command-logger')
 
-					var lastChildLog = commandLog.one('ul:last-child');
+					var lastChildLog = commandLog.one('.line-group:last-child');
 
 					if (lastChildLog.hasClass('collapse')) {
-						var linkId = lastChildLog.attr('data-btnLinkId');
-
-						var collapseBtn = sidebar.one('.btn[data-btnLinkId="' + linkId + '"]');
-
-						instance.toggleNode(lastChildLog, collapseBtn, true);
+						instance._toggleContainer(lastChildLog, true);
 					}
 
 					var commandLogScope = instance.get('commandLogScope');
@@ -710,7 +697,7 @@ YUI.add(
 					}
 				},
 
-				scopeSidebar: function() {
+				_refreshEditMenu: function() {
 					var instance = this;
 
 					var currentScope = instance.get('currentScope');
@@ -804,11 +791,11 @@ YUI.add(
 
 						refreshXmlError(latestFailure);
 					}
-					refreshXmlClasses(id);
+					_refreshXmlClasses(id);
 				},
 
 				updateXml: function(id) {
-					refreshXmlClasses(id);
+					_refreshXmlClasses(id);
 					var linkedLine = xmlLog.one('#' + id);
 					var container = linkedLine.one('> .child-container');
 
@@ -823,7 +810,7 @@ YUI.add(
 				updateXmlClosing: function(id) {
 					var linkedLine = xmlLog.one('#' + id);
 					var closingLine = linkedLine.one('> .line-container:last-child');
-					refreshXmlClasses(id);
+					_refreshXmlClasses(id);
 					var container = linkedLine.one('> .child-container');
 
 					if (container && !container.hasClass('collapse')) {
