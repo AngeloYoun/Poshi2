@@ -24,9 +24,9 @@ YUI.add(
 				},
 
 				fails: {
-					setter: A.all,
-					valueFn: function() {
+					setter: function() {
 						var instance = this;
+						console.log('test')
 
 						var xmlLog = instance.get('xmlLog');
 
@@ -257,7 +257,7 @@ YUI.add(
 
 					if (container.hasClass('collapse')) {
 						instance.toggleNode(container);
-						instance.scrollToNode(container);
+						instance.scrollToNode(container.one('.line-group'));
 						timeout = 200;
 					}
 
@@ -531,9 +531,7 @@ YUI.add(
 					if (node.hasClass('macro')) {
 						var macroScope = node.all('[data-functionLinkId]');
 
-						for (var i = 0; i < macroScope.size(); i++) {
-							instance.scopeCommandLog(macroScope.item(i));
-						}
+						macroScope.each(instance.scopeCommandLog, instance);
 					}
 					else {
 						instance.scopeCommandLog(node);
@@ -578,6 +576,10 @@ YUI.add(
 					var scrollNode = WIN;
 
 					if (node) {
+						console.log(node);
+
+						node = node.one('> .line-container');
+
 						var halfNodeHeight = (node.innerHeight() / 2);
 
 						var halfWindowHeight = (WIN.height() / 2);
@@ -636,9 +638,7 @@ YUI.add(
 
 						var commandFailures = commandLog.all('.failed');
 
-						for (var i = 0; i < commandFailures.size(); i++) {
-							instance.injectXmlError(commandFailures.item(i));
-						}
+						commandFailures.each(instance.injectXmlError, instance)
 					}
 					else {
 						instance.set('commandLogId', null);
@@ -650,16 +650,14 @@ YUI.add(
 
 					instance.refreshXmlClasses(logId);
 
+					instance.set('fails');
+
 					instance.transitionCommandLog(commandLog);
 
 					var fails = instance.get('fails');
 
 					if (fails) {
-						fails.each(
-							function(item) {
-								instance.refreshXmlLog(item);
-							}
-						);
+						fails.each(instance.refreshXmlLog, instance);
 					}
 				},
 
@@ -787,6 +785,49 @@ YUI.add(
 						else {
 							sidebarParameterTitle.addClass('hidden');
 						}
+					}
+				},
+
+				updateLog: function(id, isFail) {
+					if (isFail) {
+						var test = xmlLog.one('#' + id);
+						var test2 = test.attr('data-status01');
+					}
+					var commandLog = sidebar.one('.command-log[data-logId="' + commandLogId +'"]');
+					var latestCommand = commandLog.one('.line-group:last-child');
+
+					if (latestCommand) {
+						linkFunction(null, latestCommand);
+					}
+					if (latestCommand.hasClass('failed')) {
+						var latestFailure = latestCommand;
+
+						refreshXmlError(latestFailure);
+					}
+					refreshXmlClasses(id);
+				},
+
+				updateXml: function(id) {
+					refreshXmlClasses(id);
+					var linkedLine = xmlLog.one('#' + id);
+					var container = linkedLine.one('> .child-container');
+
+					var firstLine = linkedLine.one('.line-container');
+
+					if (container && container.hasClass('collapse')) {
+						collapseToggle(null, container);
+					}
+					scrollToNode(firstLine);
+				},
+
+				updateXmlClosing: function(id) {
+					var linkedLine = xmlLog.one('#' + id);
+					var closingLine = linkedLine.one('> .line-container:last-child');
+					refreshXmlClasses(id);
+					var container = linkedLine.one('> .child-container');
+
+					if (container && !container.hasClass('collapse')) {
+						collapseToggle(null, container);
 					}
 				}
 			}
