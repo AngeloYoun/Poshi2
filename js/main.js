@@ -145,7 +145,7 @@ YUI.add(
 					);
 				},
 
-				clearXmlErrors: function(command) {
+				_clearXmlErrors: function(command) {
 					command.all('.errorPanel').remove(true);
 
 					var btnContainer = command.one('.btn-container');
@@ -257,7 +257,7 @@ YUI.add(
 
 					if (container.hasClass('collapse')) {
 						instance._toggleContainer(container, false);
-						instance.scrollToNode(container.one('.line-group'));
+						instance._scrollToNode(container.one('.line-group'));
 						timeout = 200;
 					}
 
@@ -268,7 +268,7 @@ YUI.add(
 						);
 					}
 					else {
-						instance.scrollToNode(node);
+						instance._scrollToNode(node);
 					}
 				},
 
@@ -464,12 +464,12 @@ YUI.add(
 					}
 				},
 
-				_refreshXmlLogClasses: function(logId) {
+				_toggleXmlLogClasses: function(logId) {
 					var instance = this;
 
-					var selector = 'data-status' + logId;
-
 					var status = instance.get('status');
+
+					var selector = 'data-status' + logId;
 
 					for (var i = 0; i < status.length; i++) {
 						var currentStatus = status[i];
@@ -480,14 +480,13 @@ YUI.add(
 					}
 				},
 
-				_refreshXmlNodeClass: function(id) {
+				_setXmlNodeClass: function(id) {
 					var instance = this;
 
-					var selector = 'data-status' + logId;
-
 					var status = instance.get('status');
+					var node = instance.get('xmlLog');
 
-					var node = this.get('xmlLog');
+					var selector = 'data-status' + logId;
 
 					var currentStatus = node.attr(selector);
 
@@ -496,7 +495,7 @@ YUI.add(
 					}
 
 					node.addClass(currentStatus);
-				}
+				},
 
 				selectCurrentScope: function(node) {
 					var instance = this;
@@ -549,7 +548,7 @@ YUI.add(
 
 					var commandLogScope = instance.get('commandLogScope');
 
-					instance.scrollToNode(commandLogScope.first(), true);
+					instance._scrollToNode(commandLogScope.first(), true);
 				},
 
 				_scopeCommandLog: function(node) {
@@ -580,7 +579,7 @@ YUI.add(
 					commandLogScope.addClass('current-scope');
 				},
 
-				scrollToNode: function(node, inSidebar) {
+				_scrollToNode: function(node, inSidebar) {
 					var instance = this;
 
 					var scrollNode = WIN;
@@ -589,7 +588,6 @@ YUI.add(
 						node = node.one('> .line-container');
 
 						var halfNodeHeight = (node.innerHeight() / 2);
-
 						var halfWindowHeight = (WIN.height() / 2);
 
 						var offsetHeight = (halfWindowHeight - halfNodeHeight);
@@ -653,10 +651,10 @@ YUI.add(
 
 						fails = instance.get('xmlLog').all('.fail');
 
-						fails.each(instance.clearXmlErrors)
+						fails.each(instance._clearXmlErrors)
 					}
 
-					instance._refreshXmlLogClasses(logId);
+					instance._toggleXmlLogClasses(logId);
 
 					instance.set('fails');
 
@@ -664,8 +662,9 @@ YUI.add(
 
 					var fails = instance.get('fails');
 
-					if (fails) {
+					if (fails.size() > 0) {
 						fails.each(instance.displayNode, instance);
+
 						instance.selectCurrentScope(fails.first());
 					}
 				},
@@ -711,7 +710,7 @@ YUI.add(
 					var commandLogScope = instance.get('commandLogScope');
 
 					if (commandLogScope && commandLogId) {
-						instance.scrollToNode(commandLogScope.first(), true);
+						instance._scrollToNode(commandLogScope.first(), true);
 					}
 				},
 
@@ -803,13 +802,13 @@ YUI.add(
 					if (latestCommand.hasClass('failed')) {
 						var latestFailure = latestCommand;
 
-						refreshXmlError(latestFailure);
+						_injectXmlError(latestFailure);
 					}
-					_refreshXmlNodeClass(id);
+					_setXmlNodeClass(id);
 				},
 
 				updateXml: function(id) {
-					_refreshXmlNodeClass(id);
+					_setXmlNodeClass(id);
 					var linkedLine = xmlLog.one('#' + id);
 					var container = linkedLine.one('> .child-container');
 
@@ -818,13 +817,13 @@ YUI.add(
 					if (container && container.hasClass('collapse')) {
 						collapseToggle(null, container);
 					}
-					scrollToNode(firstLine);
+					_scrollToNode(firstLine);
 				},
 
 				updateXmlClosing: function(id) {
 					var linkedLine = xmlLog.one('#' + id);
 					var closingLine = linkedLine.one('> .line-container:last-child');
-					_refreshXmlNodeClass(id);
+					_setXmlNodeClass(id);
 					var container = linkedLine.one('> .child-container');
 
 					if (container && !container.hasClass('collapse')) {
