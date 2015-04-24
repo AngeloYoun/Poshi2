@@ -29,14 +29,6 @@ li {
 .xml-log {
   display: block;
   position: relative;
-  width: 80%;
-}
-
-.command-logger .xml-log {
-  width: 60%;
-}
-
-.minimized-sidebar .xml-log {
   width: 100%;
 }
 
@@ -195,38 +187,38 @@ li {
 }
 
 /* ---------- Link run log ---------- */
-.command-logger .pass.conditional-failed > .line-container {
+.link-run-log .pass.conditional-failed > .line-container {
   background: transparent;
 }
-.command-logger .pass > .line-container {
+.link-run-log .pass > .line-container {
   background-color: rgba(245, 245, 245, 0.34);
   margin-top: 1px;
   padding-right: 2%;
   width: 102%;
 }
-.command-logger .function.pass > .line-container {
+.link-run-log .function.pass > .line-container {
   background: #D8D8D8;
   border: 1px solid #DE8968;
 }
-.command-logger .pending > .line-container {
+.link-run-log .pending > .line-container {
   background-color: rgba(254, 144, 60, 0.07);
   border: 2px dotted #FF8E24;
 }
-.command-logger .hover.pass.function {
+.link-run-log .hover.pass.function {
   background: transparent;
   outline-width: 0;
 }
-.command-logger .current-scope.pass.function {
+.link-run-log .current-scope.pass.function {
   background: transparent;
   outline-width: 0;
 }
-.command-logger .hover.pass > .line-container, .command-logger .hover.pending > .line-container {
+.link-run-log .hover.pass > .line-container, .link-run-log .hover.pending > .line-container {
   background-color: #FFFBF1;
 }
-.command-logger .current-scope.pass > .line-container, .command-logger .current-scope.pending > .line-container {
+.link-run-log .current-scope.pass > .line-container, .link-run-log .current-scope.pending > .line-container {
   background-color: #FFDBA2;
 }
-.command-logger .running .pending.function > .line-container {
+.link-run-log .running .pending.function > .line-container {
   background-color: #FFB57C;
 }
 
@@ -428,14 +420,6 @@ li {
 }
 
 /* ---------- Sidebar ---------- */
-.command-logger .sidebar {
-  width: 40%;
-}
-
-.minimized-sidebar .sidebar {
-  transform: translateX(100%);
-}
-
 .sidebar {
   background: #565C61;
   box-shadow: -5px 0 0 0 rgba(29, 60, 75, 0.3);
@@ -445,10 +429,13 @@ li {
   height: 100%;
   position: fixed;
   right: 0;
-  transform: translateX(0%);
+  transform: translateX(100%);
   transition: all 0.6s ease-out;
   width: 20%;
   z-index: 2;
+}
+.sidebar.commandLog {
+  width: 40%;
 }
 .sidebar .title {
   display: block;
@@ -532,7 +519,7 @@ li {
   display: none;
 }
 
-.command-logger .btn.btn-jump-to-error {
+.link-run-log .btn.btn-jump-to-error {
   display: block;
 }
 
@@ -658,16 +645,12 @@ li {
   color: #FC8686;
 }
 
-.misc, .action-type, .tag-type {
-  margin: 2px;
-}
-
 /* ---------- Extras ---------- */
 li {
   transition: background 0.2s ease-in-out;
 }
 
-.command-logger .pass.macro > .line-container {
+.link-run-log .pass.macro > .line-container {
   border-radius: 5px;
 }
 
@@ -738,7 +721,7 @@ li {
 }
 
 .fullscreen-image:before {
-  opacity: 0.9;
+  opacity: 0.7;
   transition: opacity 0.5s ease;
 }
 .fullscreen-image.toggle:before {

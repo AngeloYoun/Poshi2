@@ -146,6 +146,15 @@ YUI.add(
 					);
 				},
 
+				clearXmlErrors: function(command) {
+					command.all('.errorPanel').remove(true);
+
+					var btnContainer = command.one('.btn-container');
+
+					btnContainer.one('.screenshot-btn').remove(true);
+					btnContainer.one('.error-btn').remove(true);
+				},
+
 				collapseTransition: function(targetNode, resetHeights) {
 					var instance = this;
 
@@ -232,34 +241,29 @@ YUI.add(
 
 					node = node || instance.get('fails').last();
 
-					var childContainers = node.ancestors('.child-container');
+					var parentContainers = node.ancestors('.child-container');
 
-					if (childContainers) {
-						instance.expandParentContainers(childContainers, node);
+					if (parentContainers) {
+						instance.expandParentContainers(parentContainers, node);
 					}
 				},
 
-				expandParentContainers: function(childContainers, node) {
+				expandParentContainers: function(parentContainers, node) {
 					var instance = this;
 
 					var timeout = 0;
 
-					var childNode = childContainers.shift();
+					var container = parentContainers.shift();
 
-					if (childNode.hasClass('collapse')) {
-						instance.toggleNode(childNode);
-
+					if (container.hasClass('collapse')) {
+						instance.toggleNode(container);
+						instance.scrollToNode(container);
 						timeout = 200;
 					}
 
-					if (childContainers.size()) {
+					if (parentContainers.size()) {
 						setTimeout(
-							A.bind(
-								'expandParentContainers',
-								instance,
-								childContainers,
-								node
-							),
+							A.bind('expandParentContainers', instance, parentContainers, node),
 							timeout
 						);
 					}
@@ -294,9 +298,11 @@ YUI.add(
 
 						currentTarget.addClass('current-scope');
 
-						instance.set('currentScope', currentTarget);
 						instance.displayNode(currentTarget);
-						instance.selectCurrentNode(currentTarget);
+
+						instance.selectCurrentScope(currentTarget);
+
+						instance.set('currentScope', currentTarget);
 					}
 				},
 
@@ -344,7 +350,7 @@ YUI.add(
 
 						instance.displayNode(linkedFunction);
 
-						instance.selectCurrentNode(linkedFunction);
+						instance.selectCurrentScope(linkedFunction);
 					}
 				},
 
@@ -431,7 +437,58 @@ YUI.add(
 					instance.minimizeSidebar(currentTarget);
 				},
 
-				selectCurrentNode: function(node) {
+				injectXmlError: function(command) {
+					var instance = this;
+
+					var consoleLog = command.one('.console');
+					var screenshot = command.one('.screenshots');
+
+					var functionLinkId = command.attr('data-functionLinkId')
+
+					var failedFunction = instance.get('xmlLog').one('.line-group[data-functionLinkId="' + functionLinkId + '"');
+
+					if (consoleLog && screenshot && failedFunction) {
+						var btnContainer = failedFunction.one('.btn-container');
+
+						var imgBefore = screenshot.one('.before');
+						var imgAfter = screenshot.one('.after');
+
+						var screenshotError = screenshot.attr('data-errorLinkId')
+						var consoleError = consoleLog.attr('data-errorlinkid');
+
+						btnContainer.append(A.Node.create('<button class="btn screenshot-btn" data-errorlinkid="' + screenshotError + '"><div class="btn-content"></div></button>'));
+						btnContainer.append(A.Node.create('<button class="btn error-btn" data-errorlinkid="' + consoleError + '"><div class="btn-content"></div></button>'));
+
+						failedFunction.prepend(screenshot.clone());
+						failedFunction.append(consoleLog.clone());
+					}
+				},
+
+				refreshXmlLog: function(node) {
+					var instance = this;
+
+					instance.displayNode(node);
+
+					instance.selectCurrentScope(node);
+				},
+
+				refreshXmlClasses: function(logId) {
+					var instance = this;
+
+					var selector = 'data-status' + logId;
+
+					var status = instance.get('status');
+
+					for (var i = 0; i < status.length; i++) {
+						var currentStatus = status[i];
+
+						var currentStatusNodes = A.all('[' + selector + '="' + currentStatus + '"]');
+
+						currentStatusNodes.toggleClass(currentStatus);
+					}
+				},
+
+				selectCurrentScope: function(node) {
 					var instance = this;
 
 					var currentScope = instance.get('currentScope');
@@ -485,41 +542,6 @@ YUI.add(
 					var commandLogScope = instance.get('commandLogScope');
 
 					instance.scrollToNode(commandLogScope.first(), true);
-				},
-
-				refreshXmlLog: function(node) {
-					var instance = this;
-
-					instance.displayNode(node);
-
-					instance.selectCurrentNode(node);
-				},
-
-				injectXmlError: function(command) {
-					var instance = this;
-
-					var consoleLog = command.one('.console');
-					var screenshot = command.one('.screenshots');
-
-					var functionLinkId = command.attr('data-functionLinkId')
-
-					var failedFunction = instance.get('xmlLog').one('.line-group[data-functionLinkId="' + functionLinkId + '"');
-
-					if (consoleLog && screenshot && failedFunction) {
-						var btnContainer = failedFunction.one('.btn-container');
-
-						var imgBefore = screenshot.one('.before');
-						var imgAfter = screenshot.one('.after');
-
-						var screenshotError = screenshot.attr('data-errorLinkId')
-						var consoleError = consoleLog.attr('data-errorlinkid');
-
-						btnContainer.append(A.Node.create('<button class="btn screenshot-btn" data-errorlinkid="' + screenshotError + '"><div class="btn-content"></div></button>'));
-						btnContainer.append(A.Node.create('<button class="btn error-btn" data-errorlinkid="' + consoleError + '"><div class="btn-content"></div></button>'));
-
-						failedFunction.prepend(screenshot.clone());
-						failedFunction.append(consoleLog.clone());
-					}
 				},
 
 				scopeCommandLog: function(node) {
@@ -620,19 +642,13 @@ YUI.add(
 					}
 					else {
 						instance.set('commandLogId', null);
+
+						fails = instance.get('xmlLog').all('.fail');
+
+						fails.each(instance.clearXmlErrors)
 					}
 
-					var selector = 'data-status' + logId;
-
-					var status = instance.get('status');
-
-					for (var i = 0; i < status.length; i++) {
-						var currentStatus = status[i];
-
-						var currentStatusNodes = A.all('[' + selector + '="' + currentStatus + '"]');
-
-						currentStatusNodes.toggleClass(currentStatus);
-					}
+					instance.refreshXmlClasses(logId);
 
 					instance.transitionCommandLog(commandLog);
 
