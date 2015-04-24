@@ -464,7 +464,7 @@ YUI.add(
 					}
 				},
 
-				_refreshXmlClasses: function(logId) {
+				_refreshXmlLogClasses: function(logId) {
 					var instance = this;
 
 					var selector = 'data-status' + logId;
@@ -479,6 +479,24 @@ YUI.add(
 						currentStatusNodes.toggleClass(currentStatus);
 					}
 				},
+
+				_refreshXmlNodeClass: function(id) {
+					var instance = this;
+
+					var selector = 'data-status' + logId;
+
+					var status = instance.get('status');
+
+					var node = this.get('xmlLog');
+
+					var currentStatus = node.attr(selector);
+
+					for (var i = 0; i < status.length; i++) {
+						node.removeClass(status[i]);
+					}
+
+					node.addClass(currentStatus);
+				}
 
 				selectCurrentScope: function(node) {
 					var instance = this;
@@ -523,10 +541,10 @@ YUI.add(
 					if (node.hasClass('macro')) {
 						var macroScope = node.all('[data-functionLinkId]');
 
-						macroScope.each(instance.scopeCommandLog, instance);
+						macroScope.each(instance._scopeCommandLog, instance);
 					}
 					else {
-						instance.scopeCommandLog(node);
+						instance._scopeCommandLog(node);
 					}
 
 					var commandLogScope = instance.get('commandLogScope');
@@ -534,7 +552,7 @@ YUI.add(
 					instance.scrollToNode(commandLogScope.first(), true);
 				},
 
-				scopeCommandLog: function(node) {
+				_scopeCommandLog: function(node) {
 					var instance = this;
 
 					var buffer = [];
@@ -638,7 +656,7 @@ YUI.add(
 						fails.each(instance.clearXmlErrors)
 					}
 
-					instance._refreshXmlClasses(logId);
+					instance._refreshXmlLogClasses(logId);
 
 					instance.set('fails');
 
@@ -775,11 +793,7 @@ YUI.add(
 					}
 				},
 
-				updateLog: function(id, isFail) {
-					if (isFail) {
-						var test = xmlLog.one('#' + id);
-						var test2 = test.attr('data-status01');
-					}
+				updateLog: function(id) {
 					var commandLog = sidebar.one('.command-log[data-logId="' + commandLogId +'"]');
 					var latestCommand = commandLog.one('.line-group:last-child');
 
@@ -791,11 +805,11 @@ YUI.add(
 
 						refreshXmlError(latestFailure);
 					}
-					_refreshXmlClasses(id);
+					_refreshXmlNodeClass(id);
 				},
 
 				updateXml: function(id) {
-					_refreshXmlClasses(id);
+					_refreshXmlNodeClass(id);
 					var linkedLine = xmlLog.one('#' + id);
 					var container = linkedLine.one('> .child-container');
 
@@ -810,7 +824,7 @@ YUI.add(
 				updateXmlClosing: function(id) {
 					var linkedLine = xmlLog.one('#' + id);
 					var closingLine = linkedLine.one('> .line-container:last-child');
-					_refreshXmlClasses(id);
+					_refreshXmlNodeClass(id);
 					var container = linkedLine.one('> .child-container');
 
 					if (container && !container.hasClass('collapse')) {
