@@ -75,7 +75,9 @@ YUI.add(
 
 					instance.toggleCommandLog(commandLog);
 
-					instance.minimizeSidebar();
+					if (!xmlLog.hasClass('running')) {
+						instance.minimizeSidebar();
+					}
 				},
 
 				bindSidebar: function() {
@@ -290,19 +292,9 @@ YUI.add(
 					event.stopPropagation()
 
 					if (!event.target.test('.btn, .btn-container')) {
-						var currentScope = instance.get('currentScope');
-
-						if (currentScope) {
-							currentScope.removeClass('current-scope');
-						}
-
-						currentTarget.addClass('current-scope');
-
 						instance.displayNode(currentTarget);
 
 						instance.selectCurrentScope(currentTarget);
-
-						instance.set('currentScope', currentTarget);
 					}
 				},
 
@@ -332,21 +324,11 @@ YUI.add(
 					var currentTargetAncestor = event.currentTarget.ancestor();
 
 					if (currentTargetAncestor) {
-						var currentScope = instance.get('currentScope');
-
-						if (currentScope) {
-							currentScope.removeClass('current-scope');
-						}
-
 						instance._parseCommandLog(currentTargetAncestor, true);
 
 						var functionLinkId = currentTargetAncestor.attr('data-functionLinkId');
 
-						var linkedFunction = xmlLog.one('li[data-functionLinkId="' + functionLinkId + '"]');
-
-						linkedFunction.addClass('current-scope');
-
-						instance.set('currentScope', linkedFunction);
+						var linkedFunction = xmlLog.one('.line-group[data-functionLinkId="' + functionLinkId + '"]');
 
 						instance.displayNode(linkedFunction);
 
@@ -443,9 +425,9 @@ YUI.add(
 					var consoleLog = command.one('.console');
 					var screenshot = command.one('.screenshots');
 
-					var functionLinkId = command.attr('data-functionLinkId')
+					var functionLinkId = command.attr('data-functionLinkId');
 
-					var failedFunction = instance.get('xmlLog').one('.line-group[data-functionLinkId="' + functionLinkId + '"');
+					var failedFunction = instance.get('xmlLog').one('.line-group[data-functionLinkId="' + functionLinkId + '"]');
 
 					if (consoleLog && screenshot && failedFunction) {
 						var btnContainer = failedFunction.one('.btn-container');
@@ -480,13 +462,12 @@ YUI.add(
 					}
 				},
 
-				_setXmlNodeClass: function(id) {
+				_setXmlNodeClass: function(node) {
 					var instance = this;
 
 					var status = instance.get('status');
-					var node = instance.get('xmlLog');
 
-					var selector = 'data-status' + logId;
+					var selector = 'data-status' + instance.get('commandLogId');
 
 					var currentStatus = node.attr(selector);
 
@@ -507,6 +488,8 @@ YUI.add(
 					}
 
 					node.addClass('current-scope');
+
+					instance.set('currentScope', node);
 
 					if (instance.get('commandLogId')) {
 						instance._parseCommandLog(node);
@@ -651,7 +634,9 @@ YUI.add(
 
 						fails = instance.get('xmlLog').all('.fail');
 
-						fails.each(instance._clearXmlErrors)
+						if (fails.size()) {
+							fails.each(instance._clearXmlErrors);
+						}
 					}
 
 					instance._toggleXmlLogClasses(logId);
@@ -662,7 +647,7 @@ YUI.add(
 
 					var fails = instance.get('fails');
 
-					if (fails.size() > 0) {
+					if (fails.size()) {
 						fails.each(instance.displayNode, instance);
 
 						instance.selectCurrentScope(fails.first());
@@ -703,7 +688,7 @@ YUI.add(
 
 					var lastChildLog = commandLog.one('.line-group:last-child');
 
-					if (lastChildLog.hasClass('collapse')) {
+					if (lastChildLog && lastChildLog.hasClass('collapse')) {
 						instance._toggleContainer(lastChildLog, true);
 					}
 
@@ -793,41 +778,58 @@ YUI.add(
 				},
 
 				updateLog: function(id) {
-					var commandLog = sidebar.one('.command-log[data-logId="' + commandLogId +'"]');
+					console.log('test' + id);
+					var instance = this;
+
+					var commandLog = instance.get('sidebar').one('.command-log[data-logId="' + instance.get('commandLogId') +'"]');
 					var latestCommand = commandLog.one('.line-group:last-child');
 
 					if (latestCommand) {
-						linkFunction(null, latestCommand);
+						instance._parseCommandLog(latestCommand, true);
+
+						var linkedFunction = instance.get('xmlLog').one('#' + id);
+
+						instance.displayNode(linkedFunction);
+
+						instance.selectCurrentScope(linkedFunction);
+
+						instance._setXmlNodeClass(linkedFunction);
 					}
 					if (latestCommand.hasClass('failed')) {
 						var latestFailure = latestCommand;
 
-						_injectXmlError(latestFailure);
+						instance._injectXmlError(latestFailure);
 					}
-					_setXmlNodeClass(id);
 				},
 
 				updateXml: function(id) {
-					_setXmlNodeClass(id);
-					var linkedLine = xmlLog.one('#' + id);
+					console.log('test' + id);
+					var instance = this;
+
+					var linkedLine = instance.get('xmlLog').one('#' + id);
+
+					instance._setXmlNodeClass(linkedLine);
+
 					var container = linkedLine.one('> .child-container');
 
-					var firstLine = linkedLine.one('.line-container');
-
 					if (container && container.hasClass('collapse')) {
-						collapseToggle(null, container);
+						instance._toggleContainer(container, false);
 					}
-					_scrollToNode(firstLine);
+					instance._scrollToNode(linkedLine);
 				},
 
 				updateXmlClosing: function(id) {
-					var linkedLine = xmlLog.one('#' + id);
-					var closingLine = linkedLine.one('> .line-container:last-child');
-					_setXmlNodeClass(id);
+					console.log('test' + id);
+					var instance = this;
+
+					var linkedLine = instance.get('xmlLog').one('#' + id);
+
+					instance._setXmlNodeClass(linkedLine);
+
 					var container = linkedLine.one('> .child-container');
 
 					if (container && !container.hasClass('collapse')) {
-						collapseToggle(null, container);
+						instance._toggleContainer(container, false);
 					}
 				}
 			}

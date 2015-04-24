@@ -59,17 +59,20 @@
 
 				Y.on(
 					'line-started',
-					logger.updateXml
+					logger.updateXml,
+					logger
 				);
 
 				Y.on(
 					'line-complete',
-					logger.updateXmlClosing
+					logger.updateXmlClosing,
+					logger
 				);
 
 				Y.on(
 					'command-complete',
-					logger.updateLog
+					logger.updateLog,
+					logger
 				);
 			}
 		);
