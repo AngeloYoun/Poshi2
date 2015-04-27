@@ -63,6 +63,194 @@ YUI.add(
 					instance.bindXMLLog();
 				},
 
+				handleCommandCompleted: function(id) {
+					var instance = this;
+
+					var commandLog = instance.get('sidebar').one('.command-log[data-logId="' + instance.get('commandLogId') +'"]');
+					var latestCommand = commandLog.one('.line-group:last-child');
+
+					if (latestCommand) {
+						instance._parseCommandLog(latestCommand, true);
+
+						var linkedFunction = instance.get('xmlLog').one('#' + id);
+
+						instance._displayNode(linkedFunction);
+
+						instance._selectCurrentScope(linkedFunction);
+
+						instance._setXmlNodeClass(linkedFunction);
+					}
+					if (latestCommand.hasClass('failed')) {
+						var latestFailure = latestCommand;
+
+						instance._injectXmlError(latestFailure);
+					}
+				},
+
+				handleCurrentScopeSelect: function(event) {
+					var instance = this;
+
+					var currentTarget = event.currentTarget;
+
+					event.stopPropagation()
+
+					if (!event.target.test('.btn, .btn-container')) {
+						instance._displayNode(currentTarget);
+
+						instance._selectCurrentScope(currentTarget);
+					}
+				},
+
+				handleErrorBtns: function(event) {
+					var instance = this;
+
+					var currentTarget = event.currentTarget;
+
+					currentTarget.toggleClass('toggle');
+
+					var xmlLog = instance.get('xmlLog');
+
+					var errorLinkId = currentTarget.attr('data-errorLinkId');
+
+					var errorPanel = xmlLog.one('.errorPanel[data-errorLinkId="' + errorLinkId + '"]');
+
+					if (errorPanel) {
+						errorPanel.toggleClass('toggle');
+					}
+				},
+
+				handleCurrentCommandSelect: function(event) {
+					var instance = this;
+
+					var xmlLog = instance.get('xmlLog');
+
+					var currentTargetAncestor = event.currentTarget.ancestor();
+
+					if (currentTargetAncestor) {
+						instance._parseCommandLog(currentTargetAncestor, true);
+
+						var functionLinkId = currentTargetAncestor.attr('data-functionLinkId');
+
+						var linkedFunction = xmlLog.one('.line-group[data-functionLinkId="' + functionLinkId + '"]');
+
+						instance._displayNode(linkedFunction);
+
+						instance._selectCurrentScope(linkedFunction);
+					}
+				},
+
+				handleFullScreenImageClick: function(event) {
+					var instance = this;
+
+					var currentTarget = event.currentTarget;
+
+					var src = currentTarget.attr('src');
+
+					var fullScreenImage = A.one('.fullscreen-image');
+
+					if (fullScreenImage.hasClass('toggle')) {
+						fullScreenImage.append(A.Node.create('<img alt="fullscreen screenshot" src="' + src + '">'));
+					}
+					else {
+						fullScreenImage.one('*').remove(true);
+					}
+
+					fullScreenImage.toggleClass('toggle');
+				},
+
+				handleGoToErrorBtn: function(event) {
+					var instance = this;
+
+					instance._displayNode();
+				},
+
+				handleXmlNodeHover: function(event) {
+					var instance = this;
+
+					event.stopPropagation();
+
+					var prevNode = instance.get('prevNode');
+
+					if (prevNode) {
+						prevNode.removeClass('hover');
+					}
+
+					var currentTarget = event.currentTarget;
+
+					currentTarget.addClass('hover');
+
+					instance.set('prevNode', currentTarget);
+				},
+
+				handleToggleCommandLogBtn: function(event) {
+					var instance = this;
+
+					var sidebar = instance.get('sidebar');
+
+					var currentTarget = event.currentTarget;
+
+					var logId = currentTarget.attr('data-logId');
+
+					var commandLog = instance._getCommandLogNode(logId);
+
+					instance._toggleCommandLog(commandLog, currentTarget);
+				},
+
+				handleToggleCollapseBtn: function(event, inSidebar) {
+					var instance = this;
+
+					var currentTarget = event.currentTarget;
+
+					var lookUpScope = instance.get('xmlLog');
+
+					var linkId = currentTarget.attr('data-btnLinkId');
+
+					if (inSidebar) {
+						lookUpScope = instance.get('sidebar');
+					}
+
+					var collapsibleNode = lookUpScope.one('.child-container[data-btnLinkId="' + linkId + '"]');
+
+					instance._toggleContainer(collapsibleNode, inSidebar);
+				},
+
+				handleMinimizeSidebarBtn:function(event) {
+					var instance = this;
+
+					var currentTarget = event.currentTarget;
+
+					instance._minimizeSidebar(currentTarget);
+				},
+
+				handleLineCompleted: function(id) {
+					var instance = this;
+
+					var linkedLine = instance.get('xmlLog').one('#' + id);
+
+					instance._setXmlNodeClass(linkedLine);
+
+					var container = linkedLine.one('> .child-container');
+
+					if (container && !container.hasClass('collapse')) {
+						instance._toggleContainer(container, false);
+					}
+				},
+
+				handleLineStarted: function(id) {
+					var instance = this;
+
+					var linkedLine = instance.get('xmlLog').one('#' + id);
+
+					instance._setXmlNodeClass(linkedLine);
+
+					var container = linkedLine.one('> .child-container');
+
+					if (container && container.hasClass('collapse')) {
+						instance._toggleContainer(container, false);
+					}
+					instance._scrollToNode(linkedLine);
+				},
+
 				renderUI: function() {
 					var instance = this;
 
@@ -73,14 +261,14 @@ YUI.add(
 
 					xmlLog.toggleClass('running');
 
-					instance.toggleCommandLog(commandLog);
+					instance._toggleCommandLog(commandLog);
 
 					if (!xmlLog.hasClass('running')) {
-						instance.minimizeSidebar();
+						instance._minimizeSidebar();
 					}
 				},
 
-				bindSidebar: function() {
+				_bindSidebar: function() {
 					var instance = this;
 
 					var sidebar = instance.get('sidebar');
@@ -111,7 +299,7 @@ YUI.add(
 
 				},
 
-				bindXMLLog: function() {
+				_bindXMLLog: function() {
 					var instance = this;
 
 					var xmlLog = instance.get('xmlLog');
@@ -156,7 +344,7 @@ YUI.add(
 					btnContainer.one('.error-btn').remove(true);
 				},
 
-				collapseTransition: function(targetNode) {
+				_collapseTransition: function(targetNode) {
 					var instance = this;
 
 					var returnVal = false;
@@ -201,6 +389,51 @@ YUI.add(
 					return returnVal;
 				},
 
+				_displayNode: function(node) {
+					var instance = this;
+
+					node = node || instance.get('fails').last();
+
+					var parentContainers = node.ancestors('.child-container');
+
+					if (parentContainers) {
+						instance._expandParentContainers(parentContainers, node);
+					}
+				},
+
+				_expandParentContainers: function(parentContainers, node) {
+					var instance = this;
+
+					var timeout = 0;
+
+					var container = parentContainers.shift();
+
+					if (container.hasClass('collapse')) {
+						instance._toggleContainer(container, false);
+						instance._scrollToNode(container.one('.line-group'));
+						timeout = 200;
+					}
+
+					if (parentContainers.size()) {
+						setTimeout(
+							A.bind('_expandParentContainers', instance, parentContainers, node),
+							timeout
+						);
+					}
+					else {
+						instance._scrollToNode(node);
+					}
+				},
+
+				_getCommandLogNode: function(logId) {
+					var instance = this;
+
+					logId = logId || instance.get('commandLogId');
+
+					var sidebar = instance.get('sidebar');
+
+					return sidebar.one('.command-log[data-logId="' + logId + '"]');
+				},
 
 				_getTransition: function(targetNode, height, collapsing) {
 					var instance = this;
@@ -238,187 +471,6 @@ YUI.add(
 					);
 				},
 
-				displayNode: function(node) {
-					var instance = this;
-
-					node = node || instance.get('fails').last();
-
-					var parentContainers = node.ancestors('.child-container');
-
-					if (parentContainers) {
-						instance._expandParentContainers(parentContainers, node);
-					}
-				},
-
-				_expandParentContainers: function(parentContainers, node) {
-					var instance = this;
-
-					var timeout = 0;
-
-					var container = parentContainers.shift();
-
-					if (container.hasClass('collapse')) {
-						instance._toggleContainer(container, false);
-						instance._scrollToNode(container.one('.line-group'));
-						timeout = 200;
-					}
-
-					if (parentContainers.size()) {
-						setTimeout(
-							A.bind('_expandParentContainers', instance, parentContainers, node),
-							timeout
-						);
-					}
-					else {
-						instance._scrollToNode(node);
-					}
-				},
-
-				getSidebarLogNode: function(logId) {
-					var instance = this;
-
-					logId = logId || instance.get('commandLogId');
-
-					var sidebar = instance.get('sidebar');
-
-					return sidebar.one('.command-log[data-logId="' + logId + '"]');
-				},
-
-				handleCurrentScopeSelect: function(event) {
-					var instance = this;
-
-					var currentTarget = event.currentTarget;
-
-					event.stopPropagation()
-
-					if (!event.target.test('.btn, .btn-container')) {
-						instance.displayNode(currentTarget);
-
-						instance.selectCurrentScope(currentTarget);
-					}
-				},
-
-				handleErrorBtns: function(event) {
-					var instance = this;
-
-					var currentTarget = event.currentTarget;
-
-					currentTarget.toggleClass('toggle');
-
-					var xmlLog = instance.get('xmlLog');
-
-					var errorLinkId = currentTarget.attr('data-errorLinkId');
-
-					var errorPanel = xmlLog.one('.errorPanel[data-errorLinkId="' + errorLinkId + '"]');
-
-					if (errorPanel) {
-						errorPanel.toggleClass('toggle');
-					}
-				},
-
-				handleCurrentCommandSelect: function(event) {
-					var instance = this;
-
-					var xmlLog = instance.get('xmlLog');
-
-					var currentTargetAncestor = event.currentTarget.ancestor();
-
-					if (currentTargetAncestor) {
-						instance._parseCommandLog(currentTargetAncestor, true);
-
-						var functionLinkId = currentTargetAncestor.attr('data-functionLinkId');
-
-						var linkedFunction = xmlLog.one('.line-group[data-functionLinkId="' + functionLinkId + '"]');
-
-						instance.displayNode(linkedFunction);
-
-						instance.selectCurrentScope(linkedFunction);
-					}
-				},
-
-				handleFullScreenImageClick: function(event) {
-					var instance = this;
-
-					var currentTarget = event.currentTarget;
-
-					var src = currentTarget.attr('src');
-
-					var fullScreenImage = A.one('.fullscreen-image');
-
-					if (fullScreenImage.hasClass('toggle')) {
-						fullScreenImage.append(A.Node.create('<img alt="fullscreen screenshot" src="' + src + '">'));
-					}
-					else {
-						fullScreenImage.one('*').remove(true);
-					}
-
-					fullScreenImage.toggleClass('toggle');
-				},
-
-				handleGoToErrorBtn: function(event) {
-					var instance = this;
-
-					instance.displayNode();
-				},
-
-				handleXmlNodeHover: function(event) {
-					var instance = this;
-
-					event.stopPropagation();
-
-					var prevNode = instance.get('prevNode');
-
-					if (prevNode) {
-						prevNode.removeClass('hover');
-					}
-
-					var currentTarget = event.currentTarget;
-
-					currentTarget.addClass('hover');
-
-					instance.set('prevNode', currentTarget);
-				},
-
-				handleToggleCommandLogBtn: function(event) {
-					var instance = this;
-
-					var sidebar = instance.get('sidebar');
-
-					var currentTarget = event.currentTarget;
-
-					var logId = currentTarget.attr('data-logId');
-
-					var commandLog = instance.getSidebarLogNode(logId);
-
-					instance.toggleCommandLog(commandLog, currentTarget);
-				},
-
-				handleToggleCollapseBtn: function(event, inSidebar) {
-					var instance = this;
-
-					var currentTarget = event.currentTarget;
-
-					var lookUpScope = instance.get('xmlLog');
-
-					var linkId = currentTarget.attr('data-btnLinkId');
-
-					if (inSidebar) {
-						lookUpScope = instance.get('sidebar');
-					}
-
-					var collapsibleNode = lookUpScope.one('.child-container[data-btnLinkId="' + linkId + '"]');
-
-					instance._toggleContainer(collapsibleNode, inSidebar);
-				},
-
-				handleMinimizeSidebarBtn:function(event) {
-					var instance = this;
-
-					var currentTarget = event.currentTarget;
-
-					instance.minimizeSidebar(currentTarget);
-				},
-
 				_injectXmlError: function(command) {
 					var instance = this;
 
@@ -446,59 +498,7 @@ YUI.add(
 					}
 				},
 
-				_toggleXmlLogClasses: function(logId) {
-					var instance = this;
-
-					var status = instance.get('status');
-
-					var selector = 'data-status' + logId;
-
-					for (var i = 0; i < status.length; i++) {
-						var currentStatus = status[i];
-
-						var currentStatusNodes = A.all('[' + selector + '="' + currentStatus + '"]');
-
-						currentStatusNodes.toggleClass(currentStatus);
-					}
-				},
-
-				_setXmlNodeClass: function(node) {
-					var instance = this;
-
-					var status = instance.get('status');
-
-					var selector = 'data-status' + instance.get('commandLogId');
-
-					var currentStatus = node.attr(selector);
-
-					for (var i = 0; i < status.length; i++) {
-						node.removeClass(status[i]);
-					}
-
-					node.addClass(currentStatus);
-				},
-
-				selectCurrentScope: function(node) {
-					var instance = this;
-
-					var currentScope = instance.get('currentScope');
-
-					if (currentScope) {
-						currentScope.removeClass('current-scope');
-					}
-
-					node.addClass('current-scope');
-
-					instance.set('currentScope', node);
-
-					if (instance.get('commandLogId')) {
-						instance._parseCommandLog(node);
-					}
-
-					instance._refreshEditMenu();
-				},
-
-				minimizeSidebar: function(button) {
+				_minimizeSidebar: function(button) {
 					var instance = this;
 
 					var contentBox = instance.get('contentBox');
@@ -532,171 +532,6 @@ YUI.add(
 					var commandLogScope = instance.get('commandLogScope');
 
 					instance._scrollToNode(commandLogScope.first(), true);
-				},
-
-				_scopeCommandLog: function(node) {
-					var instance = this;
-
-					var buffer = [];
-
-					if (node) {
-						var sidebar = instance.get('sidebar');
-
-						var functionLinkId = node.attr('data-functionLinkId');
-
-						node = sidebar.all('.linkable[data-functionLinkId="' + functionLinkId + '"]');
-
-						while(node.size()) {
-							var lastEl = node.pop();
-
-							buffer.push(lastEl);
-						}
-					}
-
-					var commandLogScope = instance.get('commandLogScope');
-
-					commandLogScope = commandLogScope.concat(buffer);
-
-					instance.set('commandLogScope', commandLogScope);
-
-					commandLogScope.addClass('current-scope');
-				},
-
-				_scrollToNode: function(node, inSidebar) {
-					var instance = this;
-
-					var scrollNode = WIN;
-
-					if (node) {
-						node = node.one('> .line-container');
-
-						var halfNodeHeight = (node.innerHeight() / 2);
-						var halfWindowHeight = (WIN.height() / 2);
-
-						var offsetHeight = (halfWindowHeight - halfNodeHeight);
-
-						var nodeY = node.getY();
-
-						if (inSidebar) {
-							var commandLogId = instance.get('commandLogId');
-							var sidebar = instance.get('sidebar');
-
-							scrollNode = instance.getSidebarLogNode();
-
-							var dividerLine = scrollNode.one('.divider-line');
-
-							if (dividerLine) {
-								nodeY = (nodeY - dividerLine.getY());
-							}
-						}
-
-						var yDistance = (nodeY - offsetHeight);
-
-						new A.Anim(
-							{
-								duration: 2,
-								easing: 'easeOutStrong',
-								node: scrollNode,
-								to: {
-									scroll: [0, yDistance]
-								}
-							}
-						).run();
-					}
-				},
-
-				toggleCommandLog: function(commandLog, button) {
-					var instance = this;
-
-					var commandLogId = instance.get('commandLogId');
-					var sidebar = instance.get('sidebar');
-
-					var logId = commandLog.attr('data-logId');
-
-					button = button || sidebar.one('.btn-command-log[data-logId="' + logId + '"]');
-
-					button.toggleClass('toggle');
-
-					if (commandLogId !== logId) {
-						if (commandLogId) {
-							var currentActiveLog = instance.getSidebarLogNode();
-
-							instance.toggleCommandLog(currentActiveLog);
-						}
-						instance.set('commandLogId', logId);
-
-						var commandFailures = commandLog.all('.failed');
-
-						commandFailures.each(instance._injectXmlError, instance)
-					}
-					else {
-						instance.set('commandLogId', null);
-
-						fails = instance.get('xmlLog').all('.fail');
-
-						if (fails.size()) {
-							fails.each(instance._clearXmlErrors);
-						}
-					}
-
-					instance._toggleXmlLogClasses(logId);
-
-					instance.set('fails');
-
-					instance._transitionCommandLog(commandLog);
-
-					var fails = instance.get('fails');
-
-					if (fails.size()) {
-						fails.each(instance.displayNode, instance);
-
-						instance.selectCurrentScope(fails.first());
-					}
-				},
-
-				_toggleContainer: function(collapsibleContainer, inSidebar) {
-					var instance = this;
-
-					var lookUpScope = instance.get('xmlLog');
-
-					if (inSidebar) {
-						lookUpScope = instance.get('sidebar');
-					}
-
-					var linkId = collapsibleContainer.attr('data-btnLinkId');
-
-					collapsibleBtn = lookUpScope.one('.btn[data-btnLinkId="' + linkId + '"]');
-
-					var collapsed = instance.collapseTransition(collapsibleContainer);
-
-					if (collapsed) {
-						collapsibleBtn.toggleClass('toggle');
-					}
-				},
-
-				_transitionCommandLog: function(commandLog) {
-					var instance = this;
-
-					var newHeight = 0;
-
-					var commandLogId = instance.get('commandLogId');
-					var sidebar = instance.get('sidebar');
-
-					commandLog.toggleClass('collapse');
-
-					instance.get('contentBox').toggleClass('command-logger')
-
-					var lastChildLog = commandLog.one('.line-group:last-child');
-
-					if (lastChildLog && lastChildLog.hasClass('collapse')) {
-						instance._toggleContainer(lastChildLog, true);
-					}
-
-					var commandLogScope = instance.get('commandLogScope');
-
-					if (commandLogScope && commandLogId) {
-						instance._scrollToNode(commandLogScope.first(), true);
-					}
 				},
 
 				_refreshEditMenu: function() {
@@ -777,61 +612,222 @@ YUI.add(
 					}
 				},
 
-				handleCommandCompleted: function(id) {
-					console.log('test' + id);
+				_scrollToNode: function(node, inSidebar) {
 					var instance = this;
 
-					var commandLog = instance.get('sidebar').one('.command-log[data-logId="' + instance.get('commandLogId') +'"]');
-					var latestCommand = commandLog.one('.line-group:last-child');
+					var scrollNode = WIN;
 
-					if (latestCommand) {
-						instance._parseCommandLog(latestCommand, true);
+					if (node) {
+						node = node.one('> .line-container');
 
-						var linkedFunction = instance.get('xmlLog').one('#' + id);
+						var halfNodeHeight = (node.innerHeight() / 2);
+						var halfWindowHeight = (WIN.height() / 2);
 
-						instance.displayNode(linkedFunction);
+						var offsetHeight = (halfWindowHeight - halfNodeHeight);
 
-						instance.selectCurrentScope(linkedFunction);
+						var nodeY = node.getY();
 
-						instance._setXmlNodeClass(linkedFunction);
-					}
-					if (latestCommand.hasClass('failed')) {
-						var latestFailure = latestCommand;
+						if (inSidebar) {
+							var commandLogId = instance.get('commandLogId');
+							var sidebar = instance.get('sidebar');
 
-						instance._injectXmlError(latestFailure);
+							scrollNode = instance._getCommandLogNode();
+
+							var dividerLine = scrollNode.one('.divider-line');
+
+							if (dividerLine) {
+								nodeY = (nodeY - dividerLine.getY());
+							}
+						}
+
+						var yDistance = (nodeY - offsetHeight);
+
+						new A.Anim(
+							{
+								duration: 2,
+								easing: 'easeOutStrong',
+								node: scrollNode,
+								to: {
+									scroll: [0, yDistance]
+								}
+							}
+						).run();
 					}
 				},
 
-				handleLineCompleted: function(id) {
-					console.log('test' + id);
+				_scopeCommandLog: function(node) {
 					var instance = this;
 
-					var linkedLine = instance.get('xmlLog').one('#' + id);
+					var buffer = [];
 
-					instance._setXmlNodeClass(linkedLine);
+					if (node) {
+						var sidebar = instance.get('sidebar');
 
-					var container = linkedLine.one('> .child-container');
+						var functionLinkId = node.attr('data-functionLinkId');
 
-					if (container && !container.hasClass('collapse')) {
-						instance._toggleContainer(container, false);
+						node = sidebar.all('.linkable[data-functionLinkId="' + functionLinkId + '"]');
+
+						while(node.size()) {
+							var lastEl = node.pop();
+
+							buffer.push(lastEl);
+						}
+					}
+
+					var commandLogScope = instance.get('commandLogScope');
+
+					commandLogScope = commandLogScope.concat(buffer);
+
+					instance.set('commandLogScope', commandLogScope);
+
+					commandLogScope.addClass('current-scope');
+				},
+
+				_setXmlNodeClass: function(node) {
+					var instance = this;
+
+					var status = instance.get('status');
+
+					var selector = 'data-status' + instance.get('commandLogId');
+
+					var currentStatus = node.attr(selector);
+
+					for (var i = 0; i < status.length; i++) {
+						node.removeClass(status[i]);
+					}
+
+					node.addClass(currentStatus);
+				},
+
+				_selectCurrentScope: function(node) {
+					var instance = this;
+
+					var currentScope = instance.get('currentScope');
+
+					if (currentScope) {
+						currentScope.removeClass('current-scope');
+					}
+
+					node.addClass('current-scope');
+
+					instance.set('currentScope', node);
+
+					if (instance.get('commandLogId')) {
+						instance._parseCommandLog(node);
+					}
+
+					instance._refreshEditMenu();
+				},
+
+				_toggleCommandLog: function(commandLog, button) {
+					var instance = this;
+
+					var commandLogId = instance.get('commandLogId');
+					var sidebar = instance.get('sidebar');
+
+					var logId = commandLog.attr('data-logId');
+
+					button = button || sidebar.one('.btn-command-log[data-logId="' + logId + '"]');
+
+					button.toggleClass('toggle');
+
+					if (commandLogId !== logId) {
+						if (commandLogId) {
+							var currentActiveLog = instance._getCommandLogNode();
+
+							instance._toggleCommandLog(currentActiveLog);
+						}
+						instance.set('commandLogId', logId);
+
+						var commandFailures = commandLog.all('.failed');
+
+						commandFailures.each(instance._injectXmlError, instance)
+					}
+					else {
+						instance.set('commandLogId', null);
+
+						fails = instance.get('xmlLog').all('.fail');
+
+						if (fails.size()) {
+							fails.each(instance._clearXmlErrors);
+						}
+					}
+
+					instance._toggleXmlLogClasses(logId);
+
+					instance.set('fails');
+
+					instance._transitionCommandLog(commandLog);
+
+					var fails = instance.get('fails');
+
+					if (fails.size()) {
+						fails.each(instance._displayNode, instance);
+
+						instance._selectCurrentScope(fails.first());
+					}
+				},
+
+				_toggleContainer: function(collapsibleContainer, inSidebar) {
+					var instance = this;
+
+					var lookUpScope = instance.get('xmlLog');
+
+					if (inSidebar) {
+						lookUpScope = instance.get('sidebar');
+					}
+
+					var linkId = collapsibleContainer.attr('data-btnLinkId');
+
+					collapsibleBtn = lookUpScope.one('.btn[data-btnLinkId="' + linkId + '"]');
+
+					var collapsed = instance._collapseTransition(collapsibleContainer);
+
+					if (collapsed) {
+						collapsibleBtn.toggleClass('toggle');
+					}
+				},
+
+				_toggleXmlLogClasses: function(logId) {
+					var instance = this;
+
+					var status = instance.get('status');
+
+					var selector = 'data-status' + logId;
+
+					for (var i = 0; i < status.length; i++) {
+						var currentStatus = status[i];
+
+						var currentStatusNodes = A.all('[' + selector + '="' + currentStatus + '"]');
+
+						currentStatusNodes.toggleClass(currentStatus);
+					}
+				},
+
+				_transitionCommandLog: function(commandLog) {
+					var instance = this;
+
+					var newHeight = 0;
+
+					var commandLogId = instance.get('commandLogId');
+					var sidebar = instance.get('sidebar');
+
+					commandLog.toggleClass('collapse');
+
+					instance.get('contentBox').toggleClass('command-logger')
+
+					var lastChildLog = commandLog.one('.line-group:last-child');
+
+					if (lastChildLog && lastChildLog.hasClass('collapse')) {
+						instance._toggleContainer(lastChildLog, true);
+					}
+
+					var commandLogScope = instance.get('commandLogScope');
+
+					if (commandLogScope && commandLogId) {
+						instance._scrollToNode(commandLogScope.first(), true);
 					}
 				}
-
-				handleLineStarted: function(id) {
-					console.log('test' + id);
-					var instance = this;
-
-					var linkedLine = instance.get('xmlLog').one('#' + id);
-
-					instance._setXmlNodeClass(linkedLine);
-
-					var container = linkedLine.one('> .child-container');
-
-					if (container && container.hasClass('collapse')) {
-						instance._toggleContainer(container, false);
-					}
-					instance._scrollToNode(linkedLine);
-				},
 			}
 		});
 
