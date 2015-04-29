@@ -1,6 +1,7 @@
-/* ---------- Main ---------- */
+/* ---------- Font Stack ---------- */
+/* ---------- Global ---------- */
 body {
-  background-color: #B9B9B9;
+  background-color: #EBE7DC;
   font-family: menlo, source code pro, lucia console, monospace;
   font-size: 11px;
   line-height: 1.75em;
@@ -19,6 +20,7 @@ h3 {
 
 li {
   display: block;
+  padding: 1px;
 }
 
 /* ---------- XML-Log ---------- */
@@ -55,13 +57,13 @@ li {
   padding: 5px 3px;
 }
 
-.function > .line-container, .macro > .line-container {
+.function > .line-container, .macro > .line-container:nth-of-type(2) {
   cursor: pointer;
 }
 
 .macro > .child-container {
-  background-color: rgba(159, 155, 155, 0.2);
-  box-shadow: inset -1px 0 0 2px rgba(157, 157, 157, 0.69);
+  background-color: rgba(248, 203, 155, 0.38);
+  box-shadow: inset 0px 0px 0px 2px rgba(146, 146, 146, 0.06);
 }
 
 .child-container {
@@ -199,18 +201,15 @@ li {
   background: transparent;
 }
 .command-logger .pass > .line-container {
-  background-color: rgba(245, 245, 245, 0.34);
+  background-color: #7FCDD1;
   margin-top: 1px;
   padding-right: 2%;
   width: 102%;
 }
-.command-logger .function.pass > .line-container {
-  background: #D8D8D8;
-  border: 1px solid #DE8968;
-}
 .command-logger .pending > .line-container {
   background-color: rgba(254, 144, 60, 0.07);
-  border: 2px dotted #FF8E24;
+  border: 3px dotted #FD9A07;
+  padding: 4px;
 }
 .command-logger .hover.pass.function {
   background: transparent;
@@ -224,7 +223,7 @@ li {
   background-color: #FFFBF1;
 }
 .command-logger .current-scope.pass > .line-container, .command-logger .current-scope.pending > .line-container {
-  background-color: #FFDBA2;
+  background-color: #FFEB7B;
 }
 .command-logger .running .pending.function > .line-container {
   background-color: #FFB57C;
@@ -233,7 +232,8 @@ li {
 /* ---------- Scope selection ---------- */
 .current-scope {
   background-color: rgba(28, 117, 185, 0.5);
-  outline: 1px solid #DDD;
+  border: 1px solid #DEE;
+  margin: -1px;
 }
 
 .fail:after, .current-scope:after {
@@ -248,10 +248,21 @@ li {
   opacity: 0;
 }
 
+.function.pass .line-container:hover {
+  background-color: #FFF;
+}
+
+.function.pass .line-container:hover {
+  background-color: rgba(74, 220, 231, 0.46);
+  border: 1px solid #FFF;
+  padding: 4px 2px;
+}
+
 .hover {
-  background-color: rgba(89, 61, 30, 0.12);
-  border: 2px dashed #FFF;
-  margin: -2px;
+  background-color: rgba(74, 220, 231, 0.46);
+  border: 1px solid #FFF;
+  margin: 0;
+  padding: 0;
 }
 
 .pass.hover > .btn-container, .fail.hover > .btn-container {
@@ -296,12 +307,8 @@ li {
   opacity: 0.2;
 }
 
-.hover.macro > .child-container, .current-scope.macro > .child-container {
-  background: rgba(185, 185, 185, 0.3);
-}
-
 .current-scope, .hover.current-scope {
-  background-color: rgba(134, 134, 134, 0.5);
+  background-color: rgba(232, 255, 118, 0.4);
 }
 
 .current-scope.fail .line-container, .hover.fail .line-container {
@@ -321,7 +328,7 @@ li {
   position: relative;
 }
 .fail .line-container:before {
-  background-color: #EBE7DC;
+  background-color: #FFF;
   content: '';
   height: 100%;
   position: absolute;
@@ -337,7 +344,7 @@ li {
 }
 
 .console, .screenshots {
-  border: 6px solid #E2E2D9;
+  border: 6px solid #F9F9EB;
   color: #FFFBF0;
   left: 50%;
   max-height: 1000px;
@@ -419,6 +426,10 @@ li {
   color: #111;
 }
 
+.current-scope.pass .name {
+  color: #447090;
+}
+
 .tag-type {
   color: #333;
 }
@@ -437,7 +448,7 @@ li {
 }
 
 .sidebar {
-  background: #565C61;
+  background-color: #A1978B;
   box-shadow: -5px 0 0 0 rgba(29, 60, 75, 0.3);
   color: #FFF;
   display: inline-block;
@@ -461,7 +472,7 @@ li {
   margin-bottom: 60px;
 }
 .sidebar .scope-name {
-  background-color: #565C61;
+  background-color: #A1978B;
   display: block;
   float: right;
   font-size: 15px;
@@ -491,40 +502,40 @@ li {
   margin: 10px 30px;
 }
 
-.global-btn-container {
+.sidebar-btn-container {
   left: -60px;
   margin-top: 10px;
   position: absolute;
   width: 28px;
 }
-.global-btn-container .btn {
+.sidebar-btn-container .btn {
   color: #444;
   font-size: 20px;
   line-height: 25px;
   margin: 5px 15px;
 }
-.global-btn-container .btn.toggle {
+.sidebar-btn-container .btn.toggle {
   background-color: rgba(220, 220, 220, 0.6);
 }
-.global-btn-container .btn:hover {
+.sidebar-btn-container .btn:hover {
   background-color: rgba(220, 220, 220, 0.7);
 }
-.global-btn-container .btn-command-log.toggle {
+.sidebar-btn-container .btn-command-log.toggle {
   background-color: #444;
   border-color: #444;
   color: #CCC;
 }
-.global-btn-container .btn-command-log:before {
+.sidebar-btn-container .btn-command-log:before {
   content: '\f126';
 }
-.global-btn-container .btn-sidebar:before {
+.sidebar-btn-container .btn-sidebar:before {
   content: '\f104';
   display: block;
 }
-.global-btn-container .btn-jump-to-error {
+.sidebar-btn-container .btn-jump-to-error {
   display: none;
 }
-.global-btn-container .btn-jump-to-error:before {
+.sidebar-btn-container .btn-jump-to-error:before {
   content: '\f071';
 }
 
@@ -548,8 +559,13 @@ li {
   display: inline;
 }
 .command-log .current-scope {
+  background-color: #FFEB7B;
   border: 2px solid #AAA;
+  color: #555;
   outline-width: 0;
+}
+.command-log .current-scope.linkable:hover {
+  background-color: #EEE;
 }
 .command-log.collapse {
   display: block;
@@ -566,11 +582,12 @@ li {
   transition: all 0.3s ease;
 }
 .command-log .linkable:hover {
-  background: #555;
+  background: #648590;
+  color: #FFF;
   outline: 1px solid #777;
 }
 .command-log .divider-line {
-  background: #979C9F;
+  background: #B0A696;
   color: #484B4D;
   font-size: 12px;
   font-weight: bold;
@@ -595,7 +612,7 @@ li {
 .command-log .expand-toggle {
   background: transparent;
   border-width: 0;
-  color: #AAA;
+  color: #DDD;
   cursor: pointer;
   height: 20px;
   line-height: inherit;
@@ -615,6 +632,9 @@ li {
   height: 10px;
   width: 10px;
 }
+.command-log .current-scope .expand-toggle {
+  color: #444;
+}
 .command-log .failed {
   background-color: #E2604C;
 }
@@ -633,7 +653,11 @@ li {
 
 /* ---------- Syntax highlight ---------- */
 .command-name {
-  color: #FFBA6C;
+  color: #8CEFF6;
+}
+
+.current-scope .command-name {
+  color: #447090;
 }
 
 .locator-key {
@@ -758,7 +782,8 @@ li {
 
 .line-container {
   display: block;
-  transition: all 0.2s ease;
+  transition: background 0.2s ease;
+  width: 102%;
 }
 
 .expand-toggle {

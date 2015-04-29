@@ -33,10 +33,6 @@ YUI.add(
 					}
 				},
 
-				prevNode: {
-					setter: A.one
-				},
-
 				running: {
 					value: null
 				},
@@ -59,8 +55,8 @@ YUI.add(
 				bindUI: function() {
 					var instance = this;
 
-					instance.bindSidebar();
-					instance.bindXMLLog();
+					instance._bindSidebar();
+					instance._bindXMLLog();
 				},
 
 				handleCommandCompleted: function(id) {
@@ -90,15 +86,13 @@ YUI.add(
 				handleCurrentScopeSelect: function(event) {
 					var instance = this;
 
-					var currentTarget = event.currentTarget;
+					var currentTarget = event.currentTarget.ancestor();
 
 					event.stopPropagation()
 
-					if (!event.target.test('.btn, .btn-container')) {
-						instance._displayNode(currentTarget);
+					instance._displayNode(currentTarget);
 
-						instance._selectCurrentScope(currentTarget);
-					}
+					instance._selectCurrentScope(currentTarget);
 				},
 
 				handleErrorBtns: function(event) {
@@ -162,24 +156,6 @@ YUI.add(
 					var instance = this;
 
 					instance._displayNode();
-				},
-
-				handleXmlNodeHover: function(event) {
-					var instance = this;
-
-					event.stopPropagation();
-
-					var prevNode = instance.get('prevNode');
-
-					if (prevNode) {
-						prevNode.removeClass('hover');
-					}
-
-					var currentTarget = event.currentTarget;
-
-					currentTarget.addClass('hover');
-
-					instance.set('prevNode', currentTarget);
 				},
 
 				handleToggleCommandLogBtn: function(event) {
@@ -305,15 +281,9 @@ YUI.add(
 					var xmlLog = instance.get('xmlLog');
 
 					xmlLog.delegate(
-						'mouseover',
-						A.bind('handleXmlNodeHover', instance),
-						'.function, .macro, .test-group'
-					);
-
-					xmlLog.delegate(
 						'click',
 						A.bind('handleCurrentScopeSelect', instance),
-						'.function, .macro, .test-group'
+						'.function > .line-container, .macro > .line-container, .test-group > .line-container'
 					);
 
 					xmlLog.delegate(
@@ -490,8 +460,8 @@ YUI.add(
 						var screenshotError = screenshot.attr('data-errorLinkId')
 						var consoleError = consoleLog.attr('data-errorlinkid');
 
-						btnContainer.append(A.Node.create('<button class="btn screenshot-btn" data-errorlinkid="' + screenshotError + '"><div class="btn-content"></div></button>'));
-						btnContainer.append(A.Node.create('<button class="btn error-btn" data-errorlinkid="' + consoleError + '"><div class="btn-content"></div></button>'));
+						btnContainer.append(A.Node.create('<button class="btn screenshot-btn" data-errorlinkid="' + screenshotError + '" onclick="loggerInterface.handleErrorBtns()"><div class="btn-content"></div></button>'));
+						btnContainer.append(A.Node.create('<button class="btn error-btn" data-errorlinkid="' + consoleError + '" onclick="loggerInterface.handleErrorBtns()"><div class="btn-content"></div></button>'));
 
 						failedFunction.prepend(screenshot.clone());
 						failedFunction.append(consoleLog.clone());
