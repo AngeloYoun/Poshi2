@@ -249,7 +249,7 @@ YUI.add(
 					instance._toggleContainer(collapsibleNode, inSidebar);
 				},
 
-				handleMinimizeSidebarBtn:function(event) {
+				handleMinimizeSidebarBtn: function(event) {
 					var instance = this;
 
 					instance._minimizeSidebar(event.currentTarget);
