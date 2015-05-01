@@ -6,15 +6,65 @@ YUI.add(
 		var BODY = A.getBody();
 		var WIN = A.getWin();
 
+		var ATTR_DATA_LOG_ID = 'data-logId';
+
+		var ATTR_DATA_BUTTON_LINK_ID = 'data-btnLinkId';
+
+		var ATTR_DATA_ERROR_LINK_ID = 'data-errorLinkId';
+
+		var ATTR_DATA_FUNCTION_LINK_ID = 'data-functionLinkId';
+
+		var CSS_COLLAPSE = 'collapse';
+
+		var CSS_CURRENT_SCOPE = 'current-scope';
+
+		var CSS_FAIL = 'fail';
+
+		var CSS_HIDDEN = 'hidden';
+
+		var CSS_TOGGLE = 'toggle';
+
+		var CSS_TRANSITIONING = 'transitioning';
+
+		var STR_BLANK = '';
+
+		var STR_COMMAND_LOG_ID = 'commandLogId';
+
+		var STR_COMMAND_LOG_SCOPE = 'commandLogScope';
+
+		var STR_CONTENT_BOX = 'contentBox';
+
+		var STR_CURRENT_SCOPE = 'currentScope';
+
+		var STR_DOT = '.';
+
+		var STR_FAILS = 'fails';
+
+		var STR_HEIGHT = 'height';
+
+		var STR_RUNNING = 'running';
+
+		var STR_SIDEBAR = 'sidebar';
+
+		var STR_SRC = 'src';
+
+		var STR_STATUS = 'status';
+
+		var STR_XML_LOG = 'xmlLog';
+
+		var SELECTOR_FAIL = STR_DOT + CSS_FAIL;
+
+		var TPL_ERROR_BUTTONS = '<button class="btn {cssClass}" data-errorlinkid="{linkId}" onclick="loggerInterface.handleErrorBtns">' +
+				'<div class="btn-content"></div>' +
+			'</button>';
+
+		var TPL_PARAMETER = '<li class="{cssClass}">{parameter}</li>';
+
 		var PoshiLogger = A.Component.create({
 
 			NAME: 'poshilogger',
 
 			ATTRS: {
-				currentScope: {
-					setter: A.one
-				},
-
 				commandLogId: {
 					value: null
 				},
@@ -23,13 +73,17 @@ YUI.add(
 					value: new A.NodeList()
 				},
 
+				currentScope: {
+					setter: A.one
+				},
+
 				fails: {
 					setter: function() {
 						var instance = this;
 
-						var xmlLog = instance.get('xmlLog');
+						var xmlLog = instance.get(STR_XML_LOG);
 
-						return xmlLog.all('.fail');
+						return xmlLog.all(SELECTOR_FAIL);
 					}
 				},
 
@@ -62,24 +116,26 @@ YUI.add(
 				handleCommandCompleted: function(id) {
 					var instance = this;
 
-					var commandLog = instance.get('sidebar').one('.command-log[data-logId="' + instance.get('commandLogId') +'"]');
+					var logIdSelector = '.command-log[data-logId="' + instance.get(STR_COMMAND_LOG_ID) +'"]';
+
+					var commandLog = instance.get(STR_SIDEBAR).one(logIdSelector);
+
 					var latestCommand = commandLog.one('.line-group:last-child');
 
 					if (latestCommand) {
-						instance._parseCommandLog(latestCommand, true);
+						instance._parseCommandLog(latestCommand);
 
-						var linkedFunction = instance.get('xmlLog').one('#' + id);
+						var linkedFunction = instance.get(STR_XML_LOG).one('#' + id);
 
 						instance._displayNode(linkedFunction);
 
 						instance._selectCurrentScope(linkedFunction);
 
 						instance._setXmlNodeClass(linkedFunction);
-					}
-					if (latestCommand.hasClass('failed')) {
-						var latestFailure = latestCommand;
 
-						instance._injectXmlError(latestFailure);
+						if (latestCommand.hasClass('failed')) {
+							instance._injectXmlError(latestCommand);
+						}
 					}
 				},
 
@@ -100,30 +156,30 @@ YUI.add(
 
 					var currentTarget = event.currentTarget;
 
-					currentTarget.toggleClass('toggle');
+					currentTarget.toggleClass(CSS_TOGGLE);
 
-					var xmlLog = instance.get('xmlLog');
+					var xmlLog = instance.get(STR_XML_LOG);
 
-					var errorLinkId = currentTarget.attr('data-errorLinkId');
+					var errorLinkId = currentTarget.attr(ATTR_DATA_ERROR_LINK_ID);
 
 					var errorPanel = xmlLog.one('.errorPanel[data-errorLinkId="' + errorLinkId + '"]');
 
 					if (errorPanel) {
-						errorPanel.toggleClass('toggle');
+						errorPanel.toggleClass(CSS_TOGGLE);
 					}
 				},
 
 				handleCurrentCommandSelect: function(event) {
 					var instance = this;
 
-					var xmlLog = instance.get('xmlLog');
+					var xmlLog = instance.get(STR_XML_LOG);
 
 					var currentTargetAncestor = event.currentTarget.ancestor();
 
 					if (currentTargetAncestor) {
-						instance._parseCommandLog(currentTargetAncestor, true);
+						instance._parseCommandLog(currentTargetAncestor);
 
-						var functionLinkId = currentTargetAncestor.attr('data-functionLinkId');
+						var functionLinkId = currentTargetAncestor.attr(ATTR_DATA_FUNCTION_LINK_ID);
 
 						var linkedFunction = xmlLog.one('.line-group[data-functionLinkId="' + functionLinkId + '"]');
 
@@ -136,20 +192,25 @@ YUI.add(
 				handleFullScreenImageClick: function(event) {
 					var instance = this;
 
-					var currentTarget = event.currentTarget;
+					var fullScreenImageContainer = A.one('#fullScreenImage');
 
-					var src = currentTarget.attr('src');
+					if (fullScreenImageContainer) {
+						var fullScreenImage = fullScreenImageContainer.one('#image');
 
-					var fullScreenImage = A.one('.fullscreen-image');
+						if (fullScreenImage) {
+							var currentTarget = event.currentTarget;
 
-					if (fullScreenImage.hasClass('toggle')) {
-						fullScreenImage.append(A.Node.create('<img alt="fullscreen screenshot" src="' + src + '">'));
+							var src = currentTarget.attr(STR_SRC);
+
+							if (src) {
+								fullScreenImage.attr(STR_SRC, src);
+							}
+
+							fullScreenImage.toggleClass('hide', !src);
+						}
+
+						fullScreenImageContainer.toggleClass(CSS_TOGGLE, !src);
 					}
-					else {
-						fullScreenImage.one('*').remove(true);
-					}
-
-					fullScreenImage.toggleClass('toggle');
 				},
 
 				handleGoToErrorBtn: function(event) {
@@ -161,11 +222,9 @@ YUI.add(
 				handleToggleCommandLogBtn: function(event) {
 					var instance = this;
 
-					var sidebar = instance.get('sidebar');
-
 					var currentTarget = event.currentTarget;
 
-					var logId = currentTarget.attr('data-logId');
+					var logId = currentTarget.attr(ATTR_DATA_LOG_ID);
 
 					var commandLog = instance._getCommandLogNode(logId);
 
@@ -177,37 +236,31 @@ YUI.add(
 
 					var currentTarget = event.currentTarget;
 
-					var lookUpScope = instance.get('xmlLog');
-
-					var linkId = currentTarget.attr('data-btnLinkId');
+					var lookUpScope = instance.get(STR_XML_LOG);
 
 					if (inSidebar) {
-						lookUpScope = instance.get('sidebar');
+						lookUpScope = instance.get(STR_SIDEBAR);
 					}
+
+					var linkId = currentTarget.attr(ATTR_DATA_BUTTON_LINK_ID);
 
 					var collapsibleNode = lookUpScope.one('.child-container[data-btnLinkId="' + linkId + '"]');
 
 					instance._toggleContainer(collapsibleNode, inSidebar);
 				},
 
-				handleMinimizeSidebarBtn:function(event) {
+				handleMinimizeSidebarBtn: function(event) {
 					var instance = this;
 
-					var currentTarget = event.currentTarget;
-
-					instance._minimizeSidebar(currentTarget);
+					instance._minimizeSidebar(event.currentTarget);
 				},
 
 				handleLineCompleted: function(id) {
 					var instance = this;
 
-					var linkedLine = instance.get('xmlLog').one('#' + id);
+					var container = instance._handleLine(id);
 
-					instance._setXmlNodeClass(linkedLine);
-
-					var container = linkedLine.one('> .child-container');
-
-					if (container && !container.hasClass('collapse')) {
+					if (container && !container.hasClass(CSS_COLLAPSE)) {
 						instance._toggleContainer(container, false);
 					}
 				},
@@ -215,31 +268,28 @@ YUI.add(
 				handleLineStarted: function(id) {
 					var instance = this;
 
-					var linkedLine = instance.get('xmlLog').one('#' + id);
+					var container = instance._handleLine(id);
 
-					instance._setXmlNodeClass(linkedLine);
-
-					var container = linkedLine.one('> .child-container');
-
-					if (container && container.hasClass('collapse')) {
+					if (container && container.hasClass(CSS_COLLAPSE)) {
 						instance._toggleContainer(container, false);
 					}
+
 					instance._scrollToNode(linkedLine);
 				},
 
 				renderUI: function() {
 					var instance = this;
 
-					var xmlLog = instance.get('xmlLog');
-					var sidebar = instance.get('sidebar');
+					var xmlLog = instance.get(STR_XML_LOG);
+					var sidebar = instance.get(STR_SIDEBAR);
+
+					xmlLog.toggleClass(STR_RUNNING);
 
 					var commandLog = sidebar.one('.command-log');
 
-					xmlLog.toggleClass('running');
-
 					instance._toggleCommandLog(commandLog);
 
-					if (!xmlLog.hasClass('running')) {
+					if (!xmlLog.hasClass(STR_RUNNING)) {
 						instance._minimizeSidebar();
 					}
 				},
@@ -247,7 +297,7 @@ YUI.add(
 				_bindSidebar: function() {
 					var instance = this;
 
-					var sidebar = instance.get('sidebar');
+					var sidebar = instance.get(STR_SIDEBAR);
 
 					sidebar.delegate(
 						'click',
@@ -263,22 +313,34 @@ YUI.add(
 
 					var logBtn = sidebar.all('.btn-command-log');
 
-					logBtn.on('click', A.bind('handleToggleCommandLogBtn', instance));
+					logBtn.on(
+						'click',
+						A.bind('handleToggleCommandLogBtn', instance)
+					);
 
 					var sidebarBtn = sidebar.one('.btn-sidebar');
 
-					sidebarBtn.on('click', A.bind('handleMinimizeSidebarBtn', instance));
+					if (sidebarBtn) {
+						sidebarBtn.on(
+							'click',
+							A.bind('handleMinimizeSidebarBtn', instance)
+						);
+					}
 
 					var jumpToError = sidebar.one('.btn-jump-to-error');
 
-					jumpToError.on('click', A.bind('handleGoToErrorBtn', instance));
-
+					if (jumpToError) {
+						jumpToError.on(
+							'click',
+							A.bind('handleGoToErrorBtn', instance)
+						);
+					}
 				},
 
 				_bindXMLLog: function() {
 					var instance = this;
 
-					var xmlLog = instance.get('xmlLog');
+					var xmlLog = instance.get(STR_XML_LOG);
 
 					xmlLog.delegate(
 						'click',
@@ -289,7 +351,7 @@ YUI.add(
 					xmlLog.delegate(
 						'click',
 						A.bind('handleFullScreenImageClick', instance),
-						'.screenshot-container img, .fullscreen-image'
+						'.fullscreen-image, .screenshot-container img'
 					);
 
 					xmlLog.delegate(
@@ -306,12 +368,12 @@ YUI.add(
 				},
 
 				_clearXmlErrors: function(command) {
-					command.all('.errorPanel').remove(true);
+					command.all('.errorPanel').remove();
 
 					var btnContainer = command.one('.btn-container');
 
-					btnContainer.one('.screenshot-btn').remove(true);
-					btnContainer.one('.error-btn').remove(true);
+					btnContainer.one('.screenshot-btn').remove();
+					btnContainer.one('.error-btn').remove();
 				},
 
 				_collapseTransition: function(targetNode) {
@@ -319,36 +381,36 @@ YUI.add(
 
 					var returnVal = false;
 
-					var running = instance.get('running');
+					var running = instance.get(STR_RUNNING);
 
 					if (targetNode && (!running || !running.contains(targetNode))) {
 						var height;
 
-						var collapsing = (targetNode.getStyle('height') != '0px');
+						var collapsing = (targetNode.getStyle(STR_HEIGHT) != '0px');
 
 						if (collapsing) {
 							height = targetNode.outerHeight();
 
-							targetNode.setStyle('height', height);
+							targetNode.setStyle(STR_HEIGHT, height);
 
-							instance.set('running', targetNode);
+							instance.set(STR_RUNNING, targetNode);
 
-							targetNode.addClass('transitioning');
+							targetNode.addClass(CSS_TRANSITIONING);
 						}
 						else {
 							var lastChild = targetNode.getDOMNode().lastElementChild;
 
-							lastChild = A.Node(lastChild);
+							lastChild = A.one(lastChild);
 
-							targetNode.removeClass('collapse');
-							targetNode.addClass('transitioning');
+							targetNode.removeClass(CSS_COLLAPSE);
+							targetNode.addClass(CSS_TRANSITIONING);
 
 							var lastChildY = lastChild.getY();
 							var lastChildHeight = lastChild.innerHeight();
 
-							var lastChildBottomY = (lastChildY + lastChildHeight + 1);
+							var lastChildBottomY = lastChildY + lastChildHeight + 1;
 
-							height = (lastChildBottomY - targetNode.getY());
+							height = lastChildBottomY - targetNode.getY();
 						}
 
 						instance._getTransition(targetNode, height, collapsing);
@@ -362,7 +424,7 @@ YUI.add(
 				_displayNode: function(node) {
 					var instance = this;
 
-					node = node || instance.get('fails').last();
+					node = node || instance.get(STR_FAILS).last();
 
 					var parentContainers = node.ancestors('.child-container');
 
@@ -378,9 +440,11 @@ YUI.add(
 
 					var container = parentContainers.shift();
 
-					if (container.hasClass('collapse')) {
+					if (container.hasClass(CSS_COLLAPSE)) {
 						instance._toggleContainer(container, false);
+
 						instance._scrollToNode(container.one('.line-group'));
+
 						timeout = 200;
 					}
 
@@ -398,17 +462,17 @@ YUI.add(
 				_getCommandLogNode: function(logId) {
 					var instance = this;
 
-					logId = logId || instance.get('commandLogId');
+					logId = logId || instance.get(STR_COMMAND_LOG_ID);
 
-					var sidebar = instance.get('sidebar');
+					var logIdSelector = '.command-log[data-logId="' + logId + '"]';
 
-					return sidebar.one('.command-log[data-logId="' + logId + '"]');
+					return instance.get(STR_SIDEBAR).one(logIdSelector);
 				},
 
 				_getTransition: function(targetNode, height, collapsing) {
 					var instance = this;
 
-					var duration = (Math.pow(height, 0.35) / 15);
+					var duration = Math.pow(height, 0.35) / 15;
 
 					var ease = 'ease-in';
 
@@ -428,17 +492,27 @@ YUI.add(
 						},
 						function() {
 							if (collapsing) {
-								targetNode.addClass('collapse');
+								targetNode.addClass(CSS_COLLAPSE);
 							}
 							else {
-								targetNode.setStyle('height', 'auto');
+								targetNode.setStyle(STR_HEIGHT, 'auto');
 							}
 
-							instance.set('running', null);
+							instance.set(STR_RUNNING, null);
 
-							targetNode.removeClass('transitioning');
+							targetNode.removeClass(CSS_TRANSITIONING);
 						}
 					);
+				},
+
+				_handleLine: function(id) {
+					var instance = this;
+
+					var linkedLine = instance.get(STR_XML_LOG).one('#' + id);
+
+					instance._setXmlNodeClass(linkedLine);
+
+					return linkedLine.one('> .child-container');
 				},
 
 				_injectXmlError: function(command) {
@@ -447,21 +521,40 @@ YUI.add(
 					var consoleLog = command.one('.console');
 					var screenshot = command.one('.screenshots');
 
-					var functionLinkId = command.attr('data-functionLinkId');
+					var functionLinkId = command.attr(ATTR_DATA_FUNCTION_LINK_ID);
 
-					var failedFunction = instance.get('xmlLog').one('.line-group[data-functionLinkId="' + functionLinkId + '"]');
+					var functionLinkIdSelector = '.line-group[data-functionLinkId="' + functionLinkId + '"]';
+
+					var failedFunction = instance.get(STR_XML_LOG).one(functionLinkIdSelector);
 
 					if (consoleLog && screenshot && failedFunction) {
+						var buffer = [];
+
+						var consoleBtn = A.Lang.sub(
+							TPL_ERROR_BUTTONS,
+							{
+								cssClass: 'error-btn',
+								linkId: consoleLog.attr(ATTR_DATA_ERROR_LINK_ID)
+							}
+						);
+
+
+						var screenshotBtn = A.Lang.sub(
+							TPL_ERROR_BUTTONS,
+							{
+								cssClass: 'screenshot-btn',
+								linkId: screenshot.attr(ATTR_DATA_ERROR_LINK_ID)
+							}
+						);
+
+						buffer.push(screenshotBtn);
+						buffer.push(consoleBtn);
+
+						buffer = buffer.join(STR_BLANK);
+
 						var btnContainer = failedFunction.one('.btn-container');
 
-						var imgBefore = screenshot.one('.before');
-						var imgAfter = screenshot.one('.after');
-
-						var screenshotError = screenshot.attr('data-errorLinkId')
-						var consoleError = consoleLog.attr('data-errorlinkid');
-
-						btnContainer.append(A.Node.create('<button class="btn screenshot-btn" data-errorlinkid="' + screenshotError + '" onclick="loggerInterface.handleErrorBtns()"><div class="btn-content"></div></button>'));
-						btnContainer.append(A.Node.create('<button class="btn error-btn" data-errorlinkid="' + consoleError + '" onclick="loggerInterface.handleErrorBtns()"><div class="btn-content"></div></button>'));
+						btnContainer.append(buffer);
 
 						failedFunction.prepend(screenshot.clone());
 						failedFunction.append(consoleLog.clone());
@@ -471,24 +564,26 @@ YUI.add(
 				_minimizeSidebar: function(button) {
 					var instance = this;
 
-					var contentBox = instance.get('contentBox');
+					instance.get(STR_CONTENT_BOX).toggleClass('minimized-sidebar');
 
-					var button = button || instance.get('sidebar').one('.btn-sidebar')
+					var button = button || instance.get(STR_SIDEBAR).one('.btn-sidebar')
 
-					contentBox.toggleClass('minimized-sidebar')
-
-					button.toggleClass('toggle');
+					button.toggleClass(CSS_TOGGLE);
 				},
 
 				_parseCommandLog: function(node) {
 					var instance = this;
 
-					var commandLogScope = instance.get('commandLogScope');
+					var commandLogScope = instance.get(STR_COMMAND_LOG_SCOPE);
 
 					if (commandLogScope) {
-						commandLogScope.removeClass('current-scope');
+						commandLogScope.removeClass(CSS_CURRENT_SCOPE);
 					}
-					instance.set('commandLogScope', new A.NodeList());
+
+					instance.set(
+						STR_COMMAND_LOG_SCOPE,
+						new A.NodeList()
+					);
 
 					if (node.hasClass('macro')) {
 						var macroScope = node.all('[data-functionLinkId]');
@@ -499,85 +594,105 @@ YUI.add(
 						instance._scopeCommandLog(node);
 					}
 
-					var commandLogScope = instance.get('commandLogScope');
+					var commandLogScopeFirst = instance.get(STR_COMMAND_LOG_SCOPE).first();
 
-					instance._scrollToNode(commandLogScope.first(), true);
+					instance._scrollToNode(commandLogScopeFirst, true);
 				},
 
 				_refreshEditMenu: function() {
 					var instance = this;
 
-					var currentScope = instance.get('currentScope');
+					var currentScope = instance.get(STR_CURRENT_SCOPE);
 
 					if (currentScope) {
-						var sidebar = instance.get('sidebar');
-
-						var sidebarParameterTitle = sidebar.one('.parameter .title');
-						var sidebarParameterList = sidebar.one('.parameter .parameter-list');
+						var sidebar = instance.get(STR_SIDEBAR);
 
 						var scopeNames = currentScope.all('> .line-container .name');
 						var scopeTypes = currentScope.all('> .line-container .tag-type');
 
-						var scopeName = scopeNames.first();
-						var scopeType = scopeTypes.first();
+						var scopeName = scopeNames.first() || currentScope.one('.testCaseCommand');
 
-						if (scopeName) {
-							scopeName = scopeName.html();
-						}
-						else {
-							scopeName = currentScope.one('.testCaseCommand');
+						scopeName = scopeName.html();
 
-							if (scopeName) {
-								scopeName = scopeName.html();
-							}
-						}
+						var scopeType = scopeTypes.first() || currentScope.one('> .line-container .action-type') || 'test-case';
 
-						if (scopeType && (scopeType.html() != 'name')) {
+						if (!Lang.isString(scopeType)) {
 							scopeType = scopeType.html();
 						}
-						else {
-							scopeType = currentScope.one('> .line-container .action-type');
 
-							if (scopeType) {
-								scopeType = scopeType.html();
-							}
-							else {
-								scopeType = 'test-case'
-							}
-						}
+						sidebar.one('.scope-type .scope-name').html(scopeName);
+						sidebar.one('.scope-type .title').html(scopeType);
 
-						var sidebarScopeName = sidebar.one('.scope-type .scope-name');
-						var sidebarScopeTitle = sidebar.one('.scope-type .title');
+						var sidebarParameterList = sidebar.one('.parameter .parameter-list');
 
-						sidebarScopeName.html(scopeName);
-						sidebarScopeTitle.html(scopeType);
+						sidebarParameterList.all('> *').remove();
 
-						sidebarParameterList.all('> *').remove(true);
+						var sidebarParameterTitle = sidebar.one('.parameter .title');
+
+						sidebarParameterTitle.removeClass(CSS_HIDDEN);
 
 						var parameterCount;
 
-						sidebarParameterTitle.removeClass('hidden');
-
-						if (scopeType === 'macro') {
-							var parameters = currentScope.all('> .line-container .parameter-container .parameter-value');
-
-							parameterCount = parameters.size();
-
-							for (var i = 0; i < parameterCount; i += 2) {
-								sidebarParameterList.append(A.Node.create('<li class="parameter-name">' + parameters.item(i).html() + '</div>'));
-								sidebarParameterList.append(A.Node.create('<li class="parameter-value">' + parameters.item(i + 1).html() + '</div>'));
-							}
-						}
-						else if (scopeType === 'function') {
-							parameterCount = (scopeNames.size() - 1);
-
-							for (var i = 1; i <= parameterCount; i++) {
-								sidebarParameterList.append(A.Node.create('<li class="parameter-name">' + scopeTypes.item(i).html() + '</div>'));
-								sidebarParameterList.append(A.Node.create('<li class="parameter-value">' + scopeNames.item(i).html() + '</div>'));
-							}
+						if ((scopeType != 'function') || (scopeType != 'macro')) {
+							sidebarParameterTitle.addClass(CSS_HIDDEN);
 						}
 						else {
-							sidebarParameterTitle.addClass('hidden');
+							var buffer = [];
+
+							if (scopeType === 'macro') {
+								var parameters = currentScope.all('> .line-container .parameter-container .parameter-value');
+
+								for (var i = 0; i < parameters.size(); i += 2) {
+									buffer.push(
+										A.Lang.sub(
+											TPL_PARAMETER,
+											{
+												cssClass: 'parameter-name',
+												parameter: parameters.item(i).html()
+											}
+										)
+									);
+
+									buffer.push(
+										A.Lang.sub(
+											TPL_PARAMETER,
+											{
+												cssClass: 'parameter-value',
+												parameter: parameters.item(i + 1).html()
+											}
+										)
+									);
+								}
+							}
+							else if (scopeType === 'function') {
+								parameterCount = scopeNames.size() - 1;
+
+								for (var i = 1; i <= parameterCount; i++) {
+									buffer.push(
+										A.Lang.sub(
+											TPL_PARAMETER,
+											{
+												cssClass: 'parameter-name',
+												parameter: scopeTypes.item(i).html()
+											}
+										)
+									);
+
+									buffer.push(
+										A.Lang.sub(
+											TPL_PARAMETER,
+											{
+												cssClass: 'parameter-value',
+												parameter: scopeNames.item(i).html()
+											}
+										)
+									);
+								}
+							}
+
+							buffer = buffer.join(STR_BLANK);
+
+							sidebarParameterList.append(buffer);
 						}
 					}
 				},
@@ -590,27 +705,24 @@ YUI.add(
 					if (node) {
 						node = node.one('> .line-container');
 
-						var halfNodeHeight = (node.innerHeight() / 2);
-						var halfWindowHeight = (WIN.height() / 2);
+						var halfNodeHeight = node.innerHeight() / 2;
+						var halfWindowHeight = WIN.height() / 2;
 
 						var offsetHeight = (halfWindowHeight - halfNodeHeight);
 
 						var nodeY = node.getY();
 
 						if (inSidebar) {
-							var commandLogId = instance.get('commandLogId');
-							var sidebar = instance.get('sidebar');
-
 							scrollNode = instance._getCommandLogNode();
 
 							var dividerLine = scrollNode.one('.divider-line');
 
 							if (dividerLine) {
-								nodeY = (nodeY - dividerLine.getY());
+								nodeY = nodeY - dividerLine.getY();
 							}
 						}
 
-						var yDistance = (nodeY - offsetHeight);
+						var yDistance = nodeY - offsetHeight;
 
 						new A.Anim(
 							{
@@ -631,11 +743,11 @@ YUI.add(
 					var buffer = [];
 
 					if (node) {
-						var sidebar = instance.get('sidebar');
+						var functionLinkId = node.attr(ATTR_DATA_FUNCTION_LINK_ID);
 
-						var functionLinkId = node.attr('data-functionLinkId');
+						var functionLinkIdSelector = '.linkable[data-functionLinkId="' + functionLinkId + '"]';
 
-						node = sidebar.all('.linkable[data-functionLinkId="' + functionLinkId + '"]');
+						node = instance.get(STR_SIDEBAR).all(functionLinkIdSelector);
 
 						while(node.size()) {
 							var lastEl = node.pop();
@@ -644,27 +756,27 @@ YUI.add(
 						}
 					}
 
-					var commandLogScope = instance.get('commandLogScope');
+					var commandLogScope = instance.get(STR_COMMAND_LOG_SCOPE);
 
 					commandLogScope = commandLogScope.concat(buffer);
 
-					instance.set('commandLogScope', commandLogScope);
+					instance.set(STR_COMMAND_LOG_SCOPE, commandLogScope);
 
-					commandLogScope.addClass('current-scope');
+					commandLogScope.addClass(CSS_CURRENT_SCOPE);
 				},
 
 				_setXmlNodeClass: function(node) {
 					var instance = this;
 
-					var status = instance.get('status');
-
-					var selector = 'data-status' + instance.get('commandLogId');
-
-					var currentStatus = node.attr(selector);
+					var status = instance.get(STR_STATUS);
 
 					for (var i = 0; i < status.length; i++) {
 						node.removeClass(status[i]);
 					}
+
+					var selector = 'data-status' + instance.get(STR_COMMAND_LOG_ID);
+
+					var currentStatus = node.attr(selector);
 
 					node.addClass(currentStatus);
 				},
@@ -672,17 +784,17 @@ YUI.add(
 				_selectCurrentScope: function(node) {
 					var instance = this;
 
-					var currentScope = instance.get('currentScope');
+					var currentScope = instance.get(STR_CURRENT_SCOPE);
 
 					if (currentScope) {
-						currentScope.removeClass('current-scope');
+						currentScope.removeClass(CSS_CURRENT_SCOPE);
 					}
 
-					node.addClass('current-scope');
+					node.addClass(CSS_CURRENT_SCOPE);
 
-					instance.set('currentScope', node);
+					instance.set(STR_CURRENT_SCOPE, node);
 
-					if (instance.get('commandLogId')) {
+					if (instance.get(STR_COMMAND_LOG_ID)) {
 						instance._parseCommandLog(node);
 					}
 
@@ -692,14 +804,18 @@ YUI.add(
 				_toggleCommandLog: function(commandLog, button) {
 					var instance = this;
 
-					var commandLogId = instance.get('commandLogId');
-					var sidebar = instance.get('sidebar');
+					var commandLogId = instance.get(STR_COMMAND_LOG_ID);
+					var sidebar = instance.get(STR_SIDEBAR);
 
-					var logId = commandLog.attr('data-logId');
+					var logId = commandLog.attr(ATTR_DATA_LOG_ID);
 
-					button = button || sidebar.one('.btn-command-log[data-logId="' + logId + '"]');
+					var logIdSelector = '.btn-command-log[data-logId="' + logId + '"]';
 
-					button.toggleClass('toggle');
+					button = button || sidebar.one(logIdSelector);
+
+					button.toggleClass(CSS_TOGGLE);
+
+					var newLogId;
 
 					if (commandLogId !== logId) {
 						if (commandLogId) {
@@ -707,68 +823,71 @@ YUI.add(
 
 							instance._toggleCommandLog(currentActiveLog);
 						}
-						instance.set('commandLogId', logId);
+						newLogId = logId;
 
 						var commandFailures = commandLog.all('.failed');
 
 						commandFailures.each(instance._injectXmlError, instance)
 					}
 					else {
-						instance.set('commandLogId', null);
+						newLogId = null;
 
-						fails = instance.get('xmlLog').all('.fail');
+						fails = instance.get(STR_XML_LOG).all(SELECTOR_FAIL);
 
 						if (fails.size()) {
 							fails.each(instance._clearXmlErrors);
 						}
 					}
+					instance.set(STR_COMMAND_LOG_ID, newLogId);
 
 					instance._toggleXmlLogClasses(logId);
 
-					instance.set('fails');
+					var failNodes = instance.get(STR_XML_LOG).all(SELECTOR_FAIL);
+
+					instance.set(STR_FAILS, failNodes);
 
 					instance._transitionCommandLog(commandLog);
 
-					var fails = instance.get('fails');
+					if (failNodes.size()) {
+						failNodes.each(instance._displayNode, instance);
 
-					if (fails.size()) {
-						fails.each(instance._displayNode, instance);
-
-						instance._selectCurrentScope(fails.first());
+						instance._selectCurrentScope(failNodes.first());
 					}
 				},
 
 				_toggleContainer: function(collapsibleContainer, inSidebar) {
 					var instance = this;
 
-					var lookUpScope = instance.get('xmlLog');
+					var lookUpScope = instance.get(STR_XML_LOG);
 
 					if (inSidebar) {
-						lookUpScope = instance.get('sidebar');
+						lookUpScope = instance.get(STR_SIDEBAR);
 					}
 
-					var linkId = collapsibleContainer.attr('data-btnLinkId');
+					var linkId = collapsibleContainer.attr(ATTR_DATA_BUTTON_LINK_ID);
 
 					collapsibleBtn = lookUpScope.one('.btn[data-btnLinkId="' + linkId + '"]');
 
 					var collapsed = instance._collapseTransition(collapsibleContainer);
 
-					if (collapsed) {
-						collapsibleBtn.toggleClass('toggle');
+					if (collapsed && collapsibleBtn) {
+						collapsibleBtn.toggleClass(CSS_TOGGLE);
 					}
 				},
 
 				_toggleXmlLogClasses: function(logId) {
 					var instance = this;
 
-					var status = instance.get('status');
+					var status = instance.get(STR_STATUS);
 
 					var selector = 'data-status' + logId;
 
 					for (var i = 0; i < status.length; i++) {
 						var currentStatus = status[i];
 
-						var currentStatusNodes = A.all('[' + selector + '="' + currentStatus + '"]');
+						var currentStatusSelector = '[' + selector + '="' + currentStatus + '"]';
+
+						var currentStatusNodes = A.all(currentStatusSelector);
 
 						currentStatusNodes.toggleClass(currentStatus);
 					}
@@ -777,24 +896,20 @@ YUI.add(
 				_transitionCommandLog: function(commandLog) {
 					var instance = this;
 
-					var newHeight = 0;
+					commandLog.toggleClass(CSS_COLLAPSE);
 
-					var commandLogId = instance.get('commandLogId');
-					var sidebar = instance.get('sidebar');
-
-					commandLog.toggleClass('collapse');
-
-					instance.get('contentBox').toggleClass('command-logger')
+					instance.get(STR_CONTENT_BOX).toggleClass('command-logger')
 
 					var lastChildLog = commandLog.one('.line-group:last-child');
 
-					if (lastChildLog && lastChildLog.hasClass('collapse')) {
+					if (lastChildLog && lastChildLog.hasClass(CSS_COLLAPSE)) {
 						instance._toggleContainer(lastChildLog, true);
 					}
 
-					var commandLogScope = instance.get('commandLogScope');
+					var commandLogId = instance.get(STR_COMMAND_LOG_ID);
+					var commandLogScope = instance.get(STR_COMMAND_LOG_SCOPE);
 
-					if (commandLogScope && commandLogId) {
+					if (commandLogId && commandLogScope) {
 						instance._scrollToNode(commandLogScope.first(), true);
 					}
 				}
