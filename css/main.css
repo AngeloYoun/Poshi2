@@ -44,7 +44,7 @@ li {
 
 .xml-log-container {
   border-width: 0;
-  height: auto;
+  height: 100%;
   padding-left: 100px;
 }
 
@@ -73,6 +73,10 @@ li {
   list-style-type: none;
   overflow: visible;
   padding: 1px 0 1px 20px;
+}
+
+.header > .child-container {
+  height: auto;
 }
 
 .child-container.transitioning {
@@ -138,11 +142,14 @@ li {
 .btn .btn-content {
   transition: all 0.2s ease;
 }
-.btn:hover .btn-content {
+.btn:hover {
+  background-color: #E6DBD2;
+}
+.btn:hover.btn-content {
   transform: scale(1.3, 1.3);
 }
 .btn.toggle {
-  background-color: rgba(220, 220, 220, 0.6);
+  background-color: #E4D9D0;
 }
 
 .error-btn, .screenshot-btn {
@@ -223,7 +230,7 @@ li {
   background-color: #FFFBF1;
 }
 .command-logger .current-scope.pass > .line-container, .command-logger .current-scope.pending > .line-container {
-  background-color: #FFEB7B;
+  background-color: #A3D7C9;
 }
 .command-logger .running .pending.function > .line-container {
   background-color: #FFB57C;
@@ -249,13 +256,9 @@ li {
 }
 
 .function.pass .line-container:hover {
-  background-color: #FFF;
-}
-
-.function.pass .line-container:hover {
-  background-color: rgba(74, 220, 231, 0.46);
+  background-color: #A3D7C9;
   border: 1px solid #FFF;
-  padding: 4px 2px;
+  padding: 4px 2% 4px 2px;
 }
 
 .hover {
@@ -565,7 +568,8 @@ li {
   outline-width: 0;
 }
 .command-log .current-scope.linkable:hover {
-  background-color: #EEE;
+  background-color: #FAE841;
+  color: #444;
 }
 .command-log.collapse {
   display: block;
@@ -783,7 +787,6 @@ li {
 .line-container {
   display: block;
   transition: background 0.2s ease;
-  width: 102%;
 }
 
 .expand-toggle {

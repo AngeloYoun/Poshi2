@@ -64,7 +64,7 @@ li {
 
 .xml-log-container {
 	border-width: 0;
-	height: auto;
+	height: 100%;
 	padding-left: 100px;
 }
 
@@ -93,6 +93,10 @@ li {
 	list-style-type: none;
 	overflow: visible;
 	padding: 1px 0 1px 20px;
+}
+
+.header > .child-container {
+	height: auto;
 }
 
 .child-container.transitioning {
@@ -164,12 +168,16 @@ li {
 		transition: all 0.2s ease;
 	}
 
-	&:hover .btn-content {
-		transform: scale(1.3, 1.3);
+	&:hover {
+		background-color: #E6DBD2;
+
+		&.btn-content {
+			transform: scale(1.3, 1.3);
+		}
 	}
 
 	&.toggle {
-		background-color: rgba(220, 220, 220, 0.60);
+		background-color: #E4D9D0;
 	}
 }
 
@@ -282,7 +290,7 @@ li {
 	.current-scope {
 		&.pass, &.pending {
 			> .line-container {
-				background-color: #FFEB7B;
+				background-color: #A3D7C9;
 			}
 		}
 	}
@@ -300,6 +308,7 @@ li {
 	background-color: rgba(28, 117, 185, 0.5);
 	border: 1px solid #DEE;
 	margin: -1px;
+	padding: 0;
 }
 
 .fail:after, .current-scope:after {
@@ -315,13 +324,10 @@ li {
 }
 
 .function.pass .line-container:hover {
-	background-color: #FFF;
-}
-
-.function.pass .line-container:hover {
-	background-color: rgba(74, 220, 231, 0.46);
+	background-color: #A3D7C9;
 	border: 1px solid #FFF;
-	padding: 4px 2px;
+	border-right-width
+	padding: 4px 2% 4px 2px;
 }
 
 .hover {
@@ -942,7 +948,7 @@ li {
 .line-container {
 	display: block;
 	transition: background 0.2s ease;
-	width: 102%;
+	// width: 102%;
 }
 
 .expand-toggle {
