@@ -815,19 +815,22 @@ YUI.add(
 
 					button.toggleClass(CSS_TOGGLE);
 
+					var newLogId;
+
 					if (commandLogId !== logId) {
 						if (commandLogId) {
 							var currentActiveLog = instance._getCommandLogNode();
 
 							instance._toggleCommandLog(currentActiveLog);
 						}
+						newLogId = logId;
 
 						var commandFailures = commandLog.all('.failed');
 
 						commandFailures.each(instance._injectXmlError, instance)
 					}
 					else {
-						logId = null;
+						newLogId = null;
 
 						fails = instance.get(STR_XML_LOG).all(SELECTOR_FAIL);
 
@@ -835,8 +838,7 @@ YUI.add(
 							fails.each(instance._clearXmlErrors);
 						}
 					}
-
-					instance.set(STR_COMMAND_LOG_ID, logId);
+					instance.set(STR_COMMAND_LOG_ID, newLogId);
 
 					instance._toggleXmlLogClasses(logId);
 
