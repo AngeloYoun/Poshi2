@@ -766,11 +766,7 @@ YUI.add(
 
 					var selector = 'data-status' + instance.get(STR_COMMAND_LOG_ID);
 
-					console.log(node)
-
 					var currentStatus = node.attr(selector);
-
-					console.log(currentStatus)
 
 					node.addClass(currentStatus);
 				},
@@ -817,6 +813,7 @@ YUI.add(
 
 							instance._toggleCommandLog(currentActiveLog);
 						}
+
 						newLogId = logId;
 
 						var commandFailures = commandLog.all('.failed');
@@ -832,6 +829,7 @@ YUI.add(
 							fails.each(instance._clearXmlErrors);
 						}
 					}
+
 					instance.set(STR_COMMAND_LOG_ID, newLogId);
 
 					instance._toggleXmlLogClasses(logId);
