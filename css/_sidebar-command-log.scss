@@ -1,0 +1,127 @@
+
+/* ---------- Command-Log ---------- */
+
+.command-log {
+	font-family: Verdana, Geneva, sans-serif;
+	height: 100%;
+	overflow-y: scroll;
+	padding: 0;
+	transition: all 0.5s ease-in-out;
+
+	.status div {
+		display: inline;
+	}
+
+	.current-scope {
+		background-color: #FFEB7B;
+		border: 2px solid #AAA;
+		color: #555;
+		outline-width: 0;
+
+		&.linkable:hover {
+			background-color: #FAE841;
+			color: #444;
+		}
+	}
+
+	&.collapse {
+		display: block;
+		height: 0;
+	}
+
+	&.toggle {
+		height: 100%;
+	}
+
+	.line-container {
+		margin-left: 20px;
+	}
+
+	.linkable {
+		cursor: pointer;
+		transition: all 0.3s ease;
+
+		&:hover {
+			background: #648590;
+			color: #FFF;
+			outline: 1px solid #777;
+		}
+	}
+
+	.divider-line {
+		background: #B0A696;
+		color: #484B4D;
+		font-size: 12px;
+		font-weight: bold;
+		height: auto;
+		padding: 10px;
+	}
+
+	.line-group {
+		padding-bottom: 1px;
+		position: relative;
+	}
+
+	.child-container {
+		border: 1px dashed #EEE;
+		border-right-width: 0;
+		border-top-width: 0;
+		color: #FFF;
+		margin: 0 0 9px 24px;
+		overflow: hidden;
+
+		.run-line:last-child {
+			padding-bottom: 11px;
+		}
+	}
+
+	.expand-toggle {
+		background: transparent;
+		border-width: 0;
+		color: #DDD;
+		cursor: pointer;
+		height: 20px;
+		line-height: inherit;
+		margin: 6px 0 0 0;
+		padding: 0;
+		position: absolute;
+		text-align: center;
+		width: 20px;
+
+		&:hover {
+			color: #FFF;
+		}
+
+		&:before {
+			content: '\f105';
+			font-family: fontAwesome;
+			font-size: 14px;
+			height: 10px;
+			width: 10px;
+		}
+	}
+
+	.current-scope .expand-toggle {
+		color: #444;
+	}
+
+	.failed {
+		background-color: #E2604C;
+
+		&.current-scope {
+			background-color: #EE6C39;
+		}
+
+		&:hover {
+			background-color: #F0652B;
+		}
+
+		.expand-toggle {
+			color: #FBEFB4;
+		}
+	}
+
+	.title-line {
+		display: none;
+	}
+}

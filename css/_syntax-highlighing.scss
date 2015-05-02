@@ -1,0 +1,64 @@
+/* ---------- Syntax highlight ---------- */
+
+/* ---------- Sidebar ---------- */
+
+.command-name {
+	color: #8CEFF6;
+}
+
+.current-scope .command-name {
+	color: #447090;
+}
+
+.locator-key {
+	color: #CFCFCD;
+}
+
+.failed {
+	.command-name {
+		color: #FBF4D7;
+	}
+
+	.locator-key, .value {
+		color: #FFE4C7;
+	}
+}
+
+.command-log .child-container {
+	b {
+		color: #FDBA93;
+		font-weight: 300;
+
+		&:first-child {
+			color: #E9C993;
+		}
+	}
+
+	.command-failure {
+		color: #FC8686;
+	}
+}
+
+.misc, .action-type, .tag-type {
+	margin: 2px;
+}
+
+/* ---------- Xml-Log ---------- */
+
+.name {
+	color: #111;
+}
+
+.current-scope.pass .name {
+	color: #447090;
+}
+
+.tag-type {
+	color: #333;
+}
+
+.function > div .name, .macro > div .name {
+	color: #663615;
+}
+
+

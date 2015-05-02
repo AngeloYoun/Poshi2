@@ -1,0 +1,155 @@
+
+/* ---------- XML-Log ---------- */
+
+.collapse, .header > .btn-container {
+	display: none;
+}
+
+.xml-log {
+	display: block;
+	position: relative;
+	width: 80%;
+}
+
+.command-logger .xml-log {
+	width: 60%;
+}
+
+.minimized-sidebar .xml-log {
+	width: 100%;
+}
+
+.xml-log-container {
+	border-width: 0;
+	height: 100%;
+	padding-left: 100px;
+}
+
+.child-container.root-container {
+	border-width: 0;
+	overflow: visible;
+}
+
+.line-container {
+	padding: 5px 3px;
+}
+
+.function > .line-container, .macro > .line-container:nth-of-type(2){
+	cursor: pointer;
+}
+
+.macro > .child-container {
+	background-color: rgba(248, 203, 155, 0.38);
+	box-shadow: inset 0px 0px 0px 2px rgba(146, 146, 146, 0.06);
+}
+
+.child-container {
+	border-left: 1px solid #DDD;
+	color: #40444D;
+	height: 0;
+	list-style-type: none;
+	overflow: visible;
+	padding: 1px 0 1px 20px;
+}
+
+.header > .child-container {
+	height: auto;
+}
+
+.child-container.transitioning {
+	overflow: hidden;
+}
+
+.btn-container {
+	left: 0;
+	position: absolute;
+}
+
+.parameter-container {
+	border: 1px dashed #777;
+	border-right-width: 0;
+	border-top-width: 0;
+	color: #615750;
+	height: 0;
+	margin-left: 35px;
+	overflow: hidden;
+
+	.line-container {
+		padding: 5px 10px;
+	}
+
+	.line-number {
+		left: 0;
+		position: absolute;
+	}
+}
+
+.line-number {
+	border-width: 0;
+	color: #222;
+	cursor: pointer;
+	display: inline-block;
+	font-size: 10px;
+	margin-left: 5px;
+	min-width: 26px;
+	opacity: 0.2;
+
+	&:hover {
+		opacity: 1;
+	}
+}
+
+/* ---------- Link run log ---------- */
+
+.command-logger {
+	.pass {
+		&.conditional-failed > .line-container {
+			background: transparent;
+		}
+
+		> .line-container {
+			background-color: #7FCDD1;
+			margin-top: 1px;
+			padding-right: 2%;
+			width: 102%;
+		}
+	}
+
+	.pending > .line-container {
+		background-color: rgba(254, 144, 60, 0.07);
+		border: 3px dotted #FD9A07;
+		padding: 4px;
+	}
+
+	.hover.pass.function {
+		background: transparent;
+		outline-width: 0;
+	}
+
+	.current-scope.pass.function {
+		background: transparent;
+		outline-width: 0;
+	}
+
+	.hover {
+		&.pass, &.pending {
+			> .line-container {
+				background-color: #FFFBF1;
+			}
+		}
+	}
+
+	.current-scope {
+		&.pass, &.pending {
+			> .line-container {
+				background-color: #A3D7C9;
+			}
+		}
+	}
+
+	.running .pending.function {
+		> .line-container {
+			background-color: #FFB57C;
+		}
+	}
+}

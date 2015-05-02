@@ -1,0 +1,156 @@
+
+/* ---------- Buttons ---------- */
+
+.btn {
+	background: transparent;
+	border-width: 0;
+	cursor: pointer;
+	font-family: fontAwesome;
+	font-size: 10px;
+	height: 28px;
+	left: 0;
+	margin: auto;
+	outline: none;
+	padding: 2px;
+	text-align: center;
+	transition: all 0.2s ease;
+	width: 28px;
+
+	&:active:focus, &:focus, &:hover {
+		box-shadow: none;
+		outline: 0;
+	}
+
+	.btn-content {
+		transition: all 0.2s ease;
+	}
+
+	&:hover {
+		background-color: #E6DBD2;
+
+		&.btn-content {
+			transform: scale(1.3, 1.3);
+		}
+	}
+
+	&.toggle {
+		background-color: #E4D9D0;
+	}
+}
+
+.error-btn, .screenshot-btn {
+	border-color: #FF5335;
+	bottom: 0;
+	color: #FF5335;
+	font-size: 17px;
+	margin-top: 1px;
+
+	&:hover, &:focus {
+		color: #FF5335;
+	}
+}
+
+.screenshot-btn, .error-btn {
+	display: none;
+}
+
+.fail {
+	.screenshot-btn, .error-btn {
+		display: inline-block;
+	}
+
+	.btn:hover {
+		background-color: transparent;
+	}
+
+	.btn.toggle:hover {
+		background-color: #FF5335;
+	}
+}
+
+.error-btn.toggle, .screenshot-btn.toggle {
+	background: #FF5335;
+	color: #EBE7DC;
+}
+
+/* ---------- Sidebar Buttons ---------- */
+
+.sidebar-btn-container {
+	left: -60px;
+	margin-top: 10px;
+	position: absolute;
+	width: 28px;
+
+	.btn {
+		color: #444;
+		font-size: 20px;
+		line-height: 25px;
+		margin: 5px 15px;
+
+		&.toggle {
+			background-color: rgba(220, 220, 220, 0.6);
+		}
+
+		&:hover {
+			background-color: rgba(220, 220, 220, 0.7);
+		}
+	}
+	.btn-command-log {
+		&.toggle {
+			background-color: #444;
+			border-color: #444;
+			color: #CCC;
+		}
+
+		&:before {
+			content: '\f126';
+		}
+	}
+
+	.btn-sidebar:before {
+		content: '\f104';
+		display: block;
+	}
+
+	.btn-jump-to-error {
+		display: none;
+
+		&:before {
+			content: '\f071';
+		}
+	}
+}
+
+.running .btn-command-log {
+	display: none;
+}
+
+.command-logger .btn.btn-jump-to-error {
+	display: block;
+}
+
+/* ---------- Button icons ---------- */
+
+
+.btn-collapse {
+	&:before {
+		content: '+';
+	}
+
+	&.toggle:before {
+		content: '-';
+	}
+}
+
+.btn-var:before {
+	content: 'var';
+	font-family: menlo, source code pro, lucia console, monospace;
+}
+
+.error-btn .btn-content:before {
+	content: '\f071';
+}
+
+.screenshot-btn .btn-content:before {
+	content: '\f108';
+}

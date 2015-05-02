@@ -255,26 +255,26 @@ YUI.add(
 					instance._minimizeSidebar(event.currentTarget);
 				},
 
-				handleLineCompleted: function(id) {
+				handleLineTrigger: function(id, starting) {
 					var instance = this;
 
-					var container = instance._handleLine(id);
+					var linkedLine = instance.get(STR_XML_LOG).one('#' + id);
 
-					if (container && !container.hasClass(CSS_COLLAPSE)) {
-						instance._toggleContainer(container, false);
+					instance._setXmlNodeClass(linkedLine);
+
+					var container = linkedLine.one('> .child-container');
+
+					if (container) {
+						if (starting && container.hasClass(CSS_COLLAPSE)) {
+							instance._toggleContainer(container, false);
+
+							instance._scrollToNode(linkedLine);
+						}
+
+						else if (!starting && !container.hasClass(CSS_COLLAPSE)) {
+							instance._toggleContainer(container, false);
+						}
 					}
-				},
-
-				handleLineStarted: function(id) {
-					var instance = this;
-
-					var container = instance._handleLine(id);
-
-					if (container && container.hasClass(CSS_COLLAPSE)) {
-						instance._toggleContainer(container, false);
-					}
-
-					instance._scrollToNode(linkedLine);
 				},
 
 				renderUI: function() {
@@ -503,16 +503,6 @@ YUI.add(
 							targetNode.removeClass(CSS_TRANSITIONING);
 						}
 					);
-				},
-
-				_handleLine: function(id) {
-					var instance = this;
-
-					var linkedLine = instance.get(STR_XML_LOG).one('#' + id);
-
-					instance._setXmlNodeClass(linkedLine);
-
-					return linkedLine.one('> .child-container');
 				},
 
 				_injectXmlError: function(command) {
@@ -776,7 +766,11 @@ YUI.add(
 
 					var selector = 'data-status' + instance.get(STR_COMMAND_LOG_ID);
 
+					console.log(node)
+
 					var currentStatus = node.attr(selector);
+
+					console.log(currentStatus)
 
 					node.addClass(currentStatus);
 				},
