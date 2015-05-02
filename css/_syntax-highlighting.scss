@@ -39,11 +39,11 @@
 	}
 }
 
-.misc, .action-type, .tag-type {
+.action-type, .misc, .tag-type {
 	margin: 2px;
 }
 
-/* ---------- Xml-Log ---------- */
+/* ---------- XML log ---------- */
 
 .name {
 	color: #111;
@@ -57,8 +57,8 @@
 	color: #333;
 }
 
-.function > div .name, .macro > div .name {
-	color: #663615;
+.function, .macro {
+	> div .name {
+		color: #663615;
+	}
 }
-
-

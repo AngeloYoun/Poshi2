@@ -1,5 +1,4 @@
-
-/* ---------- Command-Log ---------- */
+/* ---------- Command log ---------- */
 
 .command-log {
 	font-family: Verdana, Geneva, sans-serif;
@@ -20,6 +19,10 @@
 
 		&.linkable:hover {
 			background-color: #FAE841;
+			color: #444;
+		}
+
+		.expand-toggle {
 			color: #444;
 		}
 	}
@@ -99,10 +102,6 @@
 			height: 10px;
 			width: 10px;
 		}
-	}
-
-	.current-scope .expand-toggle {
-		color: #444;
 	}
 
 	.failed {

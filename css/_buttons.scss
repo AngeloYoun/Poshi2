@@ -1,4 +1,3 @@
-
 /* ---------- Buttons ---------- */
 
 .btn {
@@ -42,38 +41,37 @@
 	border-color: #FF5335;
 	bottom: 0;
 	color: #FF5335;
+	display: none;
 	font-size: 17px;
 	margin-top: 1px;
 
-	&:hover, &:focus {
+	&:focus, &:hover{
 		color: #FF5335;
 	}
-}
 
-.screenshot-btn, .error-btn {
-	display: none;
+	&.toggle {
+		background: #FF5335;
+		color: #EBE7DC;
+	}
 }
 
 .fail {
-	.screenshot-btn, .error-btn {
+	.error-btn, .screenshot-btn {
 		display: inline-block;
 	}
 
-	.btn:hover {
-		background-color: transparent;
-	}
+	.btn {
+		&:hover {
+			background-color: transparent;
+		}
 
-	.btn.toggle:hover {
-		background-color: #FF5335;
+		&.toggle:hover {
+			background-color: #FF5335;
+		}
 	}
 }
 
-.error-btn.toggle, .screenshot-btn.toggle {
-	background: #FF5335;
-	color: #EBE7DC;
-}
-
-/* ---------- Sidebar Buttons ---------- */
+/* ---------- Sidebar buttons ---------- */
 
 .sidebar-btn-container {
 	left: -60px;
@@ -95,6 +93,7 @@
 			background-color: rgba(220, 220, 220, 0.7);
 		}
 	}
+
 	.btn-command-log {
 		&.toggle {
 			background-color: #444;
@@ -130,7 +129,6 @@
 }
 
 /* ---------- Button icons ---------- */
-
 
 .btn-collapse {
 	&:before {

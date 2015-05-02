@@ -813,6 +813,7 @@ YUI.add(
 
 							instance._toggleCommandLog(currentActiveLog);
 						}
+
 						newLogId = logId;
 
 						var commandFailures = commandLog.all('.failed');
@@ -828,6 +829,7 @@ YUI.add(
 							fails.each(instance._clearXmlErrors);
 						}
 					}
+
 					instance.set(STR_COMMAND_LOG_ID, newLogId);
 
 					instance._toggleXmlLogClasses(logId);
