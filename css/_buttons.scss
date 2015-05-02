@@ -45,7 +45,7 @@
 	font-size: 17px;
 	margin-top: 1px;
 
-	&:hover, &:focus {
+	&:focus, &:hover{
 		color: #FF5335;
 	}
 
@@ -71,7 +71,7 @@
 	}
 }
 
-/* ---------- Sidebar Buttons ---------- */
+/* ---------- Sidebar buttons ---------- */
 
 .sidebar-btn-container {
 	left: -60px;
@@ -93,6 +93,7 @@
 			background-color: rgba(220, 220, 220, 0.7);
 		}
 	}
+
 	.btn-command-log {
 		&.toggle {
 			background-color: #444;
@@ -128,7 +129,6 @@
 }
 
 /* ---------- Button icons ---------- */
-
 
 .btn-collapse {
 	&:before {
