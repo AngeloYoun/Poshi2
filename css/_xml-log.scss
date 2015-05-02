@@ -1,4 +1,3 @@
-
 /* ---------- XML-Log ---------- */
 
 .collapse, .header > .btn-container {
@@ -25,16 +24,11 @@
 	padding-left: 100px;
 }
 
-.child-container.root-container {
-	border-width: 0;
-	overflow: visible;
-}
-
 .line-container {
 	padding: 5px 3px;
 }
 
-.function > .line-container, .macro > .line-container:nth-of-type(2){
+.function > .line-container, .macro > .line-container:nth-of-type(2) {
 	cursor: pointer;
 }
 
@@ -50,14 +44,19 @@
 	list-style-type: none;
 	overflow: visible;
 	padding: 1px 0 1px 20px;
+
+	&.root-container {
+		border-width: 0;
+		overflow: visible;
+	}
+
+	&.transitioning {
+		overflow: hidden;
+	}
 }
 
 .header > .child-container {
 	height: auto;
-}
-
-.child-container.transitioning {
-	overflow: hidden;
 }
 
 .btn-container {
@@ -121,22 +120,24 @@
 		padding: 4px;
 	}
 
-	.hover.pass.function {
-		background: transparent;
-		outline-width: 0;
+	.hover {
+		&.pass {
+			&.function {
+				background: transparent;
+				outline-width: 0;
+			}
+
+			&, &.pending {
+				> .line-container {
+					background-color: #FFFBF1;
+				}
+			}
+		}
 	}
 
 	.current-scope.pass.function {
 		background: transparent;
 		outline-width: 0;
-	}
-
-	.hover {
-		&.pass, &.pending {
-			> .line-container {
-				background-color: #FFFBF1;
-			}
-		}
 	}
 
 	.current-scope {
