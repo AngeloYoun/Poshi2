@@ -766,11 +766,7 @@ YUI.add(
 
 					var selector = 'data-status' + instance.get(STR_COMMAND_LOG_ID);
 
-					console.log(node)
-
 					var currentStatus = node.attr(selector);
-
-					console.log(currentStatus)
 
 					node.addClass(currentStatus);
 				},
