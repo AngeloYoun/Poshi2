@@ -6,13 +6,13 @@ YUI.add(
 		var BODY = A.getBody();
 		var WIN = A.getWin();
 
-		var ATTR_DATA_LOG_ID = 'logId';
-
 		var ATTR_DATA_BUTTON_LINK_ID = 'btnLinkId';
 
 		var ATTR_DATA_ERROR_LINK_ID = 'errorLinkId';
 
 		var ATTR_DATA_FUNCTION_LINK_ID = 'functionLinkId';
+
+		var ATTR_DATA_LOG_ID = 'logId';
 
 		var CSS_COLLAPSE = 'collapse';
 
@@ -106,6 +106,23 @@ YUI.add(
 			},
 
 			prototype: {
+				renderUI: function() {
+					var instance = this;
+
+					var xmlLog = instance.get(STR_XML_LOG);
+					var sidebar = instance.get(STR_SIDEBAR);
+
+					xmlLog.toggleClass(STR_RUNNING);
+
+					var commandLog = sidebar.one('.command-log');
+
+					instance._toggleCommandLog(commandLog);
+
+					if (!xmlLog.hasClass(STR_RUNNING)) {
+						instance._minimizeSidebar();
+					}
+				},
+
 				bindUI: function() {
 					var instance = this;
 
@@ -116,7 +133,7 @@ YUI.add(
 				handleCommandCompleted: function(id) {
 					var instance = this;
 
-					var logIdSelector = '.command-log[data-logId="' + instance.get(STR_COMMAND_LOG_ID) +'"]';
+					var logIdSelector = '.command-log[data-logId="' + instance.get(STR_COMMAND_LOG_ID) + '"]';
 
 					var commandLog = instance.get(STR_SIDEBAR).one(logIdSelector);
 
@@ -139,12 +156,32 @@ YUI.add(
 					}
 				},
 
+				handleCurrentCommandSelect: function(event) {
+					var instance = this;
+
+					var xmlLog = instance.get(STR_XML_LOG);
+
+					var currentTargetAncestor = event.currentTarget.ancestor();
+
+					if (currentTargetAncestor) {
+						instance._parseCommandLog(currentTargetAncestor);
+
+						var functionLinkId = currentTargetAncestor.getData(ATTR_DATA_FUNCTION_LINK_ID);
+
+						var linkedFunction = xmlLog.one('.line-group[data-functionLinkId="' + functionLinkId + '"]');
+
+						instance._displayNode(linkedFunction);
+
+						instance._selectCurrentScope(linkedFunction);
+					}
+				},
+
 				handleCurrentScopeSelect: function(event) {
 					var instance = this;
 
 					var currentTarget = event.currentTarget.ancestor();
 
-					event.stopPropagation()
+					event.stopPropagation();
 
 					instance._displayNode(currentTarget);
 
@@ -169,38 +206,20 @@ YUI.add(
 					}
 				},
 
-				handleCurrentCommandSelect: function(event) {
-					var instance = this;
-
-					var xmlLog = instance.get(STR_XML_LOG);
-
-					var currentTargetAncestor = event.currentTarget.ancestor();
-
-					if (currentTargetAncestor) {
-						instance._parseCommandLog(currentTargetAncestor);
-
-						var functionLinkId = currentTargetAncestor.getData(ATTR_DATA_FUNCTION_LINK_ID);
-
-						var linkedFunction = xmlLog.one('.line-group[data-functionLinkId="' + functionLinkId + '"]');
-
-						instance._displayNode(linkedFunction);
-
-						instance._selectCurrentScope(linkedFunction);
-					}
-				},
-
 				handleFullScreenImageClick: function(event) {
 					var instance = this;
 
 					var fullScreenImageContainer = A.one('#fullScreenImage');
 
 					if (fullScreenImageContainer) {
+						var src;
+
 						var fullScreenImage = fullScreenImageContainer.one('#image');
 
 						if (fullScreenImage) {
 							var currentTarget = event.currentTarget;
 
-							var src = currentTarget.getData(STR_SRC);
+							src = currentTarget.getData(STR_SRC);
 
 							if (src) {
 								fullScreenImage.getData(STR_SRC, src);
@@ -217,42 +236,6 @@ YUI.add(
 					var instance = this;
 
 					instance._displayNode();
-				},
-
-				handleToggleCommandLogBtn: function(event) {
-					var instance = this;
-
-					var currentTarget = event.currentTarget;
-
-					var logId = currentTarget.getData(ATTR_DATA_LOG_ID);
-
-					var commandLog = instance._getCommandLogNode(logId);
-
-					instance._toggleCommandLog(commandLog, currentTarget);
-				},
-
-				handleToggleCollapseBtn: function(event, inSidebar) {
-					var instance = this;
-
-					var currentTarget = event.currentTarget;
-
-					var lookUpScope = instance.get(STR_XML_LOG);
-
-					if (inSidebar) {
-						lookUpScope = instance.get(STR_SIDEBAR);
-					}
-
-					var linkId = currentTarget.getData(ATTR_DATA_BUTTON_LINK_ID);
-
-					var collapsibleNode = lookUpScope.one('.child-container[data-btnLinkId="' + linkId + '"]');
-
-					instance._toggleContainer(collapsibleNode, inSidebar);
-				},
-
-				handleMinimizeSidebarBtn: function(event) {
-					var instance = this;
-
-					instance._minimizeSidebar(event.currentTarget);
 				},
 
 				handleLineTrigger: function(id, starting) {
@@ -277,21 +260,40 @@ YUI.add(
 					}
 				},
 
-				renderUI: function() {
+				handleMinimizeSidebarBtn: function(event) {
 					var instance = this;
 
-					var xmlLog = instance.get(STR_XML_LOG);
-					var sidebar = instance.get(STR_SIDEBAR);
+					instance._minimizeSidebar(event.currentTarget);
+				},
 
-					xmlLog.toggleClass(STR_RUNNING);
+				handleToggleCollapseBtn: function(event, inSidebar) {
+					var instance = this;
 
-					var commandLog = sidebar.one('.command-log');
+					var currentTarget = event.currentTarget;
 
-					instance._toggleCommandLog(commandLog);
+					var lookUpScope = instance.get(STR_XML_LOG);
 
-					if (!xmlLog.hasClass(STR_RUNNING)) {
-						instance._minimizeSidebar();
+					if (inSidebar) {
+						lookUpScope = instance.get(STR_SIDEBAR);
 					}
+
+					var linkId = currentTarget.getData(ATTR_DATA_BUTTON_LINK_ID);
+
+					var collapsibleNode = lookUpScope.one('.child-container[data-btnLinkId="' + linkId + '"]');
+
+					instance._toggleContainer(collapsibleNode, inSidebar);
+				},
+
+				handleToggleCommandLogBtn: function(event) {
+					var instance = this;
+
+					var currentTarget = event.currentTarget;
+
+					var logId = currentTarget.getData(ATTR_DATA_LOG_ID);
+
+					var commandLog = instance._getCommandLogNode(logId);
+
+					instance._toggleCommandLog(commandLog, currentTarget);
 				},
 
 				_bindSidebar: function() {
@@ -385,7 +387,7 @@ YUI.add(
 					if (targetNode && (!running || !running.contains(targetNode))) {
 						var height;
 
-						var collapsing = (targetNode.getStyle(STR_HEIGHT) != '0px');
+						var collapsing = targetNode.getStyle(STR_HEIGHT) != '0px';
 
 						if (collapsing) {
 							height = targetNode.outerHeight();
@@ -527,7 +529,6 @@ YUI.add(
 							}
 						);
 
-
 						var screenshotBtn = A.Lang.sub(
 							TPL_ERROR_BUTTONS,
 							{
@@ -555,7 +556,7 @@ YUI.add(
 
 					instance.get(STR_CONTENT_BOX).toggleClass('minimized-sidebar');
 
-					var button = button || instance.get(STR_SIDEBAR).one('.btn-sidebar')
+					button = button || instance.get(STR_SIDEBAR).one('.btn-sidebar');
 
 					button.toggleClass(CSS_TOGGLE);
 				},
@@ -620,7 +621,7 @@ YUI.add(
 
 						sidebarParameterTitle.removeClass(CSS_HIDDEN);
 
-						if ((scopeType != 'function') || (scopeType != 'macro')) {
+						if (scopeType != 'function' || scopeType != 'macro') {
 							sidebarParameterTitle.addClass(CSS_HIDDEN);
 						}
 						else {
@@ -685,6 +686,28 @@ YUI.add(
 					}
 				},
 
+				_scopeCommandLog: function(node) {
+					var instance = this;
+
+					if (node) {
+						var functionLinkId = node.getData(ATTR_DATA_FUNCTION_LINK_ID);
+
+						var functionLinkIdSelector = '.linkable[data-functionLinkId="' + functionLinkId + '"]';
+
+						node = instance.get(STR_SIDEBAR).all(functionLinkIdSelector);
+
+						var buffer = node.getDOMNodes().reverse();
+
+						var commandLogScope = instance.get(STR_COMMAND_LOG_SCOPE);
+
+						commandLogScope = commandLogScope.concat(buffer);
+
+						instance.set(STR_COMMAND_LOG_SCOPE, commandLogScope);
+
+						commandLogScope.addClass(CSS_CURRENT_SCOPE);
+					}
+				},
+
 				_scrollToNode: function(node, inSidebar) {
 					var instance = this;
 
@@ -696,7 +719,7 @@ YUI.add(
 						var halfNodeHeight = node.innerHeight() / 2;
 						var halfWindowHeight = WIN.height() / 2;
 
-						var offsetHeight = (halfWindowHeight - halfNodeHeight);
+						var offsetHeight = halfWindowHeight - halfNodeHeight;
 
 						var nodeY = node.getY();
 
@@ -706,7 +729,7 @@ YUI.add(
 							var dividerLine = scrollNode.one('.divider-line');
 
 							if (dividerLine) {
-								nodeY = nodeY - dividerLine.getY();
+								nodeY -= dividerLine.getY();
 							}
 						}
 
@@ -723,46 +746,6 @@ YUI.add(
 							}
 						).run();
 					}
-				},
-
-				_scopeCommandLog: function(node) {
-					var instance = this;
-
-					var buffer = [];
-
-					if (node) {
-						var functionLinkId = node.getData(ATTR_DATA_FUNCTION_LINK_ID);
-
-						var functionLinkIdSelector = '.linkable[data-functionLinkId="' + functionLinkId + '"]';
-
-						node = instance.get(STR_SIDEBAR).all(functionLinkIdSelector);
-
-						var buffer = node.getDOMNodes().reverse();
-					}
-
-					var commandLogScope = instance.get(STR_COMMAND_LOG_SCOPE);
-
-					commandLogScope = commandLogScope.concat(buffer);
-
-					instance.set(STR_COMMAND_LOG_SCOPE, commandLogScope);
-
-					commandLogScope.addClass(CSS_CURRENT_SCOPE);
-				},
-
-				_setXmlNodeClass: function(node) {
-					var instance = this;
-
-					var status = instance.get(STR_STATUS);
-
-					for (var i = 0; i < status.length; i++) {
-						node.removeClass(status[i]);
-					}
-
-					var selector = 'data-status' + instance.get(STR_COMMAND_LOG_ID);
-
-					var currentStatus = node.getData(selector);
-
-					node.addClass(currentStatus);
 				},
 
 				_selectCurrentScope: function(node) {
@@ -783,6 +766,22 @@ YUI.add(
 					}
 
 					instance._refreshEditMenu();
+				},
+
+				_setXmlNodeClass: function(node) {
+					var instance = this;
+
+					var status = instance.get(STR_STATUS);
+
+					for (var i = 0; i < status.length; i++) {
+						node.removeClass(status[i]);
+					}
+
+					var selector = 'data-status' + instance.get(STR_COMMAND_LOG_ID);
+
+					var currentStatus = node.getData(selector);
+
+					node.addClass(currentStatus);
 				},
 
 				_toggleCommandLog: function(commandLog, button) {
@@ -812,12 +811,12 @@ YUI.add(
 
 						var commandFailures = commandLog.all('.failed');
 
-						commandFailures.each(instance._injectXmlError, instance)
+						commandFailures.each(instance._injectXmlError, instance);
 					}
 					else {
 						newLogId = null;
 
-						fails = instance.get(STR_XML_LOG).all(SELECTOR_FAIL);
+						var fails = instance.get(STR_XML_LOG).all(SELECTOR_FAIL);
 
 						if (fails.size()) {
 							fails.each(instance._clearXmlErrors);
@@ -852,7 +851,7 @@ YUI.add(
 
 					var linkId = collapsibleContainer.getData(ATTR_DATA_BUTTON_LINK_ID);
 
-					collapsibleBtn = lookUpScope.one('.btn[data-btnLinkId="' + linkId + '"]');
+					var collapsibleBtn = lookUpScope.one('.btn[data-btnLinkId="' + linkId + '"]');
 
 					var collapsed = instance._collapseTransition(collapsibleContainer);
 
@@ -884,7 +883,7 @@ YUI.add(
 
 					commandLog.toggleClass(CSS_COLLAPSE);
 
-					instance.get(STR_CONTENT_BOX).toggleClass('command-logger')
+					instance.get(STR_CONTENT_BOX).toggleClass('command-logger');
 
 					var lastChildLog = commandLog.one('.line-group:last-child');
 
@@ -906,6 +905,6 @@ YUI.add(
 	},
 	'',
 	{
-		requires: ['aui-component', 'anim', 'aui-base', 'aui-node', 'event', 'resize', 'transition', 'widget']
+		requires: ['anim', 'aui-base', 'aui-component', 'aui-node', 'event', 'resize', 'transition', 'widget']
 	}
 );
