@@ -6,13 +6,13 @@ YUI.add(
 		var BODY = A.getBody();
 		var WIN = A.getWin();
 
-		var ATTR_DATA_LOG_ID = 'data-logId';
+		var ATTR_DATA_LOG_ID = 'logId';
 
-		var ATTR_DATA_BUTTON_LINK_ID = 'data-btnLinkId';
+		var ATTR_DATA_BUTTON_LINK_ID = 'btnLinkId';
 
-		var ATTR_DATA_ERROR_LINK_ID = 'data-errorLinkId';
+		var ATTR_DATA_ERROR_LINK_ID = 'errorLinkId';
 
-		var ATTR_DATA_FUNCTION_LINK_ID = 'data-functionLinkId';
+		var ATTR_DATA_FUNCTION_LINK_ID = 'functionLinkId';
 
 		var CSS_COLLAPSE = 'collapse';
 
@@ -160,7 +160,7 @@ YUI.add(
 
 					var xmlLog = instance.get(STR_XML_LOG);
 
-					var errorLinkId = currentTarget.attr(ATTR_DATA_ERROR_LINK_ID);
+					var errorLinkId = currentTarget.getData(ATTR_DATA_ERROR_LINK_ID);
 
 					var errorPanel = xmlLog.one('.errorPanel[data-errorLinkId="' + errorLinkId + '"]');
 
@@ -179,7 +179,7 @@ YUI.add(
 					if (currentTargetAncestor) {
 						instance._parseCommandLog(currentTargetAncestor);
 
-						var functionLinkId = currentTargetAncestor.attr(ATTR_DATA_FUNCTION_LINK_ID);
+						var functionLinkId = currentTargetAncestor.getData(ATTR_DATA_FUNCTION_LINK_ID);
 
 						var linkedFunction = xmlLog.one('.line-group[data-functionLinkId="' + functionLinkId + '"]');
 
@@ -200,10 +200,10 @@ YUI.add(
 						if (fullScreenImage) {
 							var currentTarget = event.currentTarget;
 
-							var src = currentTarget.attr(STR_SRC);
+							var src = currentTarget.getData(STR_SRC);
 
 							if (src) {
-								fullScreenImage.attr(STR_SRC, src);
+								fullScreenImage.getData(STR_SRC, src);
 							}
 
 							fullScreenImage.toggleClass('hide', !src);
@@ -224,7 +224,7 @@ YUI.add(
 
 					var currentTarget = event.currentTarget;
 
-					var logId = currentTarget.attr(ATTR_DATA_LOG_ID);
+					var logId = currentTarget.getData(ATTR_DATA_LOG_ID);
 
 					var commandLog = instance._getCommandLogNode(logId);
 
@@ -242,7 +242,7 @@ YUI.add(
 						lookUpScope = instance.get(STR_SIDEBAR);
 					}
 
-					var linkId = currentTarget.attr(ATTR_DATA_BUTTON_LINK_ID);
+					var linkId = currentTarget.getData(ATTR_DATA_BUTTON_LINK_ID);
 
 					var collapsibleNode = lookUpScope.one('.child-container[data-btnLinkId="' + linkId + '"]');
 
@@ -372,8 +372,7 @@ YUI.add(
 
 					var btnContainer = command.one('.btn-container');
 
-					btnContainer.one('.screenshot-btn').remove();
-					btnContainer.one('.error-btn').remove();
+					btnContainer.all('.screenshot-btn', '.error-btn').remove();
 				},
 
 				_collapseTransition: function(targetNode) {
@@ -391,7 +390,7 @@ YUI.add(
 						if (collapsing) {
 							height = targetNode.outerHeight();
 
-							targetNode.setStyle(STR_HEIGHT, height);
+							targetNode.height(height);
 
 							instance.set(STR_RUNNING, targetNode);
 
@@ -495,7 +494,7 @@ YUI.add(
 								targetNode.addClass(CSS_COLLAPSE);
 							}
 							else {
-								targetNode.setStyle(STR_HEIGHT, 'auto');
+								targetNode.height('auto');
 							}
 
 							instance.set(STR_RUNNING, null);
@@ -511,7 +510,7 @@ YUI.add(
 					var consoleLog = command.one('.console');
 					var screenshot = command.one('.screenshots');
 
-					var functionLinkId = command.attr(ATTR_DATA_FUNCTION_LINK_ID);
+					var functionLinkId = command.getData(ATTR_DATA_FUNCTION_LINK_ID);
 
 					var functionLinkIdSelector = '.line-group[data-functionLinkId="' + functionLinkId + '"]';
 
@@ -524,7 +523,7 @@ YUI.add(
 							TPL_ERROR_BUTTONS,
 							{
 								cssClass: 'error-btn',
-								linkId: consoleLog.attr(ATTR_DATA_ERROR_LINK_ID)
+								linkId: consoleLog.getData(ATTR_DATA_ERROR_LINK_ID)
 							}
 						);
 
@@ -533,7 +532,7 @@ YUI.add(
 							TPL_ERROR_BUTTONS,
 							{
 								cssClass: 'screenshot-btn',
-								linkId: screenshot.attr(ATTR_DATA_ERROR_LINK_ID)
+								linkId: screenshot.getData(ATTR_DATA_ERROR_LINK_ID)
 							}
 						);
 
@@ -615,13 +614,11 @@ YUI.add(
 
 						var sidebarParameterList = sidebar.one('.parameter .parameter-list');
 
-						sidebarParameterList.all('> *').remove();
+						sidebarParameterList.empty();
 
 						var sidebarParameterTitle = sidebar.one('.parameter .title');
 
 						sidebarParameterTitle.removeClass(CSS_HIDDEN);
-
-						var parameterCount;
 
 						if ((scopeType != 'function') || (scopeType != 'macro')) {
 							sidebarParameterTitle.addClass(CSS_HIDDEN);
@@ -631,8 +628,9 @@ YUI.add(
 
 							if (scopeType === 'macro') {
 								var parameters = currentScope.all('> .line-container .parameter-container .parameter-value');
+								var parameterSize = parameters.size();
 
-								for (var i = 0; i < parameters.size(); i += 2) {
+								for (var i = 0; i < parameterSize; i += 2) {
 									buffer.push(
 										A.Lang.sub(
 											TPL_PARAMETER,
@@ -655,7 +653,7 @@ YUI.add(
 								}
 							}
 							else if (scopeType === 'function') {
-								parameterCount = scopeNames.size() - 1;
+								var parameterCount = scopeNames.size() - 1;
 
 								for (var i = 1; i <= parameterCount; i++) {
 									buffer.push(
@@ -733,17 +731,13 @@ YUI.add(
 					var buffer = [];
 
 					if (node) {
-						var functionLinkId = node.attr(ATTR_DATA_FUNCTION_LINK_ID);
+						var functionLinkId = node.getData(ATTR_DATA_FUNCTION_LINK_ID);
 
 						var functionLinkIdSelector = '.linkable[data-functionLinkId="' + functionLinkId + '"]';
 
 						node = instance.get(STR_SIDEBAR).all(functionLinkIdSelector);
 
-						while(node.size()) {
-							var lastEl = node.pop();
-
-							buffer.push(lastEl);
-						}
+						var buffer = node.getDOMNodes().reverse();
 					}
 
 					var commandLogScope = instance.get(STR_COMMAND_LOG_SCOPE);
@@ -766,7 +760,7 @@ YUI.add(
 
 					var selector = 'data-status' + instance.get(STR_COMMAND_LOG_ID);
 
-					var currentStatus = node.attr(selector);
+					var currentStatus = node.getData(selector);
 
 					node.addClass(currentStatus);
 				},
@@ -797,7 +791,7 @@ YUI.add(
 					var commandLogId = instance.get(STR_COMMAND_LOG_ID);
 					var sidebar = instance.get(STR_SIDEBAR);
 
-					var logId = commandLog.attr(ATTR_DATA_LOG_ID);
+					var logId = commandLog.getData(ATTR_DATA_LOG_ID);
 
 					var logIdSelector = '.btn-command-log[data-logId="' + logId + '"]';
 
@@ -856,7 +850,7 @@ YUI.add(
 						lookUpScope = instance.get(STR_SIDEBAR);
 					}
 
-					var linkId = collapsibleContainer.attr(ATTR_DATA_BUTTON_LINK_ID);
+					var linkId = collapsibleContainer.getData(ATTR_DATA_BUTTON_LINK_ID);
 
 					collapsibleBtn = lookUpScope.one('.btn[data-btnLinkId="' + linkId + '"]');
 
