@@ -1,7 +1,7 @@
 /* ---------- Command log ---------- */
 
 .command-log {
-	font-family: Verdana, Geneva, sans-serif;
+	font-family: $command-log-font;
 	height: 100%;
 	overflow-y: scroll;
 	padding: 0;
@@ -12,18 +12,18 @@
 	}
 
 	.current-scope {
-		background-color: #FFEB7B;
-		border: 2px solid #AAA;
-		color: #555;
+		background-color: $scoped-command-bg-color;
+		border: $scoped-command-border;
+		color: $scoped-command-text-color;
 		outline-width: 0;
 
 		&.linkable:hover {
-			background-color: #FAE841;
-			color: #444;
+			background-color: $scoped-command-hover-bg-color;
+			color: $scoped-command-hover-text-color;
 		}
 
 		.expand-toggle {
-			color: #444;
+			color: $scoped-command-expand-toggle-color;
 		}
 	}
 
@@ -45,15 +45,15 @@
 		transition: all 0.3s ease;
 
 		&:hover {
-			background: #648590;
-			color: #FFF;
-			outline: 1px solid #777;
+			background: $command-hover-bg-color;
+			color: $command-hover-text-color;
+			outline: 1px solid $command-hover-outline-color;
 		}
 	}
 
 	.divider-line {
-		background: #B0A696;
-		color: #484B4D;
+		background: $command-log-divider-bg-color;
+		color: $command-log-divider-text-color;
 		font-size: 12px;
 		font-weight: bold;
 		height: auto;
@@ -66,10 +66,10 @@
 	}
 
 	.child-container {
-		border: 1px dashed #EEE;
+		border: 1px dashed $command-child-container-border-color;
 		border-right-width: 0;
 		border-top-width: 0;
-		color: #FFF;
+		color: $command-child-container-text-color;
 		margin: 0 0 9px 24px;
 		overflow: hidden;
 
@@ -81,7 +81,7 @@
 	.expand-toggle {
 		background: transparent;
 		border-width: 0;
-		color: #DDD;
+		color: $command-log-expand-toggle-hover-color;
 		cursor: pointer;
 		height: 20px;
 		line-height: inherit;
@@ -92,12 +92,12 @@
 		width: 20px;
 
 		&:hover {
-			color: #FFF;
+			color: $command-log-expand-toggle-color;
 		}
 
 		&:before {
 			content: '\f105';
-			font-family: fontAwesome;
+			font-family: 'FontAwesome';
 			font-size: 14px;
 			height: 10px;
 			width: 10px;
@@ -105,18 +105,18 @@
 	}
 
 	.failed {
-		background-color: #E2604C;
+		background-color: $failed-command-bg-color;
 
 		&.current-scope {
-			background-color: #EE6C39;
+			background-color: $failed-command-scoped-bg-color;
 		}
 
 		&:hover {
-			background-color: #F0652B;
+			background-color: $failed-command-hover-bg-color;
 		}
 
 		.expand-toggle {
-			color: #FBEFB4;
+			color: $failed-expand-toggle-color;
 		}
 	}
 

@@ -1,9 +1,9 @@
 /* ---------- Global ---------- */
 
 body {
-	background-color: #EBE7DC;
-	font-family: menlo, source code pro, lucia console, monospace;;
-	font-size: 11px;
+	background-color: $body-bg-color;
+	font-family: $xml-log-font;
+	font-size: $body-font-size;
 	line-height: 1.75em;
 	margin: 0;
 	overflow-x: hidden;

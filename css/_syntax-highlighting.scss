@@ -3,39 +3,42 @@
 /* ---------- Sidebar ---------- */
 
 .command-name {
-	color: #8CEFF6;
+	color: $command-name-color;
 }
 
 .current-scope .command-name {
-	color: #447090;
+	color: $scoped-command-name-color;
 }
 
-.locator-key {
-	color: #CFCFCD;
+.param-type {
+	color: $param-type-color;
 }
 
 .failed {
 	.command-name {
-		color: #FBF4D7;
+		color: $failed-command-name-color;
 	}
 
-	.locator-key, .value {
-		color: #FFE4C7;
+	.param-type {
+		color: $failed-param-type-color;
+	}
+
+	.param-value {
+		color: $failed-param-value-color;
 	}
 }
 
 .command-log .child-container {
-	b {
-		color: #FDBA93;
-		font-weight: 300;
-
-		&:first-child {
-			color: #E9C993;
-		}
+	.command-name {
+		color: $sub-command-name-color;
 	}
 
-	.command-failure {
-		color: #FC8686;
+	.param-value {
+		color: $sub-param-value-color;
+	}
+
+	.error-line .command-name {
+		color: $sub-failed-command-name-color;
 	}
 }
 
@@ -46,19 +49,19 @@
 /* ---------- XML log ---------- */
 
 .name {
-	color: #111;
+	color: $xml-name-color;
 }
 
 .current-scope.pass .name {
-	color: #447090;
+	color: $xml-scoped-name-color;
 }
 
 .tag-type {
-	color: #333;
+	color: $xml-tag-type-color;
 }
 
 .function, .macro {
 	> div .name {
-		color: #663615;
+		color: $xml-selectable-name-color;
 	}
 }
