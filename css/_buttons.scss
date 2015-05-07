@@ -1,5 +1,6 @@
 /* ---------- Buttons ---------- */
-.btn-command-log, .btn-error, .btn-jump-to-error, .btn-screenshot, .btn-sidebar{
+
+.btn-command-log, .btn-error, .btn-jump-to-error, .btn-screenshot, .btn-sidebar {
 	font-family: 'FontAwesome';
 }
 
@@ -47,7 +48,7 @@
 	font-size: 17px;
 	margin-top: 1px;
 
-	&:focus, &:hover{
+	&:focus, &:hover {
 		background-color: transparent;
 		color: $button-error-color;
 	}
