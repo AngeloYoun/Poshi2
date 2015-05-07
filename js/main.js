@@ -222,7 +222,7 @@ YUI.add(
 							src = currentTarget.getData(STR_SRC);
 
 							if (src) {
-								fullScreenImage.getData(STR_SRC, src);
+								fullScreenImage.setData(STR_SRC, src);
 							}
 
 							fullScreenImage.toggleClass('hide', !src);
@@ -250,7 +250,6 @@ YUI.add(
 					if (container) {
 						if (starting && container.hasClass(CSS_COLLAPSE)) {
 							instance._toggleContainer(container, false);
-
 							instance._scrollToNode(linkedLine);
 						}
 
@@ -694,9 +693,9 @@ YUI.add(
 
 						var functionLinkIdSelector = '.linkable[data-functionLinkId="' + functionLinkId + '"]';
 
-						node = instance.get(STR_SIDEBAR).all(functionLinkIdSelector);
+						var nodes = instance.get(STR_SIDEBAR).all(functionLinkIdSelector);
 
-						var buffer = node.getDOMNodes().reverse();
+						var buffer = nodes.getDOMNodes().reverse();
 
 						var commandLogScope = instance.get(STR_COMMAND_LOG_SCOPE);
 
