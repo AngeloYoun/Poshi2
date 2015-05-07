@@ -773,7 +773,9 @@ YUI.add(
 
 					var status = instance.get(STR_STATUS);
 
-					for (var i = 0; i < status.length; i++) {
+					var statusLength = status.length;
+
+					for (var i = 0; i < statusLength; i++) {
 						node.removeClass(status[i]);
 					}
 
@@ -867,7 +869,9 @@ YUI.add(
 
 					var selector = 'data-status' + logId;
 
-					for (var i = 0; i < status.length; i++) {
+					var statusLength = status.length;
+
+					for (var i = 0; i < statusLength; i++) {
 						var currentStatus = status[i];
 
 						var currentStatusSelector = '[' + selector + '="' + currentStatus + '"]';
