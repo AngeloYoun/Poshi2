@@ -365,7 +365,7 @@ YUI.add(
 					xmlLog.delegate(
 						'click',
 						A.bind('handleErrorBtns', instance),
-						'.error-btn, .screenshot-btn'
+						'.btn-error, .btn-screenshot'
 					);
 				},
 
@@ -374,7 +374,7 @@ YUI.add(
 
 					var btnContainer = command.one('.btn-container');
 
-					btnContainer.all('.screenshot-btn', '.error-btn').remove();
+					btnContainer.all('[data-' + ATTR_DATA_ERROR_LINK_ID + ']').remove();
 				},
 
 				_collapseTransition: function(targetNode) {
@@ -524,7 +524,7 @@ YUI.add(
 						var consoleBtn = A.Lang.sub(
 							TPL_ERROR_BUTTONS,
 							{
-								cssClass: 'error-btn',
+								cssClass: 'btn-error',
 								linkId: consoleLog.getData(ATTR_DATA_ERROR_LINK_ID)
 							}
 						);
@@ -532,7 +532,7 @@ YUI.add(
 						var screenshotBtn = A.Lang.sub(
 							TPL_ERROR_BUTTONS,
 							{
-								cssClass: 'screenshot-btn',
+								cssClass: 'btn-screenshot',
 								linkId: screenshot.getData(ATTR_DATA_ERROR_LINK_ID)
 							}
 						);
